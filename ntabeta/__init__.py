@@ -1,1 +1,3 @@
-__version__ = '0.0.1'
+from ntabeta.client import Client
+
+__version__ = '0.0.2'
