@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import os
 from ntabeta import __version__
-
+ 
 f = open(os.path.join(os.path.dirname(__file__), 'README.md'))
 long_description = f.read()
 f.close()
