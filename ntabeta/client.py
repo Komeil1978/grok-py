@@ -13,7 +13,7 @@ class Client(object):
   '''
   
   def __init__(self, key = None,
-               baseURL = 'http://50.17.120.110:1961/version/1/'):
+               baseURL = 'http://107.22.77.223:1961/version/1/'):
     '''
     Instantiate a ntabeta client
     '''
