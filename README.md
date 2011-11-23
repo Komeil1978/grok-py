@@ -1,6 +1,6 @@
 # ntabeta-py
 
-The Python client library for the ntabeta Prediction Service
+The Python client library for the Grok Prediction Service
 
 ## Installation
 

@@ -3,7 +3,7 @@
   #############################################################################
   HELLO PREDICTIONS!
   
-  Welcome to the ntabeta Prediction Service!
+  Welcome to the Grok Prediction Service!
   
   We hope this example application will serve as inspiration for your own
   creative uses of our service.
@@ -15,15 +15,15 @@
   #############################################################################
 '''
 
-import ntabeta
+import grokpy
 
 def HelloPredictions():
   
   '''
   The first thing that you'll need is your API key. You've created an account
-  at ntabeta.numenta.com right?
+  at grok.numenta.com right?
   
-  Go to ntabeta.numenta.com/account and look for your API key now. I'll wait ...
+  Go to grok.numenta.com/account and look for your API key now. I'll wait ...
   
   Back? Good! Enter that key below
 
@@ -32,7 +32,7 @@ def HelloPredictions():
   
   From the command line:
 
-    echo "export ntabeta_API_KEY=PUT_YOUR_KEY_HERE" >> ~/.bashrc
+    echo "export grok_API_KEY=PUT_YOUR_KEY_HERE" >> ~/.bashrc
     source ~/.bashrc
   '''
   
@@ -40,16 +40,16 @@ def HelloPredictions():
   
   '''
   Now we need to instantiate a client object. This will be the single point of
-  entry for all your code that interacts with the ntabeta Prediction Service.
+  entry for all your code that interacts with the Grok Prediction Service.
   '''
   
-  c = ntabeta.Client(key)
+  c = grokpy.Client(key)
   
   url = 'version/1/service/providerList'
   
   services = c.availableServices()
   
-  print 'The following services are available from the ntabeta API:'
+  print 'The following services are available from the Grok API:'
   for service in services:
     print service
 

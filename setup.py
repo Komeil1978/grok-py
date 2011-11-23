@@ -1,17 +1,17 @@
 #!/usr/bin/python
 import os
-from ntabeta import __version__
+from grokpy import __version__
  
 f = open(os.path.join(os.path.dirname(__file__), 'README.md'))
 long_description = f.read()
 f.close()
 
 sdict = {
-    'name' : 'ntabeta',
+    'name' : 'grokpy',
     'version' : __version__,
-    'description' : 'Python client for ntabeta Prediction Service',
+    'description' : 'Python client for Grok Prediction Service',
     'long_description' : long_description,
-    'url': 'http://github.com/numenta/ntabeta-py',
+    'url': 'http://github.com/numenta/grok-py',
     #'download_url' : 'http://cloud.github.com/downloads/andymccurdy/redis-py/redis-%s.tar.gz' % __version__,
     'author' : 'Ian Danforth',
     'author_email' : 'idanforth@numenta.com',
@@ -19,7 +19,7 @@ sdict = {
     'maintainer_email' : 'idanforth@numenta.com',
     'keywords' : ['numenta', 'prediction'],
     'license' : 'MIT',
-    'packages' : ['ntabeta'],
+    'packages' : ['grokpy'],
     'test_suite' : 'tests.all_tests',
     'classifiers' : [
         'Development Status :: 1 - Planning Development Status',

@@ -2,20 +2,20 @@ import os
 import urllib2
 import json
 
-from ntabeta.exceptions import (ntabetaError,
-                                AuthenticationError)
+from grokpy.exceptions import (GrokpyError,
+                               AuthenticationError)
 
 class Client(object):
   '''
-  Client for the ntabeta Prediction Service
+  Client for the Grok Prediction Service
   
-  This class wraps services provided by the ntabeta API
+  This class wraps services provided by the Grok API
   '''
   
   def __init__(self, key = None,
-               baseURL = 'http://107.22.77.223:1961/version/1/'):
+               baseURL = 'http://107.22.53.125:1961/version/1/'):
     '''
-    Instantiate a ntabeta client
+    Instantiate a Grok client
     '''
     
     # Search for API key in environment
@@ -36,13 +36,13 @@ class Client(object):
             Add your credentials to your shell environment. From the command
             line:
 
-            echo "export ntabeta_API_KEY=D23984KJHKJH" >> ~/.bashrc
+            echo "export GROK_API_KEY=D23984KJHKJH" >> ~/.bashrc
             source ~/.bashrc
   
             For either method please replace the dummy key value with your real
             key from your account page.
 
-            http://ntabeta.numenta.com/account""" % self.__class__.__name__)
+            http://grok.numenta.com/account""" % self.__class__.__name__)
         
     # The API we'll use to authenticate all HTTP calls.
     self.key = key
@@ -52,9 +52,10 @@ class Client(object):
     
   def request(self, path, method = None):
     '''
-    Make a call directly to the ntabeta API and print the returned JSON
+    Make a call directly to the Grok API and print the returned JSON
     '''
     uri = self.baseURL + path
+    print uri
     
     rv = urllib2.urlopen(uri)
     
@@ -67,29 +68,29 @@ class Client(object):
   
   def availableServices(self):
     '''
-    Returns a list of the ntabeta Services
+    Returns a list of the Grok Services
     '''
     return self.request('')
   
   def cachePurge(self):
     pass
   
+  def dataUpload(self):
+    pass
+
   def dataUploadInit(self):
     pass
   
-  def dataUploadProgres(self):
-    pass
-  
-  def dataUpload(self):
-    pass
-  
-  def fileUpload(self):
+  def dataUploadProgress(self):
     pass
   
   def inputCacheAppend(self):
     pass
   
   def inputCacheData(self):
+    pass
+
+  def joinedDataService(self):
     pass
   
   '''
@@ -161,10 +162,10 @@ class Client(object):
   SEARCH
   '''
   
-  def searchCancel(self):
+  def searchCacheData(self):
     pass
-  
-  def searchData(self):
+
+  def searchCancel(self):
     pass
   
   def searchList(self):
@@ -184,7 +185,7 @@ def find_key():
   Retrieve an API key from the user's shell environment
   '''
   try:
-    key = os.environ["ntabeta_API_KEY"]
+    key = os.environ["GROK_API_KEY"]
   except KeyError:
     return None
   

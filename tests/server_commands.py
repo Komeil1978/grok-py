@@ -1,4 +1,4 @@
-import ntabeta
+import grokpy
 import unittest
 
 class ServerCommandsTestCase(unittest.TestCase):
