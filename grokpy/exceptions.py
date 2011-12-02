@@ -2,8 +2,8 @@
 Base exceptions for the Grok Client Library
 '''
 
-class GrokpyError(Exception):
+class GrokError(Exception):
   pass
 
-class AuthenticationError(GrokpyError):
+class AuthenticationError(GrokError):
   pass

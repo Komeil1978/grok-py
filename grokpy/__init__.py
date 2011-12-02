@@ -1,3 +1,3 @@
-from grokpy.client import Client
+from grokpy import Grokpy
 
 __version__ = '0.0.2'

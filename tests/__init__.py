@@ -1,8 +1,13 @@
 import unittest
 
-from server_commands import ServerCommandsTestCase
+from TestConnection import ConnectionTestCase
+from TestProject import ProjectTestCase
 
 def all_tests():
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ServerCommandsTestCase))
+    
+    # Add tests to run here
+    suite.addTest(unittest.makeSuite(ConnectionTestCase))
+    suite.addTest(unittest.makeSuite(ProjectTestCase))
+    
     return suite

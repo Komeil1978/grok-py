@@ -1,4 +1,4 @@
-# ntabeta-py
+# grok-py
 
 The Python client library for the Grok Prediction Service
 

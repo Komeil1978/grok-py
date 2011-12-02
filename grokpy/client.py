@@ -1,4 +1,5 @@
 import os
+import urllib
 import urllib2
 import json
 
@@ -13,7 +14,7 @@ class Client(object):
   '''
   
   def __init__(self, key = None,
-               baseURL = 'http://107.22.53.125:1961/version/1/'):
+               baseURL = 'http://50.19.178.199:1961/version/1/'):
     '''
     Instantiate a Grok client
     '''
@@ -50,27 +51,26 @@ class Client(object):
     # The base path for all our HTTP calls
     self.baseURL = baseURL + 'apiKey/' + self.key + '/'
     
-  def request(self, path, method = None):
+  def request(self, path, returns = True):
     '''
     Make a call directly to the Grok API and print the returned JSON
     '''
     uri = self.baseURL + path
     print uri
     
-    rv = urllib2.urlopen(uri)
-    
-    pyResults = json.loads(rv.read())
-    
-    return pyResults['result']
+    if returns:
+      rv = urllib2.urlopen(uri)
+      pyResults = json.loads(rv.read())
+      if pyResults.get('result'):
+        return pyResults['result']
+      else:
+        return pyResults
+    else:
+      urllib2.urlopen(uri)
+      return
     
   #############################################################################
-  # API Services
-  
-  def availableServices(self):
-    '''
-    Returns a list of the Grok Services
-    '''
-    return self.request('')
+  # API Methods
   
   def cachePurge(self):
     pass
@@ -78,13 +78,13 @@ class Client(object):
   def dataUpload(self):
     pass
 
-  def dataUploadInit(self):
+  def initDataUpload(self):
     pass
   
   def dataUploadProgress(self):
     pass
   
-  def inputCacheAppend(self):
+  def appendToInputCache(self):
     pass
   
   def inputCacheData(self):
@@ -97,60 +97,79 @@ class Client(object):
   MODELS
   '''
   
-  def modelCopy(self):
+  def copyModel(self):
     pass
   
-  def modelCreate(self):
+  def createModel(self, projectId, modelName):
+    '''
+    Creates a new model
+    '''
+    modelName = urllib.quote(modelName)
+    return self.request('service/searchModelCreate/projectId/' + str(projectId) + '/name/' + modelName)
+    
+  def deleteModel(self):
     pass
   
-  def modelDelete(self):
-    pass
-  
-  def modelList(self):
+  def listModels(self):
     pass
   
   def modelPredictions(self):
     pass
   
-  def modelRead(self):
+  def readFromModel(self):
     pass
   
-  def modelUpdate(self):
+  def updateModel(self):
     pass
   
   '''
   PROJECTS
   '''
+
+  def createProject(self, name):
+    
+    name = urllib.quote(name)
+    return self.request('service/projectCreate/name/' + name)
   
-  def projectCreate(self):
-    pass
+  def deleteProject(self, projectId):
+    '''
+    Deletes a project with the given id
+    '''
+    returns = False
+    return self.request('service/projectDelete/projectId/' + str(projectId), returns)    
   
-  def projectDelete(self):
-    pass
+  def listProjects(self):
+    '''
+    Returns a list of project objects. Each object is like calling
+    projectInfo() on each project
+    '''
+    
+    return self.request('service/projectList')
+    
+  def projectInfo(self, projectId):
+    '''
+    Returns a dictionary containing project meta data
+    '''
+    
+    return self.request('service/projectRead/projectId/' + str(projectId))
   
-  def projectList(self):
-    pass
-  
-  def projectRead(self):
-    pass
-  
-  def projectUpdate(self):
+  def updateProject(self):
     pass
   
   '''
   PROVIDERS
   '''
   
-  def providerFileDelete(self):
+  def deleteProviderFile(self):
     pass
   
-  def providerFileList(self):
+  def listProviderFiles(self):
     pass
   
-  def providerFileUpload(self):
+  def uploadProviderFile(self):
     pass
   
-  def providerList(self):
+  def listProviders(self):
     '''
     Get a list of available data providers and the specification for using them
     as part of a search
@@ -165,10 +184,10 @@ class Client(object):
   def searchCacheData(self):
     pass
 
-  def searchCancel(self):
+  def cancelSearch(self):
     pass
   
-  def searchList(self):
+  def listSearches(self):
     pass
   
   def searchProgress(self):
@@ -177,7 +196,7 @@ class Client(object):
   def searchResult(self):
     pass
   
-  def searchStart(self):
+  def startSearch(self):
     pass
         
 def find_key():

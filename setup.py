@@ -22,10 +22,11 @@ sdict = {
     'packages' : ['grokpy'],
     'test_suite' : 'tests.all_tests',
     'classifiers' : [
-        'Development Status :: 1 - Planning Development Status',
+        'Development Status :: 1 - Planning',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python'],
 }
