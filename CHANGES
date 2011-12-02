@@ -1,4 +1,10 @@
 ###############################################################################
+# 0.0.3
+
+- Move to object model more closely mimicing the API object model
+- Extend HelloPrediction script through project configurationy
+
+###############################################################################
 # 0.0.2
 
 - Populate client.py with stubs for API services
