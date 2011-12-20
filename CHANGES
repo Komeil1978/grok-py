@@ -1,7 +1,12 @@
 ###############################################################################
+# 0.0.4
+
+- Install regression fix
+
+###############################################################################
 # 0.0.3
 
-- Move to object model more closely mimicing the API object model
+- Move to object model more closely mimicking the API object model
 - Extend HelloPrediction script through project configurationy
 
 ###############################################################################

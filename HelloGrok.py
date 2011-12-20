@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 '''
   #############################################################################
-  HELLO PREDICTIONS!
+  HELLO GROK!
   
   Welcome to the Grok Prediction Service!
   
@@ -15,49 +15,47 @@
   #############################################################################
 '''
 
-from grokpy import Grokpy
 import time
+import Queue
+import threading
+
+from grokpy import Grokpy
 
 def HelloPredictions():
   
   '''
-  The first thing that you'll need is your API key. You've created an account
-  at grok.numenta.com right?
+  The first thing that you'll need is your API key. You should have been
+  given a key as part of the sign up process.
   
-  Go to grok.numenta.com/account/profile and look for your API key now.
-  
-  Back? Good! Enter that key below
+  You can enter that key below.
 
   NOTE: A slightly more secure method is to store your API key in your shell
   environment.
   
   From the command line:
 
-    echo "export GROK_API_KEY=PUT_YOUR_KEY_HERE" >> ~/.bashrc
+    echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
     source ~/.bashrc
   '''
   
-  key = 'PUT_YOUR_KEY_HERE'
+  key = 'YOUR_KEY_HERE'
   
   '''
   Now we need a way to interact with the prediction service. That is going to
   be through a grokpy object. After we give it our credentials we'll have
   full access to all the functionality of the API.
   '''
-
-
-  grok = Grokpy(key, baseURL, credentials)
+  key = '' 
+  
+  grok = Grokpy(key, '')
     
   '''
   The working areas, where you'll build models, stream in data, and launch
-  swarms (searches) is called a 'project.' Lets see if we have any projects.
+  Swarms is called a 'project.' Let's create one now.
   '''
   now = time.time()
-  projectName = 'HelloPrediction' + str(now)
-  
+  projectName = 'HelloGrok' + str(now)
   myProject = grok.createProject(projectName)
-
-  print myProject.getDescription()
   
   '''
   Now lets get a list of all the projects we have
@@ -94,7 +92,6 @@ def HelloPredictions():
   
   WARNING: This is the really hard part!
   '''
-  
   gymField = {
           "aggregationFunction":"first",
           "dataFormat":{
@@ -129,7 +126,7 @@ def HelloPredictions():
           "aggregationFunction":"first",
           "dataFormat":{
             "dataType":"DATETIME",
-            "formatString":"sdf\/yyyy-MM-dd H:m:s.S"
+            "formatString":"sdf/yyyy-MM-dd H:m:s.S"
           },
           "dataType":"DATETIME",
           "fieldRange": None,
@@ -171,9 +168,53 @@ def HelloPredictions():
   '''
   Now we have to create a model
   '''
+  myModel = myProject.createModel()
   
-  myModel = project.createModel()
+  print 'Setting Model Name'
+  myModel.setName('Fun times!')
+  print 'Setting Model Note'
+  myModel.setNote('This is a neat model of stuff')
   
+  '''
+  Lets upload some data!
+  
+  We want to be able to monitor the upload progress so we're going to take
+  advantage of the threading library to upload in one thread, and monitor in
+  another.
+  '''
+  
+  # Create our queue
+  queue = Queue.Queue()
+  
+  # Time how long this takes
+  startTime = time.time()
+  
+  # How many threads we need to kick off
+  numThreads = 2
+  
+  # Start up our threads. They will poll the queue until we populate it.
+  for i in range(numThreads):
+    t = ThreadRunner(queue)
+    t.setDaemon(True)
+    t.start()
+  
+  # Put all our calls into the queue  
+  queue.put((myModel.upload, 'hotgym_small_headless.csv'))
+  queue.put((myModel.monitorUpload, None))
+ 
+  # Block until queue is empty then continue   
+  queue.join()
+  
+  
+  
+  print 'Uploading data'
+  myModel.upload('hotgym_small_headless.csv')
+  
+  '''
+  Lets train this bitch!
+  '''
+  print 'Starting training swarm'
+  myModel.swarm()
 
 if __name__ == '__main__':
   HelloPredictions()
