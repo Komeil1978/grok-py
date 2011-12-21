@@ -12,12 +12,3 @@ class Field(object):
     # Create a dictionary describing this field
     self.description = descDict
 
-  @staticmethod
-  def getFieldFromJSON(jsonString):
-    '''
-    Accepts a JSON string and returns a Field object
-    '''
-    
-    description = json.loads(jsonString)
-    
-    return Field(**description)

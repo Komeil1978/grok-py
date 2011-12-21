@@ -53,31 +53,6 @@ class Grokpy(object):
       
     return projects
   
-  def createStream(self, JSON = None):
+  def createStream(self):
     
-    newStream = Stream()
-    
-    # If the user gives us JSON, make lemonade
-    if JSON:
-      newStream.configFromJSON(JSON)
-    
-    return newStream
-  
-class ThreadRunner(threading.Thread):
-  '''
-  Make service requests in separate threads
-  '''
-
-  def __init__(self, queue):
-    threading.Thread.__init__(self)
-    # The queue from which we will pull tasks
-    self.queue = queue
-
-  def run(self):
-    while True:
-      serviceCall, params = self.queue.get()
-      if params:
-        result = serviceCall(*params)
-      else:
-        result = serviceCall()
-      self.queue.task_done()
+    return Stream()

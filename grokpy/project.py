@@ -45,21 +45,6 @@ class Project(object):
     
     return self.c.request(requestDef, 'POST')
     
-  def configure(self, **kwargs):
-    '''
-    Set the streamConfiguration of the project
-    '''
-    
-    desc = self.getDescription()
-    
-    for arg, value in kwargs.iteritems():
-      desc['streamConfiguration'][arg] = value
-    
-    requestDef = {'service': 'projectUpdate',
-                  'project': desc}
-    
-    return self.c.request(requestDef, 'POST')
-    
   def createModel(self):
     '''
     Create a model associated with this project

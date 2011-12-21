@@ -9,19 +9,21 @@ class Model(object):
   def __init__(self, connection, projectDef, modelDef = {}):
     # Our connection to the Grok API
     self.c = connection
+    
     # The project this model belongs to
     self.projectDef = projectDef
+    
     # The Id of this model
     self.id = None
+    
     # The Stream this model will listen to
     self.stream = None
+    
     # Whether this is a search or production model
     if 'running' in modelDef:
       self.type = 'production'
     else:
       self.type = 'search'
-    # If this model has requested an upload store the id here
-    self.uploadId = None
     
   def addStream(self, stream):
     '''
@@ -104,7 +106,6 @@ class Model(object):
     
     return self.c.request(requestDef)
     
-  
   def getDescription(self):
     '''
     Get the current state of the model from Grok
@@ -150,30 +151,7 @@ class Model(object):
                   'note': newNote}
     
     return self.c.request(requestDef)
-    
 
-    
-  def monitorUpload(self, updateDelay = 1000):
-    '''
-    Opens a connection to Grok and listens for updates on the progress of
-    an upload
-    
-    updateDelay - ms delay between updates. Range: 500 -> 10000
-    '''
-    attempts = 0
-    while True:
-      if attempts >= 10:
-        raise GrokError('No uploadId found. Upload progress cannot be monitored'
-                        'Please call model.upload() before monitorUpload()')
-      elif not self.uploadId:
-        attempts += 1
-        time.sleep(.5)
-        continue
-      else:
-        requestDef = {'service': 'fileUploadProgress',
-                      'uploadId': self.uploadId,
-                      'updateDelay': updateDelay}
-        self.c.request(requestDef)
   
 
     
