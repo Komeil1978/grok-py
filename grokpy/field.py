@@ -1,3 +1,6 @@
+import inspect
+import json
+
 
 class Field(object):
   '''
@@ -5,21 +8,16 @@ class Field(object):
   input data.
   '''
 
-  def __init__(self,
-               aggregationFunction = "first",
-               formatString = None,
-               dataType = "ENUMERATION",
-               fieldRange = None,
-               fieldSubset = None,
-               flag = None,
-               index = 0,
-               name = "gym",
-               useField = True):
-    pass
+  def __init__(self, descDict):
+    # Create a dictionary describing this field
+    self.description = descDict
 
   @staticmethod
   def getFieldFromJSON(jsonString):
     '''
     Accepts a JSON string and returns a Field object
     '''
-    return Field()
+    
+    description = json.loads(jsonString)
+    
+    return Field(**description)

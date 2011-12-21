@@ -1,127 +1,80 @@
 #!/usr/bin/env python
 '''
   #############################################################################
-  HELLO GROK!
+  Welcome to Grok!
   
-  Welcome to the Grok Prediction Service!
+  In this sample application we'll be creating a model of energy use for a
+  local business, in this case a Recreation Center.
   
-  We hope this example application will serve as inspiration for your own
-  creative uses of our service.
+  Spiking energy use can be a sign of waste for a business. To save energy, and
+  money, we need a way to predict what our energy consumption will be like in
+  the next hour, so we can take action *now* to prevent wasting power.
   
-  This application will go through all the steps you'll need to create models
-  for your own data sets and start getting predictions back in just a few
-  minutes.
+  In this application we will:
+  
+  * Create a Project
+  * Configure a Project for the sample energy use data
+  * Create a Model
+  * Stream data to that Model
+  * Start a Grok Swarm to optimize that Model
+  * Get results from the Swarm
+  
+  We'll end up with a CSV we can examine to see how well Grok learned and
+  predicted the energy use for this business.
   
   #############################################################################
 '''
 
 import time
-import Queue
-import threading
+import csv
 
 from grokpy import Grokpy
 
-def HelloPredictions():
+def HelloGrok():
   
   '''
-  The first thing that you'll need is your API key. You should have been
-  given a key as part of the sign up process.
-  
-  You can enter that key below.
-
-  NOTE: A slightly more secure method is to store your API key in your shell
+  API KEY NOTE: A slightly more secure method is to store your API key in your shell
   environment.
   
   From the command line:
-
     echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
     source ~/.bashrc
   '''
+  # Enter your API key here
+  key = 'YOUR_KEY_HERE' 
   
-  key = 'YOUR_KEY_HERE'
+  # Connect to Grok
+  print 'Connecting to Grok ...'
+  grok = Grokpy(key)
   
-  '''
-  Now we need a way to interact with the prediction service. That is going to
-  be through a grokpy object. After we give it our credentials we'll have
-  full access to all the functionality of the API.
-  '''
-  key = '' 
-  
-  grok = Grokpy(key, '')
-    
-  '''
-  The working areas, where you'll build models, stream in data, and launch
-  Swarms is called a 'project.' Let's create one now.
-  '''
+  # Create a project to hold our predictive models
   now = time.time()
-  projectName = 'HelloGrok' + str(now)
+  projectName = 'HelloGrok ' + str(now)
+  print 'Creating an initial project: ' + projectName
   myProject = grok.createProject(projectName)
+    
+  # Create a blank model in that project
+  print 'Creating an empty model ...'
+  recCenterEnergyModel = myProject.createModel()
+  
+  # Create an empty stream of data
+  myStream = grok.createStream()
   
   '''
-  Now lets get a list of all the projects we have
-  '''
-  projects = grok.listProjects()
-  for project in projects:
-    print project.id
+  Add data and define our Stream
   
+  For Grok to use your data we need a careful specification of that data to
+  work with. The combination of your data and it's specification is what
+  we call a 'Stream'.
   '''
-  Now lets remove all those projects
-  '''  
-  for project in projects:
-    project.delete()
+  # Add data from a local source
+  with open('data/rec-center.csv', 'rU') as fileHandle:
+    reader = csv.reader(fileHandle)
+    recCenterData = [row for row in reader]
   
-  '''
-  Make sure they are all gone
-  '''
-  projects = grok.listProjects()
-  assert (len(projects) == 0)
-  print 'All gone!'
+  print myStream.addRecords(recCenterData)
   
-  '''
-  Make another project to work with
-  '''
-  myProject = grok.createProject('Happy Project')
-
-  '''
-  Update the name of that project, just for fun
-  '''
-  myProject.setName('Joyus Chorus - 2')
-  
-  '''
-  Next we need to configure our project so that it knows what data to expect.
-  
-  WARNING: This is the really hard part!
-  '''
-  gymField = {
-          "aggregationFunction":"first",
-          "dataFormat":{
-            "dataType":"ENUMERATION",
-            "formatString": None
-          },
-          "dataType":"ENUMERATION",
-          "fieldRange":None,
-          "fieldSubset":None,
-          "flag":"NONE",
-          "index":0,
-          "name":"gym",
-          "useField": True
-        }
-  
-  addressField = {
-          "aggregationFunction":"first",
-          "dataFormat":{
-            "dataType":"ENUMERATION",
-            "formatString": None
-          },
-          "dataType":"ENUMERATION",
-          "fieldRange": None,
-          "fieldSubset": None,
-          "flag":"NONE",
-          "index":1,
-          "name":"address",
-          "useField": True
-        }
-  
+  # Define Stream specification
   timestampField = {
           "aggregationFunction":"first",
           "dataFormat":{
@@ -132,7 +85,7 @@ def HelloPredictions():
           "fieldRange": None,
           "fieldSubset": None,
           "flag":"TIMESTAMP",
-          "index":2,
+          "index":0,
           "name":"timestamp",
           "useField": True
         }
@@ -147,74 +100,44 @@ def HelloPredictions():
           "fieldRange": None,
           "fieldSubset": None,
           "flag":"NONE",
-          "index":3,
+          "index":1,
           "name":"consumption",
           "useField": True
         }
   
-  config = {
-      "locationFieldIndex":1,
-      "predictionFieldIndex":3,
-      "temporalFieldIndex":2,
-      "timeAggregation":"RECORD"
-      }
-
-  config['fields'] = [gymField, addressField, timestampField, consumptionField]
+  # Add fields
+  myStream.addField(timestampField)
+  myStream.addField(consumptionField)
   
-  myProject.configure(**config)
-  
-  print '=' * 40
+  # Top level Stream configuration
+  myStream.setTemporalFieldIndex(0)
+  myStream.setPredictionFieldIndex(1)
   
   '''
-  Now we have to create a model
-  '''
-  myModel = myProject.createModel()
+  Marry the model to the Stream
   
-  print 'Setting Model Name'
-  myModel.setName('Fun times!')
-  print 'Setting Model Note'
-  myModel.setNote('This is a neat model of stuff')
+  Once a model is tied to a stream of data it is set with that configuration
+  '''
+  recCenterEnergyModel.addStream(myStream)
   
   '''
-  Lets upload some data!
-  
-  We want to be able to monitor the upload progress so we're going to take
-  advantage of the threading library to upload in one thread, and monitor in
-  another.
-  '''
-  
-  # Create our queue
-  queue = Queue.Queue()
-  
-  # Time how long this takes
-  startTime = time.time()
-  
-  # How many threads we need to kick off
-  numThreads = 2
-  
-  # Start up our threads. They will poll the queue until we populate it.
-  for i in range(numThreads):
-    t = ThreadRunner(queue)
-    t.setDaemon(True)
-    t.start()
-  
-  # Put all our calls into the queue  
-  queue.put((myModel.upload, 'hotgym_small_headless.csv'))
-  queue.put((myModel.monitorUpload, None))
- 
-  # Block until queue is empty then continue   
-  queue.join()
-  
-  
-  
-  print 'Uploading data'
-  myModel.upload('hotgym_small_headless.csv')
+  Now we have a project, a stream with data, and a model configured for that
+  stream. Lets start a Grok Swarm to find the best configuration of our model
+  to predict the data that exist in the stream.
   
   '''
-  Lets train this bitch!
-  '''
-  print 'Starting training swarm'
-  myModel.swarm()
+  print 'Starting Grok Swarm'
+  recCenterEnergyModel.startSwarm()
+  
+  # Monitor the swarm
+  print 'Swarm started. Progress follows:'
+  while True:
+    SwarmState = recCenterEnergyModel.getSwarmProgress()
+    print SwarmState['jobStatus']
+    print len(SwarmState['models'])
+    print len(SwarmState['results'])
+    print 'Sleeping for 5 seconds ...'
+    time.sleep(5)
 
 if __name__ == '__main__':
-  HelloPredictions()
+  HelloGrok()

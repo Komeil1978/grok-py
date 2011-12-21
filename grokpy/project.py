@@ -9,6 +9,8 @@ class Project(object):
     
     self.c = connection
     self.id = str(projectDef['id'])
+    self.name = projectDef['name']
+    self.projectDef = projectDef
     
   def getDescription(self):
     '''
@@ -63,10 +65,12 @@ class Project(object):
     Create a model associated with this project
     '''
     
-    requestDef = {'service': 'searchModelCreate',
-                  'projectId': self.id}
+    '''
+    WARNING: HACK
     
-    modelDef = self.c.request(requestDef)
+    Due to the current object model we don't actually create the model until
+    we associate a stream with the model
+    '''
     
-    return Model(self.c, modelDef)
+    return Model(self.c, self.projectDef)
     

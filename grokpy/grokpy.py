@@ -53,6 +53,15 @@ class Grokpy(object):
       
     return projects
   
+  def createStream(self, JSON = None):
+    
+    newStream = Stream()
+    
+    # If the user gives us JSON, make lemonade
+    if JSON:
+      newStream.configFromJSON(JSON)
+    
+    return newStream
   
 class ThreadRunner(threading.Thread):
   '''

@@ -113,8 +113,6 @@ class Connection(object):
       result = content['result']
     else:
       result = None
-
-    #print result
     
     return result
   

@@ -6,11 +6,15 @@ class Model(object):
   Object representing a Grok Model
   '''
 
-  def __init__(self, connection, modelDef):
+  def __init__(self, connection, projectDef, modelDef = {}):
     # Our connection to the Grok API
     self.c = connection
-    # UID for this model
-    self.id = modelDef['id']
+    # The project this model belongs to
+    self.projectDef = projectDef
+    # The Id of this model
+    self.id = None
+    # The Stream this model will listen to
+    self.stream = None
     # Whether this is a search or production model
     if 'running' in modelDef:
       self.type = 'production'
@@ -18,6 +22,88 @@ class Model(object):
       self.type = 'search'
     # If this model has requested an upload store the id here
     self.uploadId = None
+    
+  def addStream(self, stream):
+    '''
+    Associates a stream with a model
+    
+    WARNING: HACK
+    
+    Due to the current object model this is actually where:
+       - The project is configured server side
+       - The model is created
+       - Data is streamed to the model input cache
+    '''
+    # Store our Stream object for later use
+    self.stream = stream
+    
+    # Configure project
+    print 'CONFIGURING PROJECT'
+    
+    desc = {'streamConfiguration': {} }
+    for arg, value in self.stream.description.iteritems():
+      desc['streamConfiguration'][arg] = value
+    
+    self.projectDef.update(desc)
+
+    requestDef = {'service': 'projectUpdate',
+                  'project': self.projectDef}
+    
+    print self.c.request(requestDef, 'POST')
+    
+    # Create the model
+    print 'CREATING MODEL'
+    
+    requestDef = {'service': 'searchModelCreate',
+                  'projectId': self.projectDef['id']}
+    
+    modelDef = self.c.request(requestDef)
+    
+    self.id = modelDef['id']
+    
+    # Upload data held temporarily in Stream object
+    print 'APPENDING DATA'
+    service = self.type + 'ModelInputCacheAppend'
+    param = self.type + 'ModelId'
+    
+    requestDef = {'service': service,
+                  param: self.id,
+                  'data': self.stream.records}
+    
+    self.c.request(requestDef)
+    
+    print 'DONE'
+    
+    return 
+  
+  def startSwarm(self):
+    '''
+    Runs permutations on model parameters to find the optimal model
+    characteristics for the given data.
+    '''
+    
+    param = self.type + 'ModelId'
+    
+    requestDef = {'service': 'searchStart',
+                  param: self.id}
+    
+    self.c.request(requestDef)
+    
+    return
+  
+  def getSwarmProgress(self):
+    '''
+    Polls the server for progress of a running Swarm
+    '''
+    
+    param = self.type + 'ModelId'
+    
+    requestDef = {'service': 'searchProgress',
+                  param: self.id,
+                  'stream': False}
+    
+    return self.c.request(requestDef)
+    
   
   def getDescription(self):
     '''
@@ -33,7 +119,7 @@ class Model(object):
     
   def setName(self, newName):
     '''
-    Rename the project
+    Rename the model
     '''
     # Get current description
     desc = self.getDescription()
@@ -65,41 +151,7 @@ class Model(object):
     
     return self.c.request(requestDef)
     
-  def upload(self, filePath):
-    '''
-    Uploads data from a given file to this model
-    '''
-    
-    # Make sure we can open the given file
-    _, filename = os.path.split(filePath)
-    size = os.path.getsize(filePath)
-    fh = open(filePath, 'r')
-    
-    # Get a handle for our upload
-    requestDef = {'service': 'fileUploadInit'}
-    uploadId = self.c.request(requestDef)
-    
-    # Store this locally
-    self.uploadId = uploadId
-    
-    # Send the file contents
-    service = self.type + 'ModelInputCacheUpload'
-    idParam = self.type + 'ModelId'
-    
-    ## These will be sent as URL params
-    requestDef = {'service': service,
-                  idParam: self.id,
-                  'uploadId': uploadId,
-                  'filename': filename}
-    ## File content will be alone in the body
-    body = fh.read()
-    
-    headers = {'content-type':'text/csv', 'content-length': str(size)}
-    
-    numRows = self.c.request(requestDef, 'POST', body, headers)
-    
-    # Clean up
-    fh.close()
+
     
   def monitorUpload(self, updateDelay = 1000):
     '''
@@ -123,16 +175,5 @@ class Model(object):
                       'updateDelay': updateDelay}
         self.c.request(requestDef)
   
-  def swarm(self):
-    '''
-    Runs permutations on model parameters to find the optimal model
-    characteristics for the given data.
-    '''
-    
-    idParam = self.type + 'ModelId'
-    
-    requestDef = {'service': 'searchStart',
-                  idParam: self.id}
-    
-    self.c.request(requestDef)
+
     
