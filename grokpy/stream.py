@@ -8,30 +8,30 @@ class Stream(object):
 
   def __init__(self):
     # Our stream description
-    self.description = {'fields': []}
+    self.streamDescription = {'fields': []}
     
     # Our local data store
     self.records = None
     
   def setLocationFieldIndex(self, index):
-    self.description['locationFieldIndex'] = index
+    self.streamDescription['locationFieldIndex'] = index
 
   def setPredictionFieldIndex(self, index):
-    self.description['predictionFieldIndex'] = index
+    self.streamDescription['predictionFieldIndex'] = index
     
   def setTemporalFieldIndex(self, index):
-    self.description['temporalFieldIndex'] = index
+    self.streamDescription['temporalFieldIndex'] = index
   
   def setTimeAggregation(self, aggregationType):
-    self.description['timeAggregation'] = aggregationType
+    self.streamDescription['timeAggregation'] = aggregationType
   
-  def addField(self, descDict):
+  def addField(self, **kwargs):
     '''
     Add a field object to a stream
     '''
-    newField = Field(descDict)
-    
-    self.description['fields'].append(newField.description)
+    newField = Field(**kwargs)
+
+    self.streamDescription['fields'].append(newField.fieldDescription)
     
     return newField
     

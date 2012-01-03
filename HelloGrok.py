@@ -32,6 +32,8 @@ from grokpy import Grokpy
 
 def HelloGrok():
   
+  # Enter your API key here
+  key = 'JupyeXS3D86EztZ8Z8b67AkWsvvcbrSx' 
   '''
   API KEY NOTE: A slightly more secure method is to store your API key in your shell
   environment.
@@ -40,12 +42,10 @@ def HelloGrok():
     echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
     source ~/.bashrc
   '''
-  # Enter your API key here
-  key = 'YOUR_KEY_HERE' 
   
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = Grokpy(key)
+  grok = Grokpy(key, 'http://184.73.142.169:1961/')
   
   # Create a project to hold our predictive models
   now = time.time()
@@ -57,9 +57,6 @@ def HelloGrok():
   print 'Creating an empty model ...'
   recCenterEnergyModel = myProject.createModel()
   
-  # Create an empty stream of data
-  myStream = grok.createStream()
-  
   '''
   Add data and define our Stream
   
@@ -67,28 +64,32 @@ def HelloGrok():
   work with. The combination of your data and it's specification is what
   we call a 'Stream'.
   '''
+  # Create an empty stream
+  myStream = grok.createStream()
+  
   # Add data from a local source
-  with open('data/rec-center.csv', 'rU') as fileHandle:
-    reader = csv.reader(fileHandle)
-    recCenterData = [row for row in reader]
+  fileHandle = open('data/rec-center.csv', 'rU')
+  reader = csv.reader(fileHandle)
+  recCenterData = [row for row in reader]
+  fileHandle.close()
   
   print myStream.addRecords(recCenterData)
   
   # Define Stream specification
   timestampField = {
-          "aggregationFunction":"first",
-          "dataFormat":{
-            "dataType":"DATETIME",
-            "formatString":"sdf/yyyy-MM-dd H:m:s.S"
-          },
+        "aggregationFunction":"first",
+        "dataFormat":{
           "dataType":"DATETIME",
-          "fieldRange": None,
-          "fieldSubset": None,
-          "flag":"TIMESTAMP",
-          "index":0,
-          "name":"timestamp",
-          "useField": True
-        }
+          "formatString":"sdf/yyyy-MM-dd H:m:s.S"
+        },
+        "dataType":"DATETIME",
+        "fieldRange": None,
+        "fieldSubset": None,
+        "flag":"TIMESTAMP",
+        "index":0,
+        "name": 'timestamp',
+        "useField": True
+      }
   
   consumptionField = {
           "aggregationFunction":"mean",
@@ -106,8 +107,8 @@ def HelloGrok():
         }
   
   # Add fields
-  myStream.addField(timestampField)
-  myStream.addField(consumptionField)
+  myStream.addField(**timestampField)
+  myStream.addField(**consumptionField)
   
   # Top level Stream configuration
   myStream.setTemporalFieldIndex(0)
@@ -134,10 +135,9 @@ def HelloGrok():
   while True:
     SwarmState = recCenterEnergyModel.getSwarmProgress()
     print SwarmState['jobStatus']
-    print len(SwarmState['models'])
-    print len(SwarmState['results'])
-    print 'Sleeping for 5 seconds ...'
-    time.sleep(5)
+    print SwarmState['results']
+    print 'Sleeping for 1 second ...'
+    time.sleep(1)
 
 if __name__ == '__main__':
   HelloGrok()

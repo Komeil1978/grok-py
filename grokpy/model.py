@@ -43,7 +43,7 @@ class Model(object):
     print 'CONFIGURING PROJECT'
     
     desc = {'streamConfiguration': {} }
-    for arg, value in self.stream.description.iteritems():
+    for arg, value in self.stream.streamDescription.iteritems():
       desc['streamConfiguration'][arg] = value
     
     self.projectDef.update(desc)
