@@ -20,6 +20,10 @@ class Grokpy(object):
       self.c = Connection(key, baseURL)
     else:
       self.c = Connection(key)
+      
+    # Minimal connection test
+    print 'TESTING CONNECTION'
+    self.testConnection()
   
   def createProject(self, projectName):
     '''
@@ -54,5 +58,17 @@ class Grokpy(object):
     return projects
   
   def createStream(self):
+    '''
+    Returns an instance of the Stream object
+    '''
     
     return Stream()
+  
+  def testConnection(self):
+    '''
+    Makes a minimial service call to test the API connection
+    '''
+    
+    requestDef = {'service': 'projectList'}
+    
+    self.c.request(requestDef)

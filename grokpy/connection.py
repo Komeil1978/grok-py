@@ -47,13 +47,19 @@ class Connection(object):
     # The base path for all our HTTP calls
     self.baseURL = baseURL + 'version/1/'
     
+    
   def request(self, requestDef, method = 'POST', body = False, headers = None):
     '''
     Interface for all HTTP requests made to the Grok API
     '''
     
-    # Create our HTTP client
-    h = httplib2.Http(".cache")
+    '''
+    Create our HTTP client
+    
+    NOTE: Timeout is set by default. As this is a socket level timeout it may
+    cause longpolling problems later. TODO: Re-visit
+    '''
+    h = httplib2.Http(".cache", 5)
     
     # Build the request
     ## GETS
@@ -95,7 +101,12 @@ class Connection(object):
     try:
       httpResponse, content = h.request(**kwargs)
     except socket.error, e:
-      raise GrokError(e)
+      if 'timed out' in e:
+        raise GrokError("Could not connect to API server. Please check the "
+                        "server URL if specified, or status.numenta.com "
+                        "(coming soon) if default.")
+      else:
+        raise GrokError(e)
     
     # Handle HTTP errors (redirects are handled by httplib2)
     if httpResponse['status'] != '200':
@@ -135,11 +146,16 @@ class Connection(object):
     Makes sure that a given key conforms to the expected format
     '''
     
+    '''
+    TODO: Put this back in when we've removed the fake api key
     if len(key) < 32:
       raise AuthenticationError('This key is too short, '
                                 'please check it again: "' + key +'"')
     else:
       return 'OK'
+      
+    '''
+    pass
     
   def _handleGrokErrors(self, errors):
     '''

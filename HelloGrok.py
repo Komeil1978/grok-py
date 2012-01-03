@@ -33,7 +33,7 @@ from grokpy import Grokpy
 def HelloGrok():
   
   # Enter your API key here
-  key = 'JupyeXS3D86EztZ8Z8b67AkWsvvcbrSx' 
+  key = 'e1gCaM3PLRze9wuCaqSqQb5l41k06h3r' 
   '''
   API KEY NOTE: A slightly more secure method is to store your API key in your shell
   environment.
@@ -45,7 +45,7 @@ def HelloGrok():
   
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = Grokpy(key, 'http://184.73.142.169:1961/')
+  grok = Grokpy(key, 'http://grok-api.numenta.com/')
   
   # Create a project to hold our predictive models
   now = time.time()
@@ -132,9 +132,11 @@ def HelloGrok():
   
   # Monitor the swarm
   print 'Swarm started. Progress follows:'
-  while True:
+  running = True
+  while running:
     SwarmState = recCenterEnergyModel.getSwarmProgress()
-    print SwarmState['jobStatus']
+    if SwarmState['jobStatus'] == 'COMPLETED':
+      running = False
     print SwarmState['results']
     print 'Sleeping for 1 second ...'
     time.sleep(1)
