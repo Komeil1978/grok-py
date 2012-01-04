@@ -1,4 +1,8 @@
+import json
+
 from field import Field
+
+from exceptions import GrokError, AuthenticationError
 
 class Stream(object):
   '''
@@ -12,18 +16,6 @@ class Stream(object):
     
     # Our local data store
     self.records = None
-    
-  def setLocationFieldIndex(self, index):
-    self.streamDescription['locationFieldIndex'] = index
-
-  def setPredictionFieldIndex(self, index):
-    self.streamDescription['predictionFieldIndex'] = index
-    
-  def setTemporalFieldIndex(self, index):
-    self.streamDescription['temporalFieldIndex'] = index
-  
-  def setTimeAggregation(self, aggregationType):
-    self.streamDescription['timeAggregation'] = aggregationType
   
   def addField(self, **kwargs):
     '''
@@ -48,3 +40,27 @@ class Stream(object):
     self.records = records
     
     return len(self.records)
+    
+  def configure(self, filePath):
+    '''
+    Reads JSON from a given file and uses that to configure the stream
+    '''
+    fileHandle = open(filePath, 'rU')
+    fields = json.load(fileHandle)
+    
+    for field in fields:
+      field = self._safe_dict(field)
+      self.addField(**field)
+
+  def _safe_dict(self, d): 
+    '''
+    Recursively clone json structure with UTF-8 dictionary keys
+    
+    From: http://www.gossamer-threads.com/lists/python/python/684379
+    '''
+    if isinstance(d, dict): 
+      return dict([(k.encode('utf-8'), self._safe_dict(v)) for k,v in d.iteritems()]) 
+    elif isinstance(d, list): 
+      return [self._safe_dict(x) for x in d] 
+    else: 
+      return d 

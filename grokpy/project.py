@@ -1,4 +1,7 @@
 from model import Model
+from stream import Stream
+
+from exceptions import GrokError, AuthenticationError
 
 class Project(object):
   '''
@@ -58,4 +61,11 @@ class Project(object):
     '''
     
     return Model(self.c, self.projectDef)
+    
+  def createStream(self):
+    '''
+    Returns an instance of the Stream object
+    '''
+    
+    return Stream()
     

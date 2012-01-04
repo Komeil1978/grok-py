@@ -1,0 +1,24 @@
+[
+ {
+  "name": "timestamp",
+  "aggregationFunction": "first",
+  "flag": "TIMESTAMP",
+  "dataFormat": {"dataType": "DATETIME", "formatString": "sdf/yyyy-MM-dd H:m:s.S"},
+  "index": 0,
+  "fieldRange": null,
+  "dataType": "DATETIME",
+  "fieldSubset": null,
+  "useField": true
+  },
+  {
+   "name": "consumption",
+   "aggregationFunction": "sum",
+   "flag": "NONE",
+   "dataFormat": {"dataType": "SCALAR", "formatString": null},
+   "index": 1,
+   "fieldRange": null,
+   "dataType": "SCALAR",
+   "fieldSubset": null,
+   "useField": true
+  }
+]

@@ -4,7 +4,7 @@ import urllib2
 import json
 import socket
 
-from exceptions import *
+from exceptions import GrokError, AuthenticationError
 
 class Connection(object):
   '''

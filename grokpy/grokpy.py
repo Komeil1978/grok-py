@@ -4,6 +4,7 @@ from connection import Connection
 from project import Project
 from stream import Stream
 from field import Field
+from exceptions import GrokError, AuthenticationError
 
 class Grokpy(object):
   '''
@@ -22,7 +23,6 @@ class Grokpy(object):
       self.c = Connection(key)
       
     # Minimal connection test
-    print 'TESTING CONNECTION'
     self.testConnection()
   
   def createProject(self, projectName):
@@ -56,13 +56,6 @@ class Grokpy(object):
     projects = [Project(self.c, pDef) for pDef in projectDescriptions]
       
     return projects
-  
-  def createStream(self):
-    '''
-    Returns an instance of the Stream object
-    '''
-    
-    return Stream()
   
   def testConnection(self):
     '''

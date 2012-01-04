@@ -1,6 +1,8 @@
 import os
 import time
 
+from exceptions import GrokError, AuthenticationError
+
 class Model(object):
   '''
   Object representing a Grok Model
@@ -28,30 +30,37 @@ class Model(object):
   def addStream(self, stream):
     '''
     Associates a stream with a model
+    '''
     
-    WARNING: HACK
+    # Store our Stream object for later use
+    self.stream = stream 
+  
+  def startSwarm(self):
+    '''
+    Runs permutations on model parameters to find the optimal model
+    characteristics for the given data.
+    '''
+    
+    ''' WARNING: HACK
     
     Due to the current object model this is actually where:
        - The project is configured server side
        - The model is created
        - Data is streamed to the model input cache
     '''
-    # Store our Stream object for later use
-    self.stream = stream
-    
+    print '<OBJECT MODEL WORKAROUND>'
+ 
     # Configure project
     print 'CONFIGURING PROJECT'
     
-    desc = {'streamConfiguration': {} }
     for arg, value in self.stream.streamDescription.iteritems():
-      desc['streamConfiguration'][arg] = value
+      self.projectDef['streamConfiguration'][arg] = value
     
-    self.projectDef.update(desc)
 
     requestDef = {'service': 'projectUpdate',
                   'project': self.projectDef}
     
-    print self.c.request(requestDef, 'POST')
+    self.c.request(requestDef, 'POST')
     
     # Create the model
     print 'CREATING MODEL'
@@ -74,15 +83,8 @@ class Model(object):
     
     self.c.request(requestDef)
     
-    print 'DONE'
-    
-    return 
-  
-  def startSwarm(self):
-    '''
-    Runs permutations on model parameters to find the optimal model
-    characteristics for the given data.
-    '''
+    print '</WORKAROUND>'
+    ''' END HACK '''
     
     param = self.type + 'ModelId'
     
@@ -92,6 +94,17 @@ class Model(object):
     self.c.request(requestDef)
     
     return
+  
+  def stopSwarm(self):
+    '''
+    Terminates a Swarm in progress
+    '''
+    param = self.type + 'ModelId'
+    
+    requestDef = {'service': 'searchCancel',
+                  param: self.id}
+    
+    self.c.request(requestDef)
   
   def getSwarmProgress(self):
     '''
@@ -151,6 +164,87 @@ class Model(object):
                   'note': newNote}
     
     return self.c.request(requestDef)
+    
+  def setLocationFieldIndex(self, index):
+    '''
+    Which stream field provides geospatial data for the model
+    '''
+    self._checkIndex(index)
+    
+    self.projectDef['streamConfiguration']['locationFieldIndex'] = index
+
+  def setPredictionFieldIndex(self, index):
+    '''
+    The stream field for which we are optimizing predictions.
+    '''
+    self._checkIndex(index)
+    
+    self.projectDef['streamConfiguration']['predictionFieldIndex'] = index
+    
+  def setTemporalFieldIndex(self, index):
+    '''
+    Which stream field provides temporal data for the model
+    '''
+    self._checkIndex(index)
+    
+    self.projectDef['streamConfiguration']['temporalFieldIndex'] = index
+  
+  def setTimeAggregation(self, aggregationType):
+    '''
+    How the model will aggregate data within the stream
+    
+    Valid Types:
+    
+    RECORD: no aggregation is done.
+    SECONDS
+    MINUTES
+    15_MINUTES
+    HOURS
+    DAYS
+    WEEKS
+    MONTHS
+    '''
+    self.projectDef['streamConfiguration']['timeAggregation'] = aggregationType
+    
+  def getSwarmResults(self, startRow = -1, endRow = -1):
+    '''
+    Returns the data in the output cache of the best model found during
+    a Grok Swarm
+    
+    The default start/end row values request all the data available.
+    '''
+    
+    service = self.type + 'ModelOutputCacheData'
+    idParam = self.type + 'ModelId'
+    
+    requestDef = {'service': service,
+                  idParam: self.id,
+                  'startRow': startRow,
+                  'endRow': endRow}
+    
+    return self.c.request(requestDef)
+  
+  #############################################################################
+  # Private methods
+  
+    
+  def _checkIndex(self, index):
+    '''
+    Ensures that specified indexes are possible for the current stream
+    '''
+    
+    if not self.stream:
+      raise GrokError('Please configure and add a Stream to this model before '
+                      'specifying how you want the model to use the stream')
+    
+    if not self.stream.streamDescription['fields']:
+      raise GrokError('Please configure and add a stream to this model before'
+                      'specifying which fields to use.')
+    
+    if index >= len(self.stream.streamDescription['fields']):
+      raise IndexError('The specified index is out of range for the given '
+                       'stream.')
+    
 
   
 
