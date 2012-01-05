@@ -65,3 +65,66 @@ class Grokpy(object):
     requestDef = {'service': 'projectList'}
     
     self.c.request(requestDef)
+  
+  def alignPredictions(self, data):
+    '''
+    Puts prediction on the same row as the actual value for easy comparison in
+    external tools like Excel.
+    
+    Example Transformation:
+    
+    RowID   ActualValue     PredictedValue
+    0       3               5
+    1       5               7
+    2       7               9
+    
+    RowID   ActualValue     PredictedValue
+    0       3               
+    1       5               5
+    2       7               7
+    3                       9
+    '''
+    
+    pass
+    
+class Aggregation(object):
+  '''
+  Enum-like class to specify valid aggregation strings
+  '''
+  RECORD = 'RECORD'
+  SECONDS = 'SECONDS'
+  MINUTES = 'MINUTES'
+  MINUTES_15 = 'MINUTES_15'
+  HOURS = 'HOURS'
+  DAYS = 'DAYS'
+  WEEKS = 'WEEKS'
+  MONTHS = 'MONTHS'
+  
+class Status(object):
+  '''
+  Enum-like class to specify valid Swarm status strings
+  '''
+  RUNNING = 'RUNNING'
+  CANCELED = 'CANCELED'
+  COMPLETED = 'COMPLETED'
+
+class GrokData(object):
+  '''
+  Enum-like class to specify valid Grok data type strings
+  '''
+  DATETIME = 'DATETIME' # a point in time. 
+  ENUMERATION = 'ENUMERATION' # a category. 
+  IP_ADDRESS = 'IP_ADDRESS' # an IP address (V4).
+  LAT_LONG = 'LAT_LONG' # a latitude/longitude combination.
+  SCALAR = 'SCALAR' # a numeric value.
+  ZIP_CODE = 'ZIP_CODE' # a U.S. zip code. Aggregated with first or last.
+
+class DataFlag(object):
+  '''
+  Enum-like class to specify valid data flag strings
+  '''
+  NONE = 'NONE'
+  RESET = 'RESET'
+  SEQUENCE = 'SEQUENCE'
+  TIMESTAMP = 'TIMESTAMP'
+  

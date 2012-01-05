@@ -20,7 +20,6 @@ class Field(object):
         "fieldRange": None,
         "fieldSubset": None,
         "flag":"NONE",
-        "index":0,
         "name": None,
         "useField": True
       }

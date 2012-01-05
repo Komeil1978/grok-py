@@ -27,11 +27,10 @@ class Model(object):
     else:
       self.type = 'search'
     
-  def addStream(self, stream):
+  def setStream(self, stream):
     '''
     Associates a stream with a model
     '''
-    
     # Store our Stream object for later use
     self.stream = stream 
   
@@ -41,13 +40,12 @@ class Model(object):
     characteristics for the given data.
     '''
     
-    ''' WARNING: HACK
-    
-    Due to the current object model this is actually where:
-       - The project is configured server side
-       - The model is created
-       - Data is streamed to the model input cache
-    '''
+    # WARNING: HACK
+    #
+    # Due to the current object model this is actually where:
+    #   - The project is configured server side
+    #   - The model is created
+    #   - Data is streamed to the model input cache
     print '<OBJECT MODEL WORKAROUND>'
  
     # Configure project
@@ -55,7 +53,6 @@ class Model(object):
     
     for arg, value in self.stream.streamDescription.iteritems():
       self.projectDef['streamConfiguration'][arg] = value
-    
 
     requestDef = {'service': 'projectUpdate',
                   'project': self.projectDef}
@@ -84,7 +81,7 @@ class Model(object):
     self.c.request(requestDef)
     
     print '</WORKAROUND>'
-    ''' END HACK '''
+    ########## END HACK
     
     param = self.type + 'ModelId'
     
@@ -165,6 +162,24 @@ class Model(object):
     
     return self.c.request(requestDef)
     
+  def setLocationField(self, fieldName):
+    '''
+    Wrapper for setLocationFieldIndex()
+    '''
+    self.setLocationFieldIndex(self._getFieldIndex(fieldName))
+  
+  def setPredictionField(self, fieldName):
+    '''
+    Wrapper for setPredictionFieldIndex()
+    '''
+    self.setPredictionFieldIndex(self._getFieldIndex(fieldName))
+  
+  def setTemporalField(self, fieldName):
+    '''
+    Wrapper for setTemporalFieldIndex()
+    '''
+    self.setTemporalFieldIndex(self._getFieldIndex(fieldName))
+    
   def setLocationFieldIndex(self, index):
     '''
     Which stream field provides geospatial data for the model
@@ -227,6 +242,27 @@ class Model(object):
   #############################################################################
   # Private methods
   
+  def _getFieldIndex(self, fieldName):
+    '''
+    Finds a field with a matching name and throws an error if there are more
+    than one matches
+    '''
+    
+    counter = 0
+    index = 0
+    for field in self.stream.streamDescription['fields']:
+      if field['name'] == fieldName:
+        counter += 1
+        index = field['index']
+    
+    if not counter:
+      raise GrokError('Field not found: ' + fieldName)
+    if counter > 1:
+      raise GrokError('Duplicate Field Name: ' + fieldName + ' More than one '
+                      'field with this name was found. Please use the '
+                      'set*FieldIndex() methods directly.')
+    
+    return index
     
   def _checkIndex(self, index):
     '''
@@ -247,5 +283,4 @@ class Model(object):
     
 
   
-
     

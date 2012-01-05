@@ -11,7 +11,7 @@ class Connection(object):
   Connection object for the Grok Prediction Service
   '''
   
-  def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com/'):
+  def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com'):
     
     # Search for API key in environment
     if not key:
@@ -45,7 +45,7 @@ class Connection(object):
     self.key = key
     
     # The base path for all our HTTP calls
-    self.baseURL = baseURL + 'version/1/'
+    self.baseURL = baseURL + '/version/1/'
     
     
   def request(self, requestDef, method = 'POST', body = False, headers = None):
@@ -59,7 +59,7 @@ class Connection(object):
     NOTE: Timeout is set by default. As this is a socket level timeout it may
     cause longpolling problems later. TODO: Re-visit
     '''
-    h = httplib2.Http(".cache", 5)
+    h = httplib2.Http(".cache", 20)
     
     # Build the request
     ## GETS
@@ -102,7 +102,7 @@ class Connection(object):
       httpResponse, content = h.request(**kwargs)
     except socket.error, e:
       if 'timed out' in e:
-        raise GrokError("Could not connect to API server. Please check the "
+        raise GrokError("Request timed out. Please check the "
                         "server URL if specified, or status.numenta.com "
                         "(coming soon) if default.")
       else:

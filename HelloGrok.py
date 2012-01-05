@@ -1,29 +1,28 @@
 #!/usr/bin/env python
-'''
-  #############################################################################
-  Welcome to Grok!
-  
-  In this sample application we'll be creating a model of energy use for a
-  local business, in this case a Recreation Center.
-  
-  Spiking energy use can be a sign of waste for a business. To save energy, and
-  money, we need a way to predict what our energy consumption will be like in
-  the next hour, so we can take action *now* to prevent wasting power.
-  
-  In this application we will:
-  
-  * Create a Project
-  * Create a Model
-  * Create a Stream of our energy use data
-  * Configure how we want our Model to use our Stream
-  * Start a Grok Swarm to optimize our Model for the given Stream
-  * Get results from the Swarm
-  
-  We'll end up with a CSV we can examine to see how well Grok learned and
-  predicted the energy use for this business.
-  
-  #############################################################################
-'''
+
+##############################################################################
+# Welcome to Grok!
+#
+# In this sample application we'll be creating a model of energy use for a
+# local business, in this case a Recreation Center.
+#
+# Spiking energy use can be a sign of waste for a business. To save energy, and
+# money, we need a way to predict what our energy consumption will be like in
+# the next hour, so we can take action *now* to prevent wasting power.
+#
+# In this application we will:
+#
+# * Create a Project
+# * Create a Model
+# * Create a Stream of our energy use data
+# * Configure how we want our Model to use our Stream
+# * Start a Grok Swarm to optimize our Model for the given Stream
+# * Get results from the Swarm
+#
+# We'll end up with a CSV we can examine to see how well Grok learned and
+# predicted the energy use for this business.
+#
+##############################################################################
 
 import time
 import csv
@@ -31,25 +30,31 @@ import os
 import signal
 import sys
 import json
+import grokpy
 
 from grokpy import Grokpy
 
+##############################################################################
+# Configuration Settings
+
+API_KEY = 'sGl15axCWW0Tn3LggUVCqXIKbTtBN2Ak'
+STREAM_SPEC = 'data/streamSpecification.json'
+INPUT_CSV = 'data/rec-center-tiny.csv'
+OUTPUT_CSV = 'output/SwarmOutput.csv'
+
 def HelloGrok():
   
-  # Enter your API key here
-  key = 'YOUR_KEY_HERE' 
-  '''
-  API KEY NOTE: A slightly more secure method is to store your API key in your
-  shell environment.
-  
-  From the command line:
-    echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
-    source ~/.bashrc
-  '''
-  
+  ##############################################################################
+  # API KEY NOTE: A slightly more secure method is to store your API key in your
+  # shell environment.
+  #
+  # From the command line:
+  #  echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
+  #  source ~/.bashrc
+
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = Grokpy(key)
+  grok = Grokpy()
   
   # Create a project to hold our predictive models
   now = time.time()
@@ -61,67 +66,60 @@ def HelloGrok():
   print 'Creating an empty model ...'
   recCenterEnergyModel = myProject.createModel()
   
-  '''
-  Define our Stream and add data
-  
-  For Grok to use your data we need a careful specification of that data to
-  work with. The combination of your data and its specification is what
-  we call a 'Stream'.
-  '''
+  ##############################################################################
+  # Define our Stream and add data
+  #
+  # For Grok to use your data we need a careful specification of that data to
+  # work with. The combination of your data and its specification is what
+  # we call a 'Stream'.
+
   # Create an empty stream
   print 'Creating an empty stream ...'
   myStream = myProject.createStream()
   
   # Specify the format of the stream using a JSON document
-  myStream.configure('data/streamConfig.json')
+  myStream.configure(STREAM_SPEC)
   
   # Add data to the stream from a local source
   print 'Adding records to stream ...'
-  fileHandle = open('data/rec-center.csv', 'rU')
+  fileHandle = open(INPUT_CSV, 'rU')
   recCenterData = [row for row in csv.reader(fileHandle)]
   fileHandle.close()
   myStream.addRecords(recCenterData)
-  
-  '''
-  Marry the model to the Stream
-  
-  Once a model is tied to a stream of data it is set with that configuration
-  '''
+
+  # Set which stream this model will listen to.
   print 'Adding stream to model and configuring ...'
-  recCenterEnergyModel.addStream(myStream)
+  recCenterEnergyModel.setStream(myStream)
   
-  '''
-  Specify how our model should use that stream of data
-  '''
-  recCenterEnergyModel.setTemporalFieldIndex(0)
-  recCenterEnergyModel.setPredictionFieldIndex(1)
-  recCenterEnergyModel.setTimeAggregation('HOURS')
+  # Specify how our model should use that stream of data
+  recCenterEnergyModel.setTemporalField('timestamp')
+  recCenterEnergyModel.setPredictionField('consumption')
+  recCenterEnergyModel.setTimeAggregation(grokpy.Aggregation.HOURS)
   
-  '''
-  Now we have a project, a stream with data, and a model configured for that
-  stream. Lets start a Grok Swarm to find the best configuration of our model
-  to predict the data that exist in the stream.
+  ##############################################################################
+  # Now we have a project, a stream with data, and a model configured for that
+  # stream. Let's start a Grok Swarm to find the best configuration of our model
+  # to predict the data that exist in the stream.
   
-  '''
   print 'Starting Grok Swarm'
   recCenterEnergyModel.startSwarm()
   
   # Monitor the swarm
   started = False
 
-  # Catch ctrl-c to terminate remote long-running processes
+  # Catch ctrl-c to terminate remote long-running processes TODO: Helper method to implement handler might be useful
   signal.signal(signal.SIGINT, signal_handler)
   
-  # TODO: Replace with callback
+  # TODO: Replace with callback / async / websockets
   while True:
     SwarmState = recCenterEnergyModel.getSwarmProgress()
     jobStatus = SwarmState['jobStatus']
     results = SwarmState['results']
     
-    if jobStatus == 'COMPLETED':
+    if jobStatus == grokpy.Status.COMPLETED:
       print 'You win! Your Grok Swarm is complete.'
       break
-    if jobStatus == 'RUNNING' and started == False:
+    if jobStatus == grokpy.Status.RUNNING and started == False:
       started = True
       print 'Swarm started.'
     if not started:
@@ -141,30 +139,27 @@ def HelloGrok():
     
   # Retrieve Swarm results
   print "Getting results from Swarm ..."
-  
   swarmResults = recCenterEnergyModel.getSwarmResults()
-  
   headers = swarmResults['columnNames']
   resultRows = swarmResults['rows']
+
   
-  # Write results out to a CSV
-  outputFilePath = "output/SwarmOutput.csv";
+  # Write results out to a CSV TODO: Helper function to output with shift / explicit calc of error
   if not os.path.exists('output'):
     print 'Output directory not found, creating ...'
     os.mkdir('output')
-  print "Saving results to " + outputFilePath
-  fileHandle = open(outputFilePath, 'w')
+  print "Saving results to " + OUTPUT_CSV
+  fileHandle = open(OUTPUT_CSV, 'w')
   writer = csv.writer(fileHandle)
   writer.writerow(headers)
-  for row in resultRows:
-    writer.writerow(row)
+  writer.writerows(resultRows)
   fileHandle.close()
   
 def signal_handler(signal, frame):
         model = frame.f_locals.get('recCenterEnergyModel')
         swarmStatus = frame.f_locals.get('jobStatus')
         # Shut down any running swarms
-        if model and swarmStatus == 'RUNNING':
+        if model and swarmStatus == grokpy.Status.RUNNING:
           print 'Caught Ctrl-C during Swarm'
           print 'Stopping in-progress Swarm ...'
           model.stopSwarm()
