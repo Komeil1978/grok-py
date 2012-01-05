@@ -9,6 +9,11 @@ from exceptions import GrokError, AuthenticationError
 class Grokpy(object):
   '''
   Top level object for interacting with the Grok Prediction Service.
+  
+  Contains:
+  
+  High Level Opertions
+  Helper Methods
   '''
   
   def __init__(self, key = None, baseURL = None):
@@ -24,6 +29,9 @@ class Grokpy(object):
       
     # Minimal connection test
     self.testConnection()
+  
+  #############################################################################
+  # High Level Operations
   
   def createProject(self, projectName):
     '''
@@ -66,7 +74,10 @@ class Grokpy(object):
     
     self.c.request(requestDef)
   
-  def alignPredictions(self, data):
+  #############################################################################
+  # Helper Methods
+  
+  def alignPredictions(self, headers, resultRows):
     '''
     Puts prediction on the same row as the actual value for easy comparison in
     external tools like Excel.
@@ -82,11 +93,30 @@ class Grokpy(object):
     0       3               
     1       5               5
     2       7               7
-    3                       9
+                            9
     '''
     
-    pass
+    # Find columns that contain predictions
+    predictionIndexes = [headers.index(header)
+                       for header in headers
+                       if ('temporal_prediction' in header)]
+  
+    # Bump all predictions down one row
+    columns = zip(*resultRows)
+    for index in range(len(columns)):
+      column = list(columns[index])
+      if index in predictionIndexes:
+        column.insert(0, '')
+      else:
+        column.append('')
+      columns[index] = column
+    resultRows = zip(*columns)
     
+    return resultRows
+
+#############################################################################
+# Enums
+
 class Aggregation(object):
   '''
   Enum-like class to specify valid aggregation strings

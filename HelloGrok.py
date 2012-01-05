@@ -39,18 +39,24 @@ from grokpy import Grokpy
 
 API_KEY = 'sGl15axCWW0Tn3LggUVCqXIKbTtBN2Ak'
 STREAM_SPEC = 'data/streamSpecification.json'
-INPUT_CSV = 'data/rec-center-tiny.csv'
+INPUT_CSV = 'data/rec-center.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
+##############################################################################
+# API KEY NOTE: A slightly more secure method is to store your API key in your
+# shell environment.
+#
+# From the command line:
+#  echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
+#  source ~/.bashrc
+
 def HelloGrok():
-  
+
   ##############################################################################
-  # API KEY NOTE: A slightly more secure method is to store your API key in your
-  # shell environment.
+  # Setup
   #
-  # From the command line:
-  #  echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
-  #  source ~/.bashrc
+  # This is where we will create all the top level objects we'll be working
+  # with in this application.
 
   # Connect to Grok
   print 'Connecting to Grok ...'
@@ -66,16 +72,16 @@ def HelloGrok():
   print 'Creating an empty model ...'
   recCenterEnergyModel = myProject.createModel()
   
+  # Create an empty stream
+  print 'Creating an empty stream ...'
+  myStream = myProject.createStream()
+  
   ##############################################################################
   # Define our Stream and add data
   #
   # For Grok to use your data we need a careful specification of that data to
   # work with. The combination of your data and its specification is what
   # we call a 'Stream'.
-
-  # Create an empty stream
-  print 'Creating an empty stream ...'
-  myStream = myProject.createStream()
   
   # Specify the format of the stream using a JSON document
   myStream.configure(STREAM_SPEC)
@@ -91,15 +97,23 @@ def HelloGrok():
   print 'Adding stream to model and configuring ...'
   recCenterEnergyModel.setStream(myStream)
   
-  # Specify how our model should use that stream of data
+  ##############################################################################
+  # Define how our Model will use our Stream
+  #
+  # Your models can listen to your streams in many different ways. Here we
+  # tell the model how to deal with each field and which field we want to
+  # optimize our predictions for etc.
+  
   recCenterEnergyModel.setTemporalField('timestamp')
   recCenterEnergyModel.setPredictionField('consumption')
   recCenterEnergyModel.setTimeAggregation(grokpy.Aggregation.HOURS)
   
   ##############################################################################
+  # Start the Swarm
+  #
   # Now we have a project, a stream with data, and a model configured for that
-  # stream. Let's start a Grok Swarm to find the best configuration of our model
-  # to predict the data that exist in the stream.
+  # stream we can start a Grok Swarm. The Swarm will find the best
+  # configuration of our model to predict the data that exist in the stream.
   
   print 'Starting Grok Swarm'
   recCenterEnergyModel.startSwarm()
@@ -136,15 +150,19 @@ def HelloGrok():
     bestValue = results['bestValue']
     print ("Current best model: " + bestConf + " - Score %.2f" % bestValue)
     time.sleep(1)
-    
+  
+  ##############################################################################
   # Retrieve Swarm results
+  
   print "Getting results from Swarm ..."
   swarmResults = recCenterEnergyModel.getSwarmResults()
   headers = swarmResults['columnNames']
   resultRows = swarmResults['rows']
-
   
-  # Write results out to a CSV TODO: Helper function to output with shift / explicit calc of error
+  # Align predictions with actuals
+  resultRows = grok.alignPredictions(headers, resultRows)
+
+  # Write results out to a CSV
   if not os.path.exists('output'):
     print 'Output directory not found, creating ...'
     os.mkdir('output')
@@ -156,14 +174,14 @@ def HelloGrok():
   fileHandle.close()
   
 def signal_handler(signal, frame):
-        model = frame.f_locals.get('recCenterEnergyModel')
-        swarmStatus = frame.f_locals.get('jobStatus')
-        # Shut down any running swarms
-        if model and swarmStatus == grokpy.Status.RUNNING:
-          print 'Caught Ctrl-C during Swarm'
-          print 'Stopping in-progress Swarm ...'
-          model.stopSwarm()
-        sys.exit(0)
+  model = frame.f_locals.get('recCenterEnergyModel')
+  swarmStatus = frame.f_locals.get('jobStatus')
+  # Shut down any running swarms
+  if model and swarmStatus == grokpy.Status.RUNNING:
+    print 'Caught Ctrl-C during Swarm'
+    print 'Stopping in-progress Swarm ...'
+    model.stopSwarm()
+  sys.exit(0)
 
 if __name__ == '__main__':
   HelloGrok()
