@@ -1,5 +1,5 @@
 import httplib2
-from grokpy import (Grokpy,
+from client import (Client,
                    Aggregation,
                    Status,
                    GrokData,

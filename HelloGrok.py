@@ -32,14 +32,14 @@ import sys
 import json
 import grokpy
 
-from grokpy import Grokpy
+from grokpy import Client
 
 ##############################################################################
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
 STREAM_SPEC = 'data/streamSpecification.json'
-INPUT_CSV = 'data/rec-center.csv'
+INPUT_CSV = 'data/rec-center-tiny.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
 ##############################################################################
@@ -60,7 +60,7 @@ def HelloGrok():
 
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = Grokpy()
+  grok = Client()
   
   # Create a project to hold our predictive models
   now = time.time()
@@ -147,7 +147,7 @@ def HelloGrok():
     
     bestConf = str(results['bestModel'])
     bestValue = results['bestValue']
-    print ("Current best model: " + bestConf + " - Error %.2f" % bestValue)
+    print ("Current best model: " + bestConf + " - ErrorScore %.2f" % bestValue)
     time.sleep(1)
   
   ##############################################################################

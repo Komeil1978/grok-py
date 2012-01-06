@@ -17,14 +17,14 @@ import sys
 import json
 import grokpy
 
-from grokpy import Grokpy
+from grokpy import Client
 
 ##############################################################################
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-PROJECT_ID = 'YOUR_PROJECT_ID_HERE'
-MODEL_ID = 'YOUR_MODEL_ID_HERE'
+PROJECT_ID = '210'
+MODEL_ID = 'wRrxFFpofzb0XM43Zpo4teExNdY6'
 OUTPUT_CSV = 'output/newPredictions.csv'
 
 ##############################################################################
@@ -42,7 +42,7 @@ def HelloGrokPart2():
   #
 
   print 'Connecting to Grok ...'
-  grok = Grokpy()
+  grok = Client()
   print 'Retrieving Project ...'
   myProject = grok.getProject(PROJECT_ID)
   print 'Retrieving Model ...'

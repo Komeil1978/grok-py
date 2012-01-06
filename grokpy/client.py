@@ -6,7 +6,7 @@ from stream import Stream
 from field import Field
 from exceptions import GrokError, AuthenticationError
 
-class Grokpy(object):
+class Client(object):
   '''
   Top level object for interacting with the Grok Prediction Service.
   
