@@ -16,7 +16,10 @@ class Model(object):
     self.projectDef = projectDef
     
     # The Id of this model
-    self.id = None
+    if modelDef:
+      self.id = modelDef['id']
+    else:
+      self.id = None
     
     # The Stream this model will listen to
     self.stream = None
@@ -238,6 +241,94 @@ class Model(object):
                   'endRow': endRow}
     
     return self.c.request(requestDef)
+    
+  def promote(self):
+    '''
+    Promotes the model to production ready status. This transitions a model
+    that has gone through a Swarm to a model ready to accept new streaming
+    records.
+    
+    NOTE: This may have ongoing charges if you don't call stop on the model
+    when not in use.
+    '''
+    self._enforceType('search')
+    
+    # Create production model
+    print 'CREATING PRODUCTION MODEL'
+    requestDef = {'service': 'productionModelCreate',
+                  'searchModelId': self.id}
+    
+    modelDef = self.c.request(requestDef)
+    
+    # Start the model
+    self.id = modelDef['id']
+    self.type = 'production'
+    
+    self.start()
+    
+  def start(self):
+    '''
+    Starts up a model, readying it to receive new data from a stream
+    '''
+    self._enforceType('production')
+    
+    requestDef = {'service': 'productionModelStart',
+                  'productionModelId': self.id}
+    
+    print 'STARTING MODEL'
+    self.c.request(requestDef)
+  
+  def stop(self):
+    '''
+    Stops a model. Stopped models will not listen for new data or produce
+    predictions
+    '''
+    self._enforceType('production')
+    
+    requestDef = {'service': 'productionModelStop',
+                  'productionModelId': self.id}
+    
+    print 'STOPPING MODEL'
+    print self.c.request(requestDef)
+    
+  def delete(self):
+    '''
+    Permanently deletes the model
+    '''
+    pass
+  
+  def sendRecords(self, data):
+    '''
+    Sends data directly to a model rather than having the model listen to a
+    stream. Only available on promoted models.
+    
+    Data: A list of lists representing rows of data
+    '''
+    self._enforceType('production')
+    
+    requestDef = {'service': 'productionModelInputCacheAppend',
+                  'productionModelId': self.id,
+                  'data': data}
+    
+    self.c.request(requestDef)
+    
+  def getPredictions(self, startRow = -1, endRow = -1):
+    '''
+    Retrieves all the predictions from the models output cache.
+    
+    TODO: Allow a range to be specified
+    '''
+    self._enforceType('production')
+    
+    requestDef = {'service': 'productionModelOutputCacheData',
+                  'productionModelId': self.id,
+                  'startRow': startRow,
+                  'endRow': endRow}
+    
+    response = self.c.request(requestDef)
+        
+    return response
+    
   
   #############################################################################
   # Private methods
@@ -282,5 +373,32 @@ class Model(object):
                        'stream.')
     
 
-  
+  def _enforceType(self, type):
+    '''
+    As an artifact of the current object model some methods can only be called
+    if a model is one type or the other
+    '''
+    
+    if self.type != type:
+      if type == 'search':
+        raise GrokError('This method is not available on promoted models.')
+      elif type == 'production':
+        raise GrokErrror('You must promote this model before calling this '
+                         'method.')
+      else:
+        raise ValueError('Unrecognised model type.')
+        
+  def _getInputCache(self, startRow = -1, endRow = -1):
+    '''
+    Returns the contents of the model's input cache
+    '''
+    service = self.type + 'ModelInputCacheData'
+    idParam = self.type + 'ModelId'
+    
+    requestDef = {'service': service,
+                  idParam: self.id,
+                  'startRow': startRow,
+                  'endRow': endRow}
+
+    return self.c.request(requestDef)
     

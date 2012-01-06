@@ -52,6 +52,26 @@ class Grokpy(object):
     
     return project
   
+  def getProject(self, projectId):
+    '''
+    Returns a Project with the given id
+    '''
+    if projectId == 'YOUR_PROJECT_ID_HERE':
+      raise GrokError('Please supply a valid project id')
+    
+    requestDef = {
+      'service': 'projectRead',
+      'projectId': projectId,
+    }
+    
+    # Make the API request
+    result = self.c.request(requestDef)
+    
+    # Use the results to instantiate a new Project object
+    project = Project(self.c, result)
+    
+    return project
+    
   def listProjects(self):
     '''
     Lists all the projects currently associated with this account

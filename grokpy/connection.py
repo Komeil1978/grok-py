@@ -6,6 +6,8 @@ import socket
 
 from exceptions import GrokError, AuthenticationError
 
+DEBUG = 0
+
 class Connection(object):
   '''
   Connection object for the Grok Prediction Service
@@ -14,7 +16,7 @@ class Connection(object):
   def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com'):
     
     # Search for API key in environment
-    if not key:
+    if not key or key == 'YOUR_KEY_HERE':
       key = self._find_key()
       if not key:
         raise AuthenticationError("""
@@ -59,7 +61,7 @@ class Connection(object):
     NOTE: Timeout is set by default. As this is a socket level timeout it may
     cause longpolling problems later. TODO: Re-visit
     '''
-    h = httplib2.Http(".cache", 20)
+    h = httplib2.Http(".cache", 10)
     
     # Build the request
     ## GETS
@@ -115,13 +117,23 @@ class Connection(object):
     # Load info from returned JSON strings
     content = json.loads(content)
     
+    if DEBUG == 1:
+      print content
+    
     # Some service requests don't return anything. :(
     if content != None:
       # Handle service errors
       if 'errors' in content:
-        self._handleGrokErrors(content['errors'])
+        self._handleGrokErrors(content['errors']) 
       # Return good results
-      result = content['result']
+      try:
+        result = content['result']
+      # Handle non-error messages
+      except KeyError:
+        try:
+          result = content['information'][0]
+        except KeyError:
+          raise GrokError('Unexpected request response:' + content)
     else:
       result = None
     

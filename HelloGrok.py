@@ -37,7 +37,7 @@ from grokpy import Grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'sGl15axCWW0Tn3LggUVCqXIKbTtBN2Ak'
+API_KEY = 'YOUR_KEY_HERE'
 STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
@@ -94,7 +94,7 @@ def HelloGrok():
   myStream.addRecords(recCenterData)
 
   # Set which stream this model will listen to.
-  print 'Adding stream to model and configuring ...'
+  print 'Attaching model to stream and configuring ...'
   recCenterEnergyModel.setStream(myStream)
   
   ##############################################################################
@@ -140,7 +140,6 @@ def HelloGrok():
       print 'Swarm is starting up ...'
       time.sleep(2)
       continue
-    
     if not results:
       print 'Initial records are being processed ...'
       time.sleep(2)
@@ -148,7 +147,7 @@ def HelloGrok():
     
     bestConf = str(results['bestModel'])
     bestValue = results['bestValue']
-    print ("Current best model: " + bestConf + " - Score %.2f" % bestValue)
+    print ("Current best model: " + bestConf + " - Error %.2f" % bestValue)
     time.sleep(1)
   
   ##############################################################################
@@ -172,6 +171,18 @@ def HelloGrok():
   writer.writerow(headers)
   writer.writerows(resultRows)
   fileHandle.close()
+  
+  ##############################################################################
+  # Next steps ...
+  #
+  # Now would be a good time to explore the results of the Swarm and familiarize
+  # yourself with their format. After that, you can take the Project id and
+  # Model id printed out below and head over to part two!
+  
+  print '\n\nOn to Part Two!'
+  print 'Take these, the wizard will ask for them:'
+  print '\t MODEL_ID: ' + recCenterEnergyModel.id
+  print '\t PROJECT_ID: ' + myProject.id
   
 def signal_handler(signal, frame):
   model = frame.f_locals.get('recCenterEnergyModel')
