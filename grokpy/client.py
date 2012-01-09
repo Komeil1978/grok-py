@@ -94,6 +94,14 @@ class Client(object):
     
     self.c.request(requestDef)
   
+  def about(self):
+    '''
+    Get current build and server information from API server
+    '''
+    requestDef = {'service': 'about'}
+    
+    return self.c.request(requestDef)
+  
   #############################################################################
   # Helper Methods
   

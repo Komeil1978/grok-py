@@ -37,7 +37,7 @@ from grokpy import Client
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'YOUR_KEY_HERE'
+API_KEY = 'sGl15axCWW0Tn3LggUVCqXIKbTtBN2Ak'
 STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center-tiny.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
@@ -60,7 +60,7 @@ def HelloGrok():
 
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = Client()
+  grok = Client(API_KEY, baseURL = 'http://dailystaging.numenta.com:1961')
   
   # Create a project to hold our predictive models
   now = time.time()
@@ -123,6 +123,17 @@ def HelloGrok():
 
   # Catch ctrl-c to terminate remote long-running processes TODO: Helper method to implement handler might be useful
   signal.signal(signal.SIGINT, signal_handler)
+  
+  print 'Monitoring swarm progress'
+  
+  # Create a callback for new state events
+  def newStateCallback(state):
+    jobStatus = state['result']['jobStatus']
+    print jobStatus
+    if jobStatus == 'COMPLETED':
+      return False
+  
+  recCenterEnergyModel.monitorSwarmProgress(newStateCallback)
   
   # TODO: Replace with callback / async / websockets
   while True:

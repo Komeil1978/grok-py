@@ -23,8 +23,8 @@ from grokpy import Client
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-PROJECT_ID = 'YOUR_PROJECT_ID_HERE'
-MODEL_ID = 'YOUR_MODEL_ID_HERE'
+PROJECT_ID = '210'
+MODEL_ID = 'wRrxFFpofzb0XM43Zpo4teExNdY6'
 OUTPUT_CSV = 'output/newPredictions.csv'
 
 ##############################################################################

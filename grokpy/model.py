@@ -1,7 +1,10 @@
 import os
 import time
+import httplib
+import json
 
 from exceptions import GrokError, AuthenticationError
+from streaming import StreamListener, Stream
 
 class Model(object):
   '''
@@ -118,7 +121,52 @@ class Model(object):
                   'stream': False}
     
     return self.c.request(requestDef)
+  
+  def monitorSwarmProgress(self, newStateCallback):
+    '''
+    Listens to a stream of output from the API server
+    '''
+    listener = StreamListener(newStateCallback)
     
+    headers = {'content-type':'application/json',
+               'API-Key': self.c.key}
+    
+    param = self.type + 'ModelId'
+    requestDef = {'version': '1',
+                  'service': 'searchProgress',
+                  param: self.id,
+                  'stream': True}
+
+    # Serialize the dict
+    body = json.dumps(requestDef)
+    
+    config = {'method': 'POST',
+               'body': body,
+               'url': self.c.baseURL,
+               'headers': headers}
+    swarmProgress = Stream(listener, **config)
+    
+    swarmProgress.listen(async=True)
+      
+  
+  def getSwarmResults(self, startRow = -1, endRow = -1):
+    '''
+    Returns the data in the output cache of the best model found during
+    a Grok Swarm
+    
+    The default start/end row values request all the data available.
+    '''
+    
+    service = self.type + 'ModelOutputCacheData'
+    idParam = self.type + 'ModelId'
+    
+    requestDef = {'service': service,
+                  idParam: self.id,
+                  'startRow': startRow,
+                  'endRow': endRow}
+    
+    return self.c.request(requestDef)
+
   def getDescription(self):
     '''
     Get the current state of the model from Grok
@@ -224,23 +272,7 @@ class Model(object):
     '''
     self.projectDef['streamConfiguration']['timeAggregation'] = aggregationType
     
-  def getSwarmResults(self, startRow = -1, endRow = -1):
-    '''
-    Returns the data in the output cache of the best model found during
-    a Grok Swarm
-    
-    The default start/end row values request all the data available.
-    '''
-    
-    service = self.type + 'ModelOutputCacheData'
-    idParam = self.type + 'ModelId'
-    
-    requestDef = {'service': service,
-                  idParam: self.id,
-                  'startRow': startRow,
-                  'endRow': endRow}
-    
-    return self.c.request(requestDef)
+
     
   def promote(self):
     '''

@@ -61,7 +61,7 @@ class Connection(object):
     NOTE: Timeout is set by default. As this is a socket level timeout it may
     cause longpolling problems later. TODO: Re-visit
     '''
-    h = httplib2.Http(".cache", 10)
+    h = httplib2.Http(".cache", 20)
     
     # Build the request
     ## GETS
