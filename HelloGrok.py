@@ -121,10 +121,9 @@ def HelloGrok():
   # Monitor the swarm
   started = False
 
-  # Catch ctrl-c to terminate remote long-running processes TODO: Helper method to implement handler might be useful
+  # Catch ctrl-c to terminate remote long-running processes
   signal.signal(signal.SIGINT, signal_handler)
   
-  # TODO: Replace with callback / async / websockets
   while True:
     SwarmState = recCenterEnergyModel.getSwarmProgress()
     jobStatus = SwarmState['jobStatus']

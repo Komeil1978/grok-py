@@ -6,6 +6,8 @@ import json
 from exceptions import GrokError, AuthenticationError
 from streaming import StreamListener, Stream
 
+VERBOSITY = 0
+
 class Model(object):
   '''
   Object representing a Grok Model
@@ -52,10 +54,10 @@ class Model(object):
     #   - The project is configured server side
     #   - The model is created
     #   - Data is streamed to the model input cache
-    print '<OBJECT MODEL WORKAROUND>'
+    if VERBOSITY >= 1: print '<OBJECT MODEL WORKAROUND>'
  
     # Configure project
-    print 'CONFIGURING PROJECT'
+    if VERBOSITY >= 1: print 'CONFIGURING PROJECT'
     
     for arg, value in self.stream.streamDescription.iteritems():
       self.projectDef['streamConfiguration'][arg] = value
@@ -66,7 +68,7 @@ class Model(object):
     self.c.request(requestDef, 'POST')
     
     # Create the model
-    print 'CREATING MODEL'
+    if VERBOSITY >= 1: print 'CREATING MODEL'
     
     requestDef = {'service': 'searchModelCreate',
                   'projectId': self.projectDef['id']}
@@ -76,7 +78,7 @@ class Model(object):
     self.id = modelDef['id']
     
     # Upload data held temporarily in Stream object
-    print 'APPENDING DATA'
+    if VERBOSITY >= 1: print 'APPENDING DATA'
     service = self.type + 'ModelInputCacheAppend'
     param = self.type + 'ModelId'
     
@@ -86,7 +88,7 @@ class Model(object):
     
     self.c.request(requestDef)
     
-    print '</WORKAROUND>'
+    if VERBOSITY >= 1: print '</WORKAROUND>'
     ########## END HACK
     
     param = self.type + 'ModelId'
