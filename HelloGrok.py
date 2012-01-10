@@ -60,7 +60,7 @@ def HelloGrok():
 
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = Client()
+  grok = Client(API_KEY)
   
   # Create a project to hold our predictive models
   now = time.time()

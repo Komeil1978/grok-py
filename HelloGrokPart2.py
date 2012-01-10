@@ -42,7 +42,7 @@ def HelloGrokPart2():
   #
 
   print 'Connecting to Grok ...'
-  grok = Client()
+  grok = Client(API_KEY)
   print 'Retrieving Project ...'
   myProject = grok.getProject(PROJECT_ID)
   print 'Retrieving Model ...'

@@ -11,8 +11,35 @@ be considered STABLE.
 
 ## Installation
 
-From source:
+From source (includes sample app):
+
+Click the 'Downloads' link
+Click either 'Download as zip' or 'Download as tar.gz'
+Unpack into a directory of your choice
 
     $ sudo python setup.py install
+
+From pip:
+
+    $ sudo pip install grokpy
+
+## Run the Sample App
+
+Add your API key to the app
+
+ * Open HelloGrok.py in your favorite editor
+ * Insert your API_KEY where it says "YOUR_API_KEY_HERE"
+
+OR add your API key to your environment
+
+From the command line:
+
+    $ echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
+    $ source ~/.bashrc
+
+Launch the app
+
+    $ python HelloGrok.py
+
 
 
