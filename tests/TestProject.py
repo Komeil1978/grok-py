@@ -1,4 +1,4 @@
-import grokpy
+from grokpy.project import Project
 import unittest
 
 class MockConnection(object):
@@ -17,15 +17,15 @@ class MockConnection(object):
 class ProjectTestCase(unittest.TestCase):
 
   def setUp(self):
-    self.connection = MockConnection()
+    self.c = MockConnection()
     self.projectName = 'Testing Time'
 
   def testCreateProject(self):
     '''
     Create a project without errors
     '''
-    project = grokpy.Project(self.connection,
-                             self.projectName)
+    project = Project(self.c,
+                      self.projectName)
         
     self.assertEquals(self.projectName, project.name)
 

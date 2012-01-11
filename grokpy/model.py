@@ -272,9 +272,11 @@ class Model(object):
     WEEKS
     MONTHS
     '''
-    self.projectDef['streamConfiguration']['timeAggregation'] = aggregationType
+    if not self.stream:
+      raise GrokError('You must set a Stream for this model to use before '
+                      'calling this method.')
     
-
+    self.projectDef['streamConfiguration']['timeAggregation'] = aggregationType
     
   def promote(self):
     '''
@@ -288,7 +290,7 @@ class Model(object):
     self._enforceType('search')
     
     # Create production model
-    print 'CREATING PRODUCTION MODEL'
+    if VERBOSITY: print 'CREATING PRODUCTION MODEL'
     requestDef = {'service': 'productionModelCreate',
                   'searchModelId': self.id}
     
@@ -309,7 +311,7 @@ class Model(object):
     requestDef = {'service': 'productionModelStart',
                   'productionModelId': self.id}
     
-    print 'STARTING MODEL'
+    if VERBOSITY: print 'STARTING MODEL'
     self.c.request(requestDef)
   
   def stop(self):
@@ -322,14 +324,20 @@ class Model(object):
     requestDef = {'service': 'productionModelStop',
                   'productionModelId': self.id}
     
-    print 'STOPPING MODEL'
-    print self.c.request(requestDef)
+    if VERBOSITY: print 'STOPPING MODEL'
+    self.c.request(requestDef)
     
   def delete(self):
     '''
     Permanently deletes the model
     '''
-    pass
+    service = self.type + 'ModelDelete'
+    idParam = self.type + 'ModelId'
+    
+    requestDef = {'service': service,
+                  idParam: self.id}
+    
+    self.c.request(requestDef)
   
   def sendRecords(self, data):
     '''
@@ -372,6 +380,9 @@ class Model(object):
     Finds a field with a matching name and throws an error if there are more
     than one matches
     '''
+    if not self.stream:
+      raise GrokError('You must set a Stream for this model to use before '
+                      'calling this method.')
     
     counter = 0
     index = 0
@@ -406,7 +417,6 @@ class Model(object):
       raise IndexError('The specified index is out of range for the given '
                        'stream.')
     
-
   def _enforceType(self, type):
     '''
     As an artifact of the current object model some methods can only be called

@@ -17,14 +17,14 @@ import sys
 import json
 import grokpy
 
-from grokpy import Client
+from grokpy import Client, GrokError
 
 ##############################################################################
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-PROJECT_ID = 'YOUR_PROJECT_ID_HERE'
-MODEL_ID = 'YOUR_MODEL_ID_HERE'
+PROJECT_ID = 'YOUR_PROJECT_ID'
+MODEL_ID = 'YOUR_MODEL_ID'
 OUTPUT_CSV = 'output/newPredictions.csv'
 
 ##############################################################################
@@ -89,7 +89,16 @@ def HelloGrokPart2():
   
   # TODO: Replace with callback
   while True:
-    response = recCenterEnergyModel.getPredictions()
+    try:
+      response = recCenterEnergyModel.getPredictions()
+    except GrokError:
+      desc = recCenterEnergyModel.getDescription()
+      if desc.get('running') == False:
+        raise GrokError('Model seems to have terminated prematurely, please '
+                        'contact support.')
+      else:
+        raise
+    
     if 'code' in response and response['code'] == 'I00003':
       print 'Predictions not yet ready'
       time.sleep(1)

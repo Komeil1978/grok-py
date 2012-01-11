@@ -11,8 +11,12 @@ class Project(object):
   def __init__(self, connection, projectDef):
     
     self.c = connection
-    self.id = str(projectDef['id'])
-    self.name = projectDef['name']
+    try:
+      self.id = projectDef['id']
+      self.id = str(self.id)
+      self.name = projectDef['name']
+    except TypeError:
+      raise GrokError('Instantiating a project expects a dictionary')
     self.projectDef = projectDef
     
   def getDescription(self):
@@ -92,6 +96,23 @@ class Project(object):
     modelDef = self.c.request(requestDef, 'POST')
     
     return Model(self.c, self.projectDef, modelDef = modelDef)
+    
+  def listModels(self):
+    '''
+    Returns a list of Models that exist in this project
+    '''
+    searchModelDefs = self._listSearchModels()
+    prodModelDefs = self._listProductionModels()
+    
+    modelDescriptions = searchModelDefs.append(prodModelDefs)
+    
+    if modelDescriptions:
+      models = [Model(self.c, self.projectDef) for model in modelDescriptions]
+    else:
+      models = []
+    
+    return models
+    
   
   def stopAllModels(self):
     '''
@@ -114,6 +135,17 @@ class Project(object):
     '''
     
     return Stream()
+    
+  def delete(self):
+    '''
+    Permanently deletes this project, its models and streams
+    TODO: Verify with new OM
+    '''
+    
+    requestDef = {'service': 'projectDelete',
+                  'projectId': self.id}
+    
+    self.c.request(requestDef)
     
   #############################################################################
   # Private methods

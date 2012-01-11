@@ -5,4 +5,7 @@ from client import (Client,
                    GrokData,
                    DataFlag)
 
+from exceptions import (AuthenticationError,
+                        GrokError)
+
 __version__ = '0.0.5'

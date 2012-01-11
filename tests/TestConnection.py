@@ -19,7 +19,6 @@ class ConnectionTestCase(unittest.TestCase):
     '''
     If you pass no key and one can't be found there should be an error
     '''
-    badURI = 'floomer'
     self.assertRaises(AuthenticationError,
                       Connection)
   

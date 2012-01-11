@@ -1,4 +1,7 @@
+import sys
 import json
+import StringIO
+import traceback
 
 from field import Field
 
@@ -34,9 +37,12 @@ class Stream(object):
     WARNING: HACK
     
     Due to the current object model we actually send the records in the
-    model.addStream() method.
+    model.startSwarm() method.
     '''
     
+    if not self.streamDescription['fields']:
+      raise GrokError('No fields found. Please configure your stream before '
+                      'adding records.')
     self.records = records
     
     return len(self.records)
@@ -46,7 +52,15 @@ class Stream(object):
     Reads JSON from a given file and uses that to configure the stream
     '''
     fileHandle = open(filePath, 'rU')
-    fields = json.load(fileHandle)
+    
+    try:
+      fields = json.load(fileHandle)
+    except:
+      msg = StringIO.StringIO()
+      print >>msg, ("Caught JSON parsing error. Your stream specification may "
+      "have errors. Original exception follows:")
+      traceback.print_exc(None, msg)
+      raise GrokError(msg.getvalue())
     
     for field in fields:
       field = self._safe_dict(field)

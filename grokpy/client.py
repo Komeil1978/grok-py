@@ -17,10 +17,7 @@ class Client(object):
   '''
   
   def __init__(self, key = None, baseURL = None):
-    '''
-    TODO: Make this into a singleton? Do we need to support multiple
-    accounts in the same process?
-    '''    
+
     # Create a connection to the API
     if baseURL:
       self.c = Connection(key, baseURL)
@@ -81,7 +78,10 @@ class Client(object):
     projectDescriptions = self.c.request(requestDef)
     
     # Create objects out of the returned descriptions
-    projects = [Project(self.c, pDef) for pDef in projectDescriptions]
+    if projectDescriptions:
+      projects = [Project(self.c, pDef) for pDef in projectDescriptions]
+    else:
+      projects = []
       
     return projects
   

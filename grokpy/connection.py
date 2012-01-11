@@ -158,15 +158,12 @@ class Connection(object):
     Makes sure that a given key conforms to the expected format
     '''
     
-    '''
-    TODO: Put this back in when we've removed the fake api key
-    if len(key) < 32:
+    if len(key) < 5:
       raise AuthenticationError('This key is too short, '
                                 'please check it again: "' + key +'"')
     else:
       return 'OK'
       
-    '''
     pass
     
   def _handleGrokErrors(self, errors):
