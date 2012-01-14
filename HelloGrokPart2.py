@@ -86,33 +86,7 @@ def HelloGrokPart2():
 
   # Get all the latest predictions (the next hour in this case)
   print 'Getting new predictions ...'
-  
-  # TODO: Replace with callback
-  while True:
-    try:
-      response = recCenterEnergyModel.getPredictions()
-    except GrokError:
-      desc = recCenterEnergyModel.getDescription()
-      if desc.get('running') == False:
-        raise GrokError('Model seems to have terminated prematurely, please '
-                        'contact support.')
-      else:
-        raise
-    
-    if 'code' in response and response['code'] == 'I00003':
-      print 'Predictions not yet ready'
-      time.sleep(1)
-    elif not response['rows']:
-      print 'Predictions not yet ready'
-      time.sleep(1)
-    else:
-      break
-  
-  headers = response['columnNames']
-  resultRows = response['rows']
-  
-  # Align predictions with actuals
-  resultRows = grok.alignPredictions(headers, resultRows)
+  headers, resultRows = recCenterEnergyModel.monitorPredictions(endRow = 2)
 
   #############################################################################
   # Write out predictions to a CSV
