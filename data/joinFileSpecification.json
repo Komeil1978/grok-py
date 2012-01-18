@@ -1,0 +1,12 @@
+[
+ {
+  "name": "day",
+  "index": 0,
+  "dataFormat": {"dataType": "ENUMERATION", "formatString": null}
+  },
+  {
+   "name": "employee",
+   "index": 1,
+   "dataFormat": {"dataType": "ENUMERATION", "formatString": null}
+  }
+]

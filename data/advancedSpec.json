@@ -18,5 +18,25 @@
    "fieldRange": null,
    "fieldSubset": null,
    "useField": true
+  },
+  {
+  "name": "zipcode",
+  "index": 2,
+  "aggregationFunction": "first",
+  "flag": "NONE",
+  "dataFormat": {"dataType": "ZIP_CODE", "formatString": null},
+  "fieldRange": null,
+  "fieldSubset": null,
+  "useField": false
+  },
+  {
+   "name": "dayOfWeek",
+   "index": 3,
+   "aggregationFunction": "first",
+   "flag": "NONE",
+   "dataFormat": {"dataType": "ENUMERATION", "formatString": null},
+   "fieldRange": null,
+   "fieldSubset": null,
+   "useField": true
   }
 ]

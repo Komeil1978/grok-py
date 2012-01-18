@@ -43,7 +43,7 @@ INPUT_CSV = 'data/rec-center.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
 ##############################################################################
-# API KEY NOTE: A slightly more secure method is to store your API key in your
+# API KEY NOTE: A more secure method is to store your API key in your
 # shell environment.
 #
 # From the command line:
@@ -61,31 +61,31 @@ def HelloGrok():
   # Connect to Grok
   print 'Connecting to Grok ...'
   grok = Client(API_KEY)
-  
+
   # Create a project to hold our predictive models
   now = time.time()
   projectName = 'HelloGrok ' + str(now)
   print 'Creating an initial project: ' + projectName
   myProject = grok.createProject(projectName)
-    
+
   # Create a blank model in that project
   print 'Creating an empty model ...'
   recCenterEnergyModel = myProject.createModel()
-  
+
   # Create an empty stream
   print 'Creating an empty stream ...'
   myStream = myProject.createStream()
-  
+
   ##############################################################################
   # Define our Stream and add data
   #
   # For Grok to use your data we need a careful specification of that data to
   # work with. The combination of your data and its specification is what
   # we call a 'Stream'.
-  
+
   # Specify the format of the stream using a JSON document
   myStream.configure(STREAM_SPEC)
-  
+
   # Add data to the stream from a local source
   print 'Adding records to stream ...'
   fileHandle = open(INPUT_CSV, 'rU')
@@ -96,39 +96,39 @@ def HelloGrok():
   # Set which stream this model will listen to.
   print 'Attaching model to stream and configuring ...'
   recCenterEnergyModel.setStream(myStream)
-  
+
   ##############################################################################
   # Define how our Model will use our Stream
   #
   # Your models can listen to your streams in many different ways. Here we
   # tell the model how to deal with each field and which field we want to
   # optimize our predictions for etc.
-  
+
   recCenterEnergyModel.setTemporalField('timestamp')
   recCenterEnergyModel.setPredictionField('consumption')
   recCenterEnergyModel.setTimeAggregation(grokpy.Aggregation.HOURS)
-  
+
   ##############################################################################
   # Start the Swarm
   #
   # Now we have a project, a stream with data, and a model configured for that
   # stream we can start a Grok Swarm. The Swarm will find the best
   # configuration of our model to predict the data that exist in the stream.
-  
+
   print 'Starting Grok Swarm'
   recCenterEnergyModel.startSwarm()
-  
+
   # Monitor the swarm
   started = False
 
   # Catch ctrl-c to terminate remote long-running processes
   signal.signal(signal.SIGINT, signal_handler)
-  
+
   while True:
     SwarmState = recCenterEnergyModel.getSwarmProgress()
     jobStatus = SwarmState['jobStatus']
     results = SwarmState['results']
-    
+
     if jobStatus == grokpy.Status.COMPLETED:
       print 'You win! Your Grok Swarm is complete.'
       break
@@ -143,20 +143,20 @@ def HelloGrok():
       print 'Initial records are being processed ...'
       time.sleep(2)
       continue
-    
+
     bestConf = str(results['bestModel'])
     bestValue = results['bestValue']
     print ("Current best model: " + bestConf + " - ErrorScore %.2f" % bestValue)
     time.sleep(1)
-  
+
   ##############################################################################
   # Retrieve Swarm results
-  
+
   print "Getting results from Swarm ..."
   swarmResults = recCenterEnergyModel.getSwarmResults()
   headers = swarmResults['columnNames']
   resultRows = swarmResults['rows']
-  
+
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)
 
@@ -170,19 +170,19 @@ def HelloGrok():
   writer.writerow(headers)
   writer.writerows(resultRows)
   fileHandle.close()
-  
+
   ##############################################################################
   # Next steps ...
   #
   # Now would be a good time to explore the results of the Swarm and familiarize
   # yourself with their format. After that, you can take the Project id and
   # Model id printed out below and head over to part two!
-  
+
   print '\n\nOn to Part Two!'
   print 'Take these, the wizard will ask for them:'
   print '\t MODEL_ID: ' + recCenterEnergyModel.id
   print '\t PROJECT_ID: ' + myProject.id
-  
+
 def signal_handler(signal, frame):
   model = frame.f_locals.get('recCenterEnergyModel')
   swarmStatus = frame.f_locals.get('jobStatus')
