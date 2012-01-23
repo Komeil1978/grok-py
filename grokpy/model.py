@@ -2,6 +2,7 @@ import os
 import time
 import httplib
 import json
+import warnings
 
 from exceptions import GrokError, AuthenticationError
 from streaming import StreamListener, Stream
@@ -69,17 +70,16 @@ class Model(object):
     requestDef = {'service': 'productionModelCreate',
                   'searchModelId': self.id}
 
-    attempts = 0
-    while True:
+    for i in range(self.maxPromoteRetries):
       try:
         modelDef = self.c.request(requestDef)
+        break
       except GrokError:
-        if attempts >= self.maxPromoteRetries:
-          raise
-        else:
-          time.sleep(1)
-          attempts += 1
-
+        warnings.warn('Promotion attempt failed. Retrying ...')
+        time.sleep(1)
+    else:
+      # Try one last time and don't catch the error
+      modelDef = self.c.request(requestDef)
 
     # Start the model
     self.id = modelDef['id']
