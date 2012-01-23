@@ -6,7 +6,7 @@ import socket
 
 from exceptions import GrokError, AuthenticationError
 
-DEBUG = 0
+VERBOSITY = 0
 
 class Connection(object):
   '''
@@ -117,7 +117,7 @@ class Connection(object):
     # Load info from returned JSON strings
     content = json.loads(content)
 
-    if DEBUG == 1:
+    if VERBOSITY >= 1:
       print content
 
     # Some service requests don't return anything. :(

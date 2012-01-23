@@ -109,16 +109,10 @@ class Stream(object):
 
     projDesc['joins'] = [joinFile]
 
-    print '=' * 40
-    print projDesc
-
     requestDef = {'service': 'projectUpdate',
                   'project': projDesc}
 
     newProjDesc = self.c.request(requestDef)
-
-    print 'UPDATED PROJECT DESCRIPTION'
-    print newProjDesc
 
   #############################################################################
   # Private methods
