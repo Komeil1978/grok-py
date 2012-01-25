@@ -23,8 +23,8 @@ from grokpy import Client, GrokError
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-MODEL_ID = 'MUPgC8olAXMDeCLQRIcLGAHKzbJB' #MODEL_ID = 'YOUR_MODEL_ID'
-PROJECT_ID = '393' #PROJECT_ID = 'YOUR_PROJECT_ID'
+MODEL_ID = 'YOUR_MODEL_ID'
+PROJECT_ID = 'YOUR_PROJECT_ID'
 
 NEW_RECORDS = 'data/rec-center-stream-training.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
