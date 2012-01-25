@@ -8,4 +8,4 @@ from client import (Client,
 from exceptions import (AuthenticationError,
                         GrokError)
 
-__version__ = '0.0.5'
+__version__ = '0.0.6'
