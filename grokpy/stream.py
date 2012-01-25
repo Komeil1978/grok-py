@@ -86,33 +86,56 @@ class Stream(object):
 
     self.c.request(requestDef, 'POST')
 
-  def useJoinFile(self, joinFile, joinFileKey, streamKey):
+  def useJoinFile(self, joinFile):
     '''
     Binds a Join File to the stream and tells it how to process incoming records
     using the file.
 
     joinFile - A JoinFile Object
-    joinFileKey - Name of field in the join file to use as the primary key
-    streamKey - Name of field in stream to join to the Join File
     '''
+    # Make sure we have everything we need
+    if not joinFile.fileKey or not joinFile.streamKey:
+      raise GrokError('Please set both a fileKey and streamKey to use this '
+                      'joinFile.')
 
     projDesc = self.parentProject.getDescription()
+    primaryKeyIndex = joinFile._getFieldIndex(joinFile.fileKey)
+    joinFieldIndex = self._getFieldIndex(joinFile.streamKey)
 
-    primaryKeyIndex = joinFile._getFieldIndex(joinFileKey)
-    joinFieldIndex = self._getFieldIndex(streamKey)
+    # Turn on the fields
+    for i, field in enumerate(joinFile.description['fields']):
+      joinFile.description['fields'][i]['useField'] = True
 
-    joinFile = {'name': joinFile.name,
-                'fields': joinFile.fields,
+    joinFile = {'name': joinFile.description['name'],
+                'fields': joinFile.description['fields'],
                 'primaryKeyIndex': primaryKeyIndex,
                 'joinFieldIndex': joinFieldIndex,
                 'joinFileId': joinFile.id}
 
-    projDesc['joins'] = [joinFile]
+    projDesc['joins'].append(joinFile)
 
     requestDef = {'service': 'projectUpdate',
                   'project': projDesc}
 
     newProjDesc = self.c.request(requestDef)
+
+  def usePublicDataSource(self, publicDataSource):
+    '''
+    Takes a configured publicDataSource and attaches it to the stream
+    '''
+
+    # Check if there is configuration we need to complete
+    if publicDataSource.locationFieldName:
+      publicDataSource.description['configuration'] = \
+      str(self._getFieldIndex(publicDataSource.locationFieldName))
+
+    projDesc = self.parentProject.getDescription()
+    projDesc['providers'].append(publicDataSource.description)
+
+    requestDef = {'service': 'projectUpdate',
+                  'project': projDesc}
+
+    self.parentProject.projectDef = self.c.request(requestDef)
 
   #############################################################################
   # Private methods
@@ -136,6 +159,7 @@ class Stream(object):
       raise GrokError('Duplicate Field Name: ' + fieldName + ' More than one '
                       'field with this name was found. Please use the '
                       'set*FieldIndex() methods directly.')
+
 
     return index
 

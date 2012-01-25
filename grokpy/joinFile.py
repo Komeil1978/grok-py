@@ -26,7 +26,11 @@ class JoinFile(object):
 
     self.name = self.description['name']
 
-    self.fields = self.description['fields']
+    # Primary key in file
+    self.fileKey = None
+
+    # Join field
+    self.streamKey = None
 
   def delete(self):
     '''
@@ -38,6 +42,18 @@ class JoinFile(object):
                   'joinFileId': self.id}
 
     self.c.request(requestDef)
+
+  def setFileKey(self, key):
+    '''
+    The field to use as primary key in the file
+    '''
+    self.fileKey = key
+
+  def setStreamKey(self, key):
+    '''
+    The field in each stream record to attempt to pair with the fileKey
+    '''
+    self.streamKey = key
 
 
   #############################################################################
@@ -52,7 +68,6 @@ class JoinFile(object):
     counter = 0
     index = 0
     for field in self.description['fields']:
-      print field
       if field['name'] == fieldName:
         counter += 1
         index = field['index']

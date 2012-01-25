@@ -104,7 +104,6 @@ class Client(object):
     '''
     Looks up and returns a PDS by its code.
     '''
-
     pdsList = self.listPublicDataSources()
 
     for pds in pdsList:
@@ -158,7 +157,8 @@ class Client(object):
     # Find columns that contain predictions
     predictionIndexes = [headers.index(header)
                        for header in headers
-                       if ('temporal_prediction' in header)]
+                       if ('temporal_prediction' in header)
+                       or ('temporal_metric' in header)]
 
     # Bump all predictions down one row
     columns = zip(*resultRows)

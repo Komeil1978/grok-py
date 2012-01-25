@@ -68,10 +68,10 @@ class Project(object):
     WARNING: HACK
 
     Due to the current object model we don't actually create the model until
-    we associate a stream with the model
+    we start a swarm
     '''
 
-    return Model(self.c, self.projectDef)
+    return Model(self)
 
   def getModel(self, modelId):
     '''
@@ -102,7 +102,7 @@ class Project(object):
 
     modelDef = self.c.request(requestDef, 'POST')
 
-    return Model(self.c, self.projectDef, modelDef = modelDef)
+    return Model(self, modelDef = modelDef)
 
   def listModels(self):
     '''
@@ -156,7 +156,6 @@ class Project(object):
 
     specHandle = open(specFilePath, 'rU')
     try:
-      print specFilePath
       fields = json.load(specHandle)
     except:
       msg = StringIO.StringIO()

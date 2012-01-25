@@ -14,12 +14,12 @@ class Model(object):
   Object representing a Grok Model
   '''
 
-  def __init__(self, connection, projectDef, modelDef = {}):
+  def __init__(self, parentProject, modelDef = {}):
     # Our connection to the Grok API
-    self.c = connection
+    self.c = parentProject.c
 
     # The project this model belongs to
-    self.projectDef = projectDef
+    self.parentProject = parentProject
 
     # The Id of this model
     if modelDef:
@@ -128,7 +128,7 @@ class Model(object):
 
   def setNote(self, newNote):
     '''
-    Adds or updates a note to for this model
+    Adds or updates a note for this model
     '''
     # Get current description
     desc = self.getDescription()
@@ -161,21 +161,20 @@ class Model(object):
     '''
     self.setTemporalFieldIndex(self._getFieldIndex(fieldName))
 
-  def setLocationFieldIndex(self, index):
-    '''
-    Which stream field provides geospatial data for the model
-    '''
-    self._checkIndex(index)
-
-    self.projectDef['streamConfiguration']['locationFieldIndex'] = index
-
   def setPredictionFieldIndex(self, index):
     '''
     The stream field for which we are optimizing predictions.
     '''
     self._checkIndex(index)
 
-    self.projectDef['streamConfiguration']['predictionFieldIndex'] = index
+    projectDesc = self.parentProject.getDescription()
+
+    projectDesc['streamConfiguration']['predictionFieldIndex'] = index
+
+    requestDef = {'service': 'projectUpdate',
+                  'project': projectDesc}
+
+    self.c.request(requestDef, 'POST')
 
   def setTemporalFieldIndex(self, index):
     '''
@@ -183,7 +182,14 @@ class Model(object):
     '''
     self._checkIndex(index)
 
-    self.projectDef['streamConfiguration']['temporalFieldIndex'] = index
+    projectDesc = self.parentProject.getDescription()
+
+    projectDesc['streamConfiguration']['temporalFieldIndex'] = index
+
+    requestDef = {'service': 'projectUpdate',
+                  'project': projectDesc}
+
+    self.c.request(requestDef, 'POST')
 
   def setTimeAggregation(self, aggregationType):
     '''
@@ -204,7 +210,14 @@ class Model(object):
       raise GrokError('You must set a Stream for this model to use before '
                       'calling this method.')
 
-    self.projectDef['streamConfiguration']['timeAggregation'] = aggregationType
+    projectDesc = self.parentProject.getDescription()
+
+    projectDesc['streamConfiguration']['timeAggregation'] = aggregationType
+
+    requestDef = {'service': 'projectUpdate',
+                  'project': projectDesc}
+
+    self.c.request(requestDef, 'POST')
 
   #############################################################################
   # Model states
@@ -277,22 +290,11 @@ class Model(object):
     #   - If given join files are uploaded
     if VERBOSITY >= 1: print '<OBJECT MODEL WORKAROUND>'
 
-    # Configure project
-    if VERBOSITY >= 1: print 'CONFIGURING PROJECT'
-
-    for arg, value in self.stream.streamDescription.iteritems():
-      self.projectDef['streamConfiguration'][arg] = value
-
-    requestDef = {'service': 'projectUpdate',
-                  'project': self.projectDef}
-
-    self.c.request(requestDef, 'POST')
-
     # Create the model
     if VERBOSITY >= 1: print 'CREATING MODEL'
 
     requestDef = {'service': 'searchModelCreate',
-                  'projectId': self.projectDef['id']}
+                  'projectId': self.parentProject.projectDef['id']}
 
     modelDef = self.c.request(requestDef)
 
@@ -320,16 +322,6 @@ class Model(object):
                     'data': self.stream.records}
 
       self.c.request(requestDef)
-
-    # Deal with join files
-    if self.stream.joinFileContents:
-      if VERBOSITY >= 1: print 'CREATING JOIN FILE'
-      requestDef = {'service': 'joinFileCreate',
-                    'name': self.stream.joinFileName,
-                    'fields': self.stream.joinFileFields,
-                    'data': self.stream.joinFileContents}
-
-      joinFileDef = self.c.request(requestDef)
 
     if VERBOSITY >= 1: print '</WORKAROUND>'
     ########## END HACK
@@ -424,11 +416,23 @@ class Model(object):
     '''
     self._enforceType('production')
 
-    requestDef = {'service': 'productionModelInputCacheAppend',
+    if len(data) > 5000:
+      i = 0
+      step = 5000
+      while i < len(data):
+        requestDef = {'service': 'productionModelInputCacheAppend',
+                  'productionModelId': self.id,
+                  'data': data[i:(i+step)]}
+
+        self.c.request(requestDef)
+        i += step
+
+    else:
+      requestDef = {'service': 'productionModelInputCacheAppend',
                   'productionModelId': self.id,
                   'data': data}
 
-    self.c.request(requestDef)
+      self.c.request(requestDef)
 
   def getPredictions(self, startRow = -1, endRow = -1):
     '''
@@ -483,7 +487,7 @@ class Model(object):
             if latestRow >= endRow:
               break
             else:
-              print 'Waiting on more predictions. Latest: %d Target: %d' % \
+              print 'Waiting on more predictions. Total so far: %d Target: %d' % \
                     (latestRow, endRow)
           self._outputStreamPosition = latestRow
           time.sleep(1)

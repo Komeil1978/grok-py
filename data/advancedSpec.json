@@ -27,7 +27,7 @@
   "dataFormat": {"dataType": "ZIP_CODE", "formatString": null},
   "fieldRange": null,
   "fieldSubset": null,
-  "useField": false
+  "useField": true
   },
   {
    "name": "dayOfWeek",

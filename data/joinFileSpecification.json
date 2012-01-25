@@ -2,11 +2,13 @@
  {
   "name": "day",
   "index": 0,
-  "dataFormat": {"dataType": "ENUMERATION", "formatString": null}
+  "dataFormat": {"dataType": "ENUMERATION", "formatString": null},
+  "useField": true
   },
   {
    "name": "employee",
    "index": 1,
-   "dataFormat": {"dataType": "ENUMERATION", "formatString": null}
+   "dataFormat": {"dataType": "ENUMERATION", "formatString": null},
+   "useField": true
   }
 ]
