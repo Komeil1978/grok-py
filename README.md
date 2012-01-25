@@ -28,18 +28,15 @@ From pip:
 Add your API key to the app
 
  * Open HelloGrok.py in your favorite editor
- * Insert your API_KEY where it says "YOUR_API_KEY_HERE"
+ * Insert your API_KEY where it says "YOUR_API_KEY"
 
 OR add your API key to your environment
 
 From the command line:
 
-    $ echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
+    $ echo "export GROK_API_KEY=YOUR_API_KEY" >> ~/.bashrc
     $ source ~/.bashrc
 
 Launch the app
 
     $ python HelloGrok.py
-
-
-
