@@ -252,6 +252,9 @@ class Model(object):
     Puts the model into a predictions only state where it will not learn from
     new data.
     '''
+
+    raise GrokError('This method is not yet implemented in the API.')
+
     self._enforceType('production')
 
     requestDef = {'service': 'productionModelUpdate',
@@ -264,6 +267,9 @@ class Model(object):
     '''
     New records will be integrated into the models future predictions.
     '''
+
+    raise GrokError('This method is not yet implemented in the API.')
+
     self._enforceType('production')
 
     requestDef = {'service': 'productionModelUpdate',
@@ -358,6 +364,18 @@ class Model(object):
                   'stream': False}
 
     return self.c.request(requestDef)
+
+  def monitorSwarm(self, swarmMonitor, async = False):
+    '''
+    swarmMonitor - An instance of the grokpy.streaming.StreamMonitor class.
+    async - Toggle to run this as a separate thread
+
+    swarmMonitor methods should return False to exit the loop.
+    '''
+    while True:
+      SwarmState = self.getSwarmProgress()
+      if not swarmMonitor.on_state(SwarmState):
+        break
 
   def monitorSwarmProgress(self, newStateCallback):
     '''

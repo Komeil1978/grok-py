@@ -154,7 +154,7 @@ class Client(object):
                             9
     '''
 
-    # Find columns that contain predictions
+    # Find columns that contain predictions / metrics
     predictionIndexes = [headers.index(header)
                        for header in headers
                        if ('temporal_prediction' in header)

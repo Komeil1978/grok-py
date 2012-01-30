@@ -7,6 +7,27 @@ from socket import timeout
 from threading import Thread
 from time import sleep
 
+class StreamMonitor(object):
+
+    def __init__(self):
+        pass
+
+    def on_state(self, state):
+        """Called when a new state is received from connection.
+
+        Override this method if you wish to manually handle
+        the stream data. Return False to stop stream and close connection.
+        """
+        return
+
+    def on_error(self, status_code):
+        """Called when a non-200 status code is returned"""
+        return False
+
+    def on_timeout(self):
+        """Called when stream connection times out"""
+        return
+
 class StreamListener(object):
 
     def __init__(self, newStateCallback):
@@ -92,15 +113,15 @@ class Stream(object):
             raise
 
     def _read_loop(self, resp):
-          decode = json.JSONDecoder().raw_decode 
+          decode = json.JSONDecoder().raw_decode
           data = ''
           while self.running:
             if resp.isclosed():
                 break
             c = resp.read(100)
             data += c
-            try: 
-              state, i = decode(data) 
+            try:
+              state, i = decode(data)
               data = data[i:].lstrip()
             except ValueError:
                 time.sleep(0.01)

@@ -8,4 +8,6 @@ from client import (Client,
 from exceptions import (AuthenticationError,
                         GrokError)
 
+from streaming import StreamMonitor
+
 __version__ = '0.0.6'
