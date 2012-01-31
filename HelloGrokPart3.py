@@ -62,25 +62,6 @@ def HelloGrokPart3():
   newStream.configure(STREAM_SPEC)
 
   ##############################################################################
-  # Upload a file to use as a lookup table.
-  #
-  # Data can be added to a stream dynamically by Grok. First we're going to
-  # give Grok a file to use as its database. Later we'll configure our stream
-  # so that each time a new record comes in, Grok will automatically add in
-  # data pulled from this file. Here we want to know who was managing the
-  # rec center on a given day, so our file lists days and who works on each of
-  # them.
-
-  myJoinFile = myProject.createJoinFile(JOIN_FILE, JOIN_FILE_SPEC)
-
-  # Which field in our join file should serve as the primary key?
-  myJoinFile.setFileKey('day')
-
-  # Which field in the stream we want to join to that key
-  myJoinFile.setStreamKey('dayOfWeek')
-  newStream.useJoinFile(myJoinFile)
-
-  ##############################################################################
   # Public Data Sources
   #
   # Grok provides a few Public Data Sources. These are databases from which
@@ -158,42 +139,12 @@ def HelloGrokPart3():
   print 'Starting Grok Swarm'
   advancedModel.startSwarm()
 
-  # Monitor the swarm
-  started = False
-
   # Catch ctrl-c to terminate remote long-running processes
   signal.signal(signal.SIGINT, signal_handler)
 
-  while True:
-    SwarmState = advancedModel.getSwarmProgress()
-    jobStatus = SwarmState['jobStatus']
-    results = SwarmState['results']
-    #print SwarmState
-
-    if jobStatus == grokpy.Status.COMPLETED:
-      if SwarmState['completionReason'] == 'ERROR':
-        errorMsg = SwarmState['completionMessage']
-        print 'Oh no! Something went wrong: ' + errorMsg
-        sys.exit(1)
-      else:
-        print 'You win! Your Grok Swarm is complete.'
-        break
-    if jobStatus == grokpy.Status.RUNNING and started == False:
-      started = True
-      print 'Swarm started.'
-    if not started:
-      print 'Swarm is starting up ...'
-      time.sleep(2)
-      continue
-    if not results:
-      print 'Initial records are being processed ...'
-      time.sleep(2)
-      continue
-
-    bestConf = str(results['bestModel'])
-    bestValue = results['bestValue']
-    print ("Current best model: " + bestConf + " - ErrorScore %.2f" % bestValue)
-    time.sleep(1)
+  # Monitor the Swarm
+  monitor = SwarmMonitor()
+  advancedModel.monitorSwarm(monitor)
 
   # Retrieve Swarm results
   print "Getting results from Swarm ..."
@@ -252,6 +203,63 @@ def HelloGrokPart3():
 
   print "\n\nFantasmic! You've completed Part Three."
   print ("Now it's time to start working with your own data. Get to it!")
+
+class SwarmMonitor(grokpy.StreamMonitor):
+
+    def __init__(self):
+        # Loop information
+        self.started = False
+
+        self.configurations = {}
+        self.highestRecordCount = 0
+
+    def on_state(self, state):
+        '''
+        Called when a new state is received from connection.
+
+        Override this method if you wish to manually handle
+        the stream data. Return False to stop stream and close connection.
+        '''
+
+        jobStatus = state['jobStatus']
+        results = state['results']
+        configurations = state['models']
+
+        if jobStatus == grokpy.Status.COMPLETED:
+          bestConfig = results['bestModel']
+          print 'Best Configuration: ' + str(bestConfig)
+          print 'Using Field(s): ' + str(self.configurations[bestConfig]['fields'])
+          print 'With an Error of: ' + str(results['bestValue'])
+          print 'You win! Your Grok Swarm is complete.'
+          # Exit the loop
+          return False
+        if jobStatus == grokpy.Status.RUNNING and self.started == False:
+          self.started = True
+          print 'Swarm started.'
+        if not self.started:
+          print 'Swarm is starting up ...'
+          time.sleep(2)
+          return True
+        if not results:
+          print 'Initial records are being processed ...'
+          time.sleep(2)
+          return True
+
+        for config in configurations:
+          if config['numRecords'] > self.highestRecordCount:
+            self.highestRecordCount = config['numRecords']
+          if config['status'] == grokpy.Status.COMPLETED:
+            self.configurations[config['modelId']] = config
+
+        if self.configurations:
+          print ('Grok has evaluated ' + str(len(self.configurations)) +
+                 ' model configurations.')
+        else:
+          print ('First models are processing records. Latest record seen: ' +
+                 str(self.highestRecordCount))
+
+        time.sleep(2)
+        return True
 
 def signal_handler(signal, frame):
   model = frame.f_locals.get('advancedModel')
