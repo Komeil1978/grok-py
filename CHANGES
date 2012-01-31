@@ -1,5 +1,14 @@
 
 ###############################################################################
+# 0.0.7
+
+- Change default output of sample apps to show progress rather than errors.
+- Deprecate File Provider (we hardly knew yee)
+- Add StreamMonitor class for use with Swarm and Production monitoring
+- Disable model learning toggles until implemented in API
+
+
+###############################################################################
 # 0.0.6
 
 - Complete HelloGrokPart3
