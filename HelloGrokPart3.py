@@ -46,7 +46,7 @@ def HelloGrokPart3():
   # Setup
   grok = Client(API_KEY)
   now = time.time()
-  myProject = grok.createProject('FileProvTesting' + str(now))
+  myProject = grok.createProject('Hello Grok Part 3' + str(now))
 
   ##############################################################################
   # Create a new model
