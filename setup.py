@@ -27,7 +27,6 @@ sdict = {
     'keywords' : ['numenta', 'prediction'],
     'license' : 'MIT',
     'packages' : ['grokpy', 'grokpy.httplib2'],
-    'test_suite' : 'tests.all_tests',
     'classifiers' : [
         'Development Status :: 1 - Planning',
         'Environment :: Console',
