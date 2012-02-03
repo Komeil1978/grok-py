@@ -42,6 +42,9 @@ class Model(object):
     # How many times we'll try to promote a model before giving up
     self.maxPromoteRetries = 3
 
+    # Where we last read from in the output cache
+    self.outputCachePointer = 0
+
   def delete(self):
     '''
     Permanently deletes the model
@@ -452,7 +455,7 @@ class Model(object):
 
       self.c.request(requestDef)
 
-  def getPredictions(self, startRow = -1, endRow = -1):
+  def getPredictions(self, startRow = -1, endRow = -1, retries = 20):
     '''
     Retrieves all the predictions from the models output from startRow to
     endRow.
@@ -466,9 +469,70 @@ class Model(object):
                   'startRow': startRow,
                   'endRow': endRow}
 
-    response = self.c.request(requestDef)
+    for i in range(retries):
+      try:
+        response = self.c.request(requestDef)
+      except GrokError:
+        desc = self.getDescription()
+        if desc.get('running') == False:
+          raise GrokError('Model seems to have terminated prematurely, please '
+                          'contact support.')
+        else:
+          raise
+      # Case: Output cache doesn't exist yet
+      if 'code' in response and response['code'] == 'I00003':
+        if VERBOSITY: print 'Predictions not yet ready'
+        time.sleep(2)
+      elif response['rows']:
+        if VERBOSITY: print 'Got next prediction ...'
+        return response
+      else:
+        if VERBOSITY: print 'No prediction yet ...'
+        time.sleep(.5)
 
-    return response
+    raise GrokError('Could not get requested prediction with ' + str(retries)
+                    + ' retries.')
+
+  def getMultiStepPredictions(self, buffer, timesteps):
+    '''
+    Gets predictions for the next N timesteps
+
+    buffer - A set of actual values to send in to prime predictions. This buffer
+             should be sent in with each call and updated as new actual values
+             are measured.
+    timesteps - The number of steps into the future to predict.
+    '''
+
+    # Send in our buffer
+    self.sendRecords(buffer)
+
+    # Get the last prediction
+    bufferLen = len(buffer)
+
+    if self.outputCachePointer == 0:
+      headers, resultRows = self.monitorPredictions(bufferLen - 1)
+    else:
+      start = self.outputCachePointer + bufferLen
+      headers, resultRows = self.monitorPredictions(start)
+
+    # Collect predictions
+    results = []
+    for i in range(timesteps):
+      latestPrediction = resultRows[-1]
+      # store the row id
+      latestId = int(latestPrediction[0])
+      self.outputCachePointer = latestId
+      # add that prediction to the list
+      results.append(latestPrediction)
+      # convert that prediction back into a row
+      tempRecord = self._predictionToInput(headers, latestPrediction)
+      # send that new row in
+      self.sendRecords([tempRecord])
+      # get the latest prediction
+      response = self.getPredictions((latestId + 1), -1)
+      resultRows = response['rows']
+
+    return headers, results
 
   def monitorPredictions(self, endRow = False):
     '''
@@ -479,38 +543,21 @@ class Model(object):
     self._enforceType('production')
 
     while True:
+      response = self.getPredictions(-1, -1)
+      resultRows = response['rows']
+      headers = response['columnNames']
       try:
-        response = self.getPredictions(-1, -1)
-      except GrokError:
-        desc = recCenterEnergyModel.getDescription()
-        if desc.get('running') == False:
-          raise GrokError('Model seems to have terminated prematurely, please '
-                          'contact support.')
-        else:
-          raise
-      # Case: Output cache doesn't exist yet
-      if 'code' in response and response['code'] == 'I00003':
-        print 'Predictions not yet ready'
+        latestRow = int(response['rows'][-1][0])
+        if endRow:
+          if latestRow >= endRow:
+            break
+          else:
+            pass
+            #print 'Waiting on more predictions. Total so far: %d Target: %d' % (latestRow, endRow)
+        self._outputStreamPosition = latestRow
         time.sleep(1)
-      # Case: Output cache exists but is empty
-      elif not response['rows']:
-        print 'Predictions not yet ready'
-        time.sleep(1)
-      else:
-        resultRows = response['rows']
-        headers = response['columnNames']
-        try:
-          latestRow = int(response['rows'][-1][0])
-          if endRow:
-            if latestRow >= endRow:
-              break
-            else:
-              print 'Waiting on more predictions. Total so far: %d Target: %d' % \
-                    (latestRow, endRow)
-          self._outputStreamPosition = latestRow
-          time.sleep(1)
-        except IndexError:
-          pass
+      except IndexError:
+        pass
 
     return headers, resultRows
 
@@ -587,3 +634,26 @@ class Model(object):
                   'endRow': endRow}
 
     return self.c.request(requestDef)
+
+  def _predictionToInput(self, headers, prediction):
+    '''
+    Converts predictions back into inputs for multi-step prediction
+
+    headers: The column names for each prediction
+    prediction: A list of inputs, predictions, and metrics
+    '''
+
+    if not len(headers) == len(prediction):
+      raise GrokError('Headers and predictions do not match up. ' +
+                      str(headers) + ' ' + str(prediction))
+
+    # Match up headers and values
+    zipped = dict(zip(headers, prediction))
+    input = {}
+    for name, value in zipped.iteritems():
+      # Extract only relevant values. Preds will overwrite if they exist.
+      if 'input' in name or 'temporal_prediction' in name:
+        prefix, field = name.split(':')
+        input[field] = value
+
+    return input.values()
