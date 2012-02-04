@@ -38,7 +38,7 @@ import grokpy
 
 API_KEY = 'YOUR_KEY_HERE'
 STREAM_SPEC = 'data/streamSpecification.json'
-INPUT_CSV = 'data/rec-center-tiny.csv'
+INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
 ##############################################################################

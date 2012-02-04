@@ -108,13 +108,12 @@ class Project(object):
     '''
     Returns a list of Models that exist in this project
     '''
-    searchModelDefs = self._listSearchModels()
-    prodModelDefs = self._listProductionModels()
+    modelDescriptions = self._listSearchModels()
 
-    modelDescriptions = searchModelDefs.append(prodModelDefs)
+    modelDescriptions.extend(self._listProductionModels())
 
     if modelDescriptions:
-      models = [Model(self.c, self.projectDef) for model in modelDescriptions]
+      models = [Model(self, desc) for desc in modelDescriptions]
     else:
       models = []
 
