@@ -189,8 +189,17 @@ class SwarmMonitor(grokpy.StreamMonitor):
 
         if jobStatus == grokpy.Status.COMPLETED:
           bestConfig = results['bestModel']
+          fieldsUsed = self.configurations[bestConfig]['fields']
           print 'Best Configuration: ' + str(bestConfig)
-          print 'Using Field(s): ' + str(self.configurations[bestConfig]['fields'])
+          print 'Using Field(s): ' + str(fieldsUsed)
+          if len(fieldsUsed) > 1:
+            fieldContributions = state['fieldContributions']
+            print 'Field Contributions:'
+            for field in fieldContributions:
+              if field['contribution'] > 0:
+                print('\tUsing ' + field['name'] + ' improved accuracy by ' +
+                      str(field['contribution']) + ' percent.')
+
           print 'With an Error of: ' + str(results['bestValue'])
           print 'You win! Your Grok Swarm is complete.'
           # Exit the loop
@@ -203,7 +212,7 @@ class SwarmMonitor(grokpy.StreamMonitor):
           time.sleep(2)
           return True
         if not results:
-          print 'Initial records are being processed ...'
+          print 'Initial records are being loaded ...'
           time.sleep(2)
           return True
 
