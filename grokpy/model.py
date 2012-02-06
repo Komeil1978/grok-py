@@ -250,13 +250,14 @@ class Model(object):
     if VERBOSITY: print 'STOPPING MODEL'
     self.c.request(requestDef)
 
-  def disableLearning(self):
+  def disableLearning(self, retries = 3):
     '''
     Puts the model into a predictions only state where it will not learn from
     new data.
-    '''
 
-    raise GrokError('This method is not yet implemented in the API.')
+    Retries - If this method is called immediately after model promotion it may
+              fail. By default we will retry a few times.
+    '''
 
     self._enforceType('production')
 
@@ -264,14 +265,20 @@ class Model(object):
                   'productionModelId': self.id,
                   'inferenceOnly': True}
 
-    return self.c.request(requestDef)
+    for i in range(retries):
+      try:
+        return self.c.request(requestDef)
+      except GrokError:
+        warnings.warn('Disable attempt failed. Retrying ...')
+        time.sleep(1)
+    else:
+      # Try one last time and don't catch the error
+      return self.c.request(requestDef)
 
   def enableLearning(self):
     '''
     New records will be integrated into the models future predictions.
     '''
-
-    raise GrokError('This method is not yet implemented in the API.')
 
     self._enforceType('production')
 
