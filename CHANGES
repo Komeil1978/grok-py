@@ -1,12 +1,20 @@
 
 ###############################################################################
+# 0.0.8
+
+- Re-enable learning methods on models
+- Expose field rankings at end of Swarm
+- Fix .listModels() method. Looks like this never got updated when I changed how models are initialized.
+- Add experimental multistep prediction method to models. Make getPredictions() method smarter.
+- Remove test_suite option from setup.py. Throws a warning under 2.7.2 win
+
+###############################################################################
 # 0.0.7
 
 - Change default output of sample apps to show progress rather than errors.
 - Deprecate File Provider (we hardly knew yee)
 - Add StreamMonitor class for use with Swarm and Production monitoring
 - Disable model learning toggles until implemented in API
-
 
 ###############################################################################
 # 0.0.6
