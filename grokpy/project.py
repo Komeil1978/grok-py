@@ -174,17 +174,6 @@ class Project(object):
 
     return JoinFile(self, response)
 
-  def delete(self):
-    '''
-    Permanently deletes this project, its models and streams
-    TODO: Verify with new OM
-    '''
-
-    requestDef = {'service': 'projectDelete',
-                  'projectId': self.id}
-
-    self.c.request(requestDef)
-
   #############################################################################
   # Private methods
 

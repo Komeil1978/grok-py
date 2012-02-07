@@ -1,4 +1,5 @@
 import threading
+import httplib2
 
 from connection import Connection
 from project import Project
@@ -17,13 +18,22 @@ class Client(object):
   Helper Methods
   '''
 
-  def __init__(self, key = None, baseURL = None):
+  def __init__(self, key = None, baseURL = None, connection = None):
+    '''
+    Key - Grok API Key
+    baseURL - baseURL - Grok server request target
+    connection - An instance of the grokpy.Connection class. Used mainly for
+                 testing.
+    '''
 
     # Create a connection to the API
-    if baseURL:
-      self.c = Connection(key, baseURL)
+    if not connection:
+      if baseURL:
+        self.c = Connection(httpClient, key, baseURL)
+      else:
+        self.c = Connection(httpClient, key)
     else:
-      self.c = Connection(key)
+      self.c = connection
 
     # Minimal connection test
     self.testConnection()
@@ -94,9 +104,11 @@ class Client(object):
 
     dataSourceDescriptions = self.c.request(requestDef)
 
-    publicDataSources = []
-    for dsd in dataSourceDescriptions:
-      publicDataSources.append(PublicDataSource(self.c, dsd))
+    if dataSourceDescriptions:
+      publicDataSources = [PublicDataSource(self.c, dsd) for dsd in
+                           dataSourceDescriptions]
+    else:
+      publicDataSources = []
 
     return publicDataSources
 
