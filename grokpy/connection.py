@@ -61,7 +61,8 @@ class Connection(object):
     NOTE: Timeout is set by default. As this is a socket level timeout it may
     cause longpolling problems later. TODO: Re-visit
     '''
-    h = httplib2.Http(".cache", 20)
+
+    h = self._getHTTPClient()
 
     # Build the request
     ## GETS
@@ -141,6 +142,12 @@ class Connection(object):
 
   ###########################################################################
   # Private Methods
+
+  def _getHTTPClient(self):
+    '''
+    This is an abstraction layer. This method will be over-ridden in tests.
+    '''
+    return httplib2.Http(".cache", 20)
 
   def _find_key(self):
     '''
