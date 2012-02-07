@@ -1,6 +1,6 @@
 import os
-import httplib2
 import urllib2
+import httplib2
 import json
 import socket
 
@@ -13,7 +13,12 @@ class Connection(object):
   Connection object for the Grok Prediction Service
   '''
 
-  def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com'):
+  def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com', httpClient = None):
+    '''
+    httpClient - An instance of an HTTP Client Object
+    key - Grok API Key
+    baseURL - Grok server request target
+    '''
 
     # Search for API key in environment
     if not key or key == 'YOUR_KEY_HERE':
@@ -49,6 +54,11 @@ class Connection(object):
     # The base path for all our HTTP calls
     self.baseURL = baseURL + '/version/1/'
 
+    # The HTTP Client we'll use to make requests
+    if not httpClient:
+      httpClient = httplib2.Http(".cache", 20)
+
+    self.h = httpClient
 
   def request(self, requestDef, method = 'POST', body = False, headers = None):
     '''
@@ -61,8 +71,6 @@ class Connection(object):
     NOTE: Timeout is set by default. As this is a socket level timeout it may
     cause longpolling problems later. TODO: Re-visit
     '''
-
-    h = self._getHTTPClient()
 
     # Build the request
     ## GETS
@@ -102,7 +110,7 @@ class Connection(object):
 
     # Make the request, handle initial connection errors
     try:
-      httpResponse, content = h.request(**kwargs)
+      httpResponse, content = self.h.request(**kwargs)
     except socket.error, e:
       if 'timed out' in e:
         raise GrokError("Request timed out. Please check the "
@@ -143,12 +151,6 @@ class Connection(object):
   ###########################################################################
   # Private Methods
 
-  def _getHTTPClient(self):
-    '''
-    This is an abstraction layer. This method will be over-ridden in tests.
-    '''
-    return httplib2.Http(".cache", 20)
-
   def _find_key(self):
     '''
     Retrieve an API key from the user's shell environment
@@ -170,8 +172,6 @@ class Connection(object):
                                 'please check it again: "' + key +'"')
     else:
       return 'OK'
-
-    pass
 
   def _handleGrokErrors(self, errors):
     '''

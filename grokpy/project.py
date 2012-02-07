@@ -57,7 +57,12 @@ class Project(object):
     requestDef = {'service': 'projectUpdate',
                   'project': desc}
 
-    return self.c.request(requestDef, 'POST')
+    response = self.c.request(requestDef, 'POST')
+
+    # Update locals
+    self.name = newName
+
+    return response
 
   def createModel(self):
     '''
@@ -119,20 +124,27 @@ class Project(object):
 
     return models
 
-  def stopAllModels(self):
+  def stopAllModels(self, verbose = False):
     '''
-    A convenience method to stop all models that have been promoted
+    A convenience method to stop all models that have been promoted.
+
+    This method can take many seconds to return depending on how many
+    models are being stopped.
     '''
 
     productionModels = self._listProductionModels()
 
+    stoppedModelIds = []
     for model in productionModels:
       if model['running']:
         id = model['id']
-        print 'Stopping model: ' + id
+        stoppedModelIds.append(id)
+        if verbose: print 'Stopping model: ' + str(id)
         requestDef = {'service': 'productionModelStop',
                       'productionModelId': id}
         self.c.request(requestDef)
+
+    return stoppedModelIds
 
   def createStream(self):
     '''
@@ -140,50 +152,6 @@ class Project(object):
     '''
 
     return Stream(self)
-
-  def createJoinFile(self, dataFilePath, specFilePath):
-    '''
-    Uploads the contents of a csv file which can be used to programatically
-    add fields to records in a stream.
-    '''
-    # Get data
-    _, filename = os.path.split(dataFilePath)
-    dataHandle = open(dataFilePath, 'rU')
-    joinFileContents = [row for row in csv.reader(dataHandle)]
-    dataHandle.close()
-    # Get spec
-
-    specHandle = open(specFilePath, 'rU')
-    try:
-      fields = json.load(specHandle)
-    except:
-      msg = StringIO.StringIO()
-      print >>msg, ("Caught JSON parsing error. Your stream specification may "
-      "have errors. Original exception follows:")
-      traceback.print_exc(None, msg)
-      raise GrokError(msg.getvalue())
-    specHandle.close()
-
-    requestDef = {'service': 'joinFileCreate',
-                  'projectId': self.id,
-                  'name': filename,
-                  'fields': fields,
-                  'data': joinFileContents}
-
-    response = self.c.request(requestDef, 'POST')
-
-    return JoinFile(self, response)
-
-  def delete(self):
-    '''
-    Permanently deletes this project, its models and streams
-    TODO: Verify with new OM
-    '''
-
-    requestDef = {'service': 'projectDelete',
-                  'projectId': self.id}
-
-    self.c.request(requestDef)
 
   #############################################################################
   # Private methods
