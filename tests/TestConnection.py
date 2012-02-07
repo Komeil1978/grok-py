@@ -2,7 +2,7 @@ import grokpy
 import unittest
 
 from grokpy.connection import Connection
-from grokpy.exceptions import AuthenticationError
+from grokpy.exceptions import AuthenticationError, GrokError
 
 class ConnectionTestCase(unittest.TestCase):
 
@@ -14,14 +14,7 @@ class ConnectionTestCase(unittest.TestCase):
     Basic connection without errors
     '''
     connection = Connection(self.mockKey)
-    
-  def testNoKey(self):
-    '''
-    If you pass no key and one can't be found there should be an error
-    '''
-    self.assertRaises(AuthenticationError,
-                      Connection)
-  
+
   def testBadKey(self):
     '''
     A key that doesn't look right should throw an error immediately
@@ -29,7 +22,41 @@ class ConnectionTestCase(unittest.TestCase):
     badKey = 'foo'
     self.assertRaises(AuthenticationError,
                       Connection, badKey)
-    
+
+  def testNon200Response(self):
+    '''
+    If the HTTP response isn't 200 we should throw an error
+    '''
+
+    # Mock out HTTP Client
+    class mockHTTPClient(object):
+      def request(self, **kwargs):
+        return {'status': 404}, 'mockContent'
+
+    c = MockConnection(mockHTTPClient)
+
+    # Define a minimal request
+    requestDef = {'service': 'projectList'}
+
+    self.assertRaises(GrokError, c.request, requestDef)
+
+class MockConnection(Connection):
+  '''
+  Allows a test to override the http client that the standard connection uses.
+
+  Think of it as adding dependency injection after the fact.
+  '''
+
+  def __init__(self, mockHTTPClient):
+    self.mockHTTPClient = mockHTTPClient
+
+    # Bring in all the parent class attributes
+    Connection.__init__(self)
+
+  def _getHTTPClient(self):
+    return self.mockHTTPClient()
+
+
 if __name__ == '__main__':
   debug = 0
   if debug:
