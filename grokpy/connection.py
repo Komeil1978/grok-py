@@ -151,12 +151,6 @@ class Connection(object):
   ###########################################################################
   # Private Methods
 
-  def _getHTTPClient(self):
-    '''
-    This is an abstraction layer. This method will be over-ridden in tests.
-    '''
-    return httplib2.Http(".cache", 20)
-
   def _find_key(self):
     '''
     Retrieve an API key from the user's shell environment
@@ -178,8 +172,6 @@ class Connection(object):
                                 'please check it again: "' + key +'"')
     else:
       return 'OK'
-
-    pass
 
   def _handleGrokErrors(self, errors):
     '''
