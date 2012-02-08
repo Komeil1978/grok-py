@@ -1,16 +1,17 @@
 import grokpy
-import unittest2 as unittest
+import unittest
 import socket
 import httplib2
 from mock import Mock
 
+from groktestcase import GrokTestCase
 from grokpy.connection import Connection
 from grokpy.client import Client
 from grokpy.project import Project
 from grokpy.publicDataSource import PublicDataSource
 from grokpy.exceptions import AuthenticationError, GrokError
 
-class ClientTestCase(unittest.TestCase):
+class ClientTestCase(GrokTestCase):
 
   def setUp(self):
     self.mockKey = 'SeQ9AhK57vOeoySQn1EvwElhZV1X87AB'

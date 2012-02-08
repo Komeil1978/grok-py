@@ -1,5 +1,6 @@
 import os
 import urllib2
+import httplib2
 import json
 import socket
 
@@ -12,7 +13,7 @@ class Connection(object):
   Connection object for the Grok Prediction Service
   '''
 
-  def __init__(self, httpClient, key = None, baseURL = 'http://grok-api.numenta.com'):
+  def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com', httpClient = None):
     '''
     httpClient - An instance of an HTTP Client Object
     key - Grok API Key
@@ -54,6 +55,9 @@ class Connection(object):
     self.baseURL = baseURL + '/version/1/'
 
     # The HTTP Client we'll use to make requests
+    if not httpClient:
+      httpClient = httplib2.Http(".cache", 20)
+
     self.h = httpClient
 
   def request(self, requestDef, method = 'POST', body = False, headers = None):

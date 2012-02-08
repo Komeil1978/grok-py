@@ -1,13 +1,14 @@
 import grokpy
-import unittest2 as unittest
+import unittest
 import socket
 import httplib2
 from mock import Mock
 
+from groktestcase import GrokTestCase
 from grokpy.connection import Connection
 from grokpy.exceptions import AuthenticationError, GrokError
 
-class ConnectionTestCase(unittest.TestCase):
+class ConnectionTestCase(GrokTestCase):
 
   def setUp(self):
     self.mockKey = 'SeQ9AhK57vOeoySQn1EvwElhZV1X87AB'
@@ -18,7 +19,7 @@ class ConnectionTestCase(unittest.TestCase):
     '''
     This key should pass validity checks.
     '''
-    c = Connection(self.h, self.mockKey)
+    c = Connection(self.mockKey)
 
     self.assertEqual(c.key, self.mockKey)
 
@@ -26,11 +27,11 @@ class ConnectionTestCase(unittest.TestCase):
     '''
     Verify expected base URL and one we pass in
     '''
-    c = Connection(self.h, self.mockKey)
+    c = Connection(self.mockKey)
 
     self.assertEqual(c.baseURL, 'http://grok-api.numenta.com/version/1/')
 
-    c2 = Connection(self.h, self.mockKey, 'http://www.example.com')
+    c2 = Connection(self.mockKey, 'http://www.example.com')
 
     self.assertEqual(c2.baseURL, 'http://www.example.com/version/1/')
 
@@ -40,7 +41,7 @@ class ConnectionTestCase(unittest.TestCase):
     '''
     badKey = 'foo'
     self.assertRaises(AuthenticationError,
-                      Connection, self.h, badKey)
+                      Connection, badKey)
 
   def testBasicRequest(self):
     '''
@@ -49,12 +50,12 @@ class ConnectionTestCase(unittest.TestCase):
 
     # Create our Mock HTTP Client
     mock = Mock(spec=self.h)
-    
+
     # Define it's responses
     mock.request.return_value = ({'status': '200'}, '{"result": "success"}')
 
     # Make the request
-    c = Connection(mock, key = self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
     c.request(requestDef)
 
@@ -76,7 +77,7 @@ class ConnectionTestCase(unittest.TestCase):
     mock.request.return_value = ({'status': '200'}, '{"result": "success"}')
 
     # Make the request
-    c = Connection(mock, key = self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
     c.request(requestDef, 'GET')
 
@@ -90,7 +91,7 @@ class ConnectionTestCase(unittest.TestCase):
     This version only allows GET and POST
     '''
 
-    c = Connection(self.h, self.mockKey)
+    c = Connection(self.mockKey)
 
     requestDef = {'service': 'projectList'}
 
@@ -107,7 +108,7 @@ class ConnectionTestCase(unittest.TestCase):
     # Define a side effect
     mock.request.side_effect = socket.error('This request has timed out')
 
-    c = Connection(mock, self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
 
     self.assertRaises(GrokError, c.request, requestDef)
@@ -123,7 +124,7 @@ class ConnectionTestCase(unittest.TestCase):
     # Define a side effect
     mock.request.side_effect = socket.error('Foobar')
 
-    c = Connection(mock, self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
 
     self.assertRaisesRegexp(GrokError, 'Foobar', c.request, requestDef)
@@ -139,7 +140,7 @@ class ConnectionTestCase(unittest.TestCase):
     mock.request.return_value = ({'status': '404'}, '{"result": "Error"}')
 
     # Make the request
-    c = Connection(mock, self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
 
     # Assert an error is raised
@@ -156,7 +157,7 @@ class ConnectionTestCase(unittest.TestCase):
     mock.request.return_value = ({'status': '200'}, '{"errors": "EC2 is dead"}')
 
     # Make the request
-    c = Connection(mock, self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
 
     # Assert an error is raised
@@ -176,7 +177,7 @@ class ConnectionTestCase(unittest.TestCase):
     mock.request.return_value = ({'status': '200'}, JSON)
 
     # Make the request
-    c = Connection(mock, self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
 
     self.assertEquals(c.request(requestDef), infoString)
@@ -192,7 +193,7 @@ class ConnectionTestCase(unittest.TestCase):
     mock.request.return_value = ({'status': '200'}, '{}')
 
     # Make the request
-    c = Connection(mock, self.mockKey)
+    c = Connection(self.mockKey, httpClient = mock)
     requestDef = {'service': 'projectList'}
 
     # Assert an error is raised

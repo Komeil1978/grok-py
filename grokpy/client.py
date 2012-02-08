@@ -29,9 +29,9 @@ class Client(object):
     # Create a connection to the API
     if not connection:
       if baseURL:
-        self.c = Connection(httpClient, key, baseURL)
+        self.c = Connection(key, baseURL)
       else:
-        self.c = Connection(httpClient, key)
+        self.c = Connection(key)
     else:
       self.c = connection
 
