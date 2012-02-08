@@ -1,5 +1,4 @@
 import unittest
-import httplib2
 from mock import Mock
 
 from groktestcase import GrokTestCase
