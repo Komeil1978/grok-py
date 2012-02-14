@@ -22,12 +22,9 @@ class Stream(object):
     # Our stream description
     self.streamDescription = {'fields': []}
 
-    # Our local data store
+    # HACK: Our local data store
+    # In API v2 this should go away
     self.records = None
-
-    # HACK: Store contents of join file locally for bit
-    self.joinFileContents = None
-    self.joinFileName = None
 
     self.parentProject = parentProject
 
