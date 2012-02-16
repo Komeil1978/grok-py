@@ -321,23 +321,7 @@ class Model(object):
     service = self.type + 'ModelInputCacheAppend'
     param = self.type + 'ModelId'
 
-    if len(self.stream.records) > 5000:
-      i = 0
-      step = 5000
-      while i < len(self.stream.records):
-        requestDef = {'service': service,
-                    param: self.id,
-                    'data': self.stream.records[i:(i+step)]}
-
-        self.c.request(requestDef)
-        i += step
-
-    else:
-      requestDef = {'service': service,
-                    param: self.id,
-                    'data': self.stream.records}
-
-      self.c.request(requestDef)
+    self.stream._addRecords(self.id, service, param)
 
     if VERBOSITY >= 1: print '</WORKAROUND>'
     ########## END HACK
