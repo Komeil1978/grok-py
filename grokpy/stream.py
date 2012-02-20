@@ -77,7 +77,6 @@ class Stream(object):
       if len(self.records) > step:
         i = 0
         while i < len(self.records):
-          print step
           requestDef = {'service': service,
                       param: modelId,
                       'data': self.records[i:(i+step)]}
@@ -94,7 +93,7 @@ class Stream(object):
     except GrokError:
       # Break recursion if this just isn't going to work
       if step < 100: raise
-      # Try sending half as many records. 
+      # Try sending half as many records.
       step = int(math.floor(step / 2))
       self._addRecords(modelId, service, param, step)
 
