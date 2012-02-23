@@ -179,8 +179,7 @@ class SwarmMonitor(grokpy.StreamMonitor):
         '''
         Called when a new state is received from connection.
 
-        Override this method if you wish to manually handle
-        the stream data. Return False to stop stream and close connection.
+        Returns False to stop stream and close connection.
         '''
 
         jobStatus = state['jobStatus']

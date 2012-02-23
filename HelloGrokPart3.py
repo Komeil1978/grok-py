@@ -19,14 +19,13 @@ import sys
 import json
 import grokpy
 
+from math import floor
 from grokpy import Client
 
 ##############################################################################
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-JOIN_FILE = 'data/workSchedule.csv'
-JOIN_FILE_SPEC = 'data/joinFileSpecification.json'
 SWARM_INPUT_CSV = 'data/rec-center-advanced-swarm.csv'
 STREAM_SPEC = 'data/advancedSpec.json'
 SWARM_OUTPUT_CSV = 'output/advancedSwarmOutput.csv'
@@ -181,8 +180,12 @@ def HelloGrokPart3():
   advancedModel.sendRecords(newRecords)
 
   # Get all the new predictions
-  then = time.time()
-  headers, resultRows = advancedModel.monitorPredictions(endRow = 1462)
+  totalRecords = len(newRecords)
+  expectedRows = int(floor(totalRecords / 4)) - 1
+  expectedRows = expectedRows - (expectedRows % 4)
+
+  print 'Monitoring predictions ...'
+  headers, resultRows = advancedModel.monitorPredictions(expectedRows)
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)

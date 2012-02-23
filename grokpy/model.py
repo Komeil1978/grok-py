@@ -543,8 +543,8 @@ class Model(object):
           if latestRow >= endRow:
             break
           else:
+            if VERBOSITY: print 'Waiting on more predictions. Total so far: %d Target: %d' % (latestRow, endRow)
             pass
-            #print 'Waiting on more predictions. Total so far: %d Target: %d' % (latestRow, endRow)
         self._outputStreamPosition = latestRow
         time.sleep(1)
       except IndexError:

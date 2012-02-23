@@ -17,14 +17,15 @@ import sys
 import json
 import grokpy
 
+from math import floor
 from grokpy import Client, GrokError
 
 ##############################################################################
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-MODEL_ID = 'YOUR_MODEL_ID'
-PROJECT_ID = 'YOUR_PROJECT_ID'
+MODEL_ID = 'ScgCyd7PLI4ANrVQlJrbenXd6vbA'
+PROJECT_ID = '591'
 
 NEW_RECORDS = 'data/rec-center-stream-training.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
@@ -66,11 +67,10 @@ def HelloGrokPart2():
   recCenterEnergyModel.promote()
 
   ##############################################################################
-  # Data in, predictions out
+  # Sending new records
 
   fileHandle= open(NEW_RECORDS)
   newRecords = [row for row in csv.reader(fileHandle)]
-
   fileHandle.close()
 
   # Send data. (Recall that this model will aggregate into hourly buckets)
@@ -78,9 +78,22 @@ def HelloGrokPart2():
   # This method will send a maximum of 5k records per request.
   recCenterEnergyModel.sendRecords(newRecords)
 
-  # Get all the new predictions
-  then = time.time()
-  headers, resultRows = recCenterEnergyModel.monitorPredictions(endRow = 2206)
+  ##############################################################################
+  # Retrieving predictions
+  #
+  # Currently you need to know how many records you expect to get out
+  # when you start monitoring the production model. This is awkward and ugly
+  # and will be improved.
+
+  # How many records are we sending? -1 since we're dealing with indexes here.
+  totalRecords = len(newRecords)
+  # In this example we aggregate 15 minute intervals to 1 hour intervals
+  expectedRows = int(floor(totalRecords / 4)) - 1
+  # We need at least 4 records in for every one out
+  expectedRows = expectedRows - (expectedRows % 4)
+
+  print 'Monitoring predictions ...'
+  headers, resultRows = recCenterEnergyModel.monitorPredictions(expectedRows)
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)
