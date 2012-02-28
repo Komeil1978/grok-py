@@ -161,10 +161,17 @@ def HelloGrok():
   # yourself with their format. After that, you can take the Project id and
   # Model id printed out below and head over to part two!
 
-  print '\n\nOn to Part Two!'
-  print 'Take these, the wizard will ask for them:'
-  print '\t MODEL_ID: ' + recCenterEnergyModel.id
-  print '\t PROJECT_ID: ' + myProject.id
+  print """
+=====================================================================
+On to Part Two!
+  Take these, the wizard will ask for them:
+  MODEL_ID: %s
+  PROJECT_ID: %s
+
+Please edit HelloGrokPart2.py, adding in the MODEL_ID and PROJECT_ID.
+Then run:
+  python HelloGrokPart2.py""" % (recCenterEnergyModel.id,
+                                 myProject.id)
 
 class SwarmMonitor(grokpy.StreamMonitor):
 
@@ -189,18 +196,18 @@ class SwarmMonitor(grokpy.StreamMonitor):
         if jobStatus == grokpy.Status.COMPLETED:
           bestConfig = results['bestModel']
           fieldsUsed = self.configurations[bestConfig]['fields']
-          print 'Best Configuration: ' + str(bestConfig)
-          print 'Using Field(s): ' + str(fieldsUsed)
+          print 'You win! Your Grok Swarm is complete.'
+          print '\tBest Configuration: ' + str(bestConfig)
+          print '\tWith an Error of: ' + str(results['bestValue'])
+          print '\tUsing Field(s): ' + str(fieldsUsed)
           if len(fieldsUsed) > 1:
             fieldContributions = state['fieldContributions']
-            print 'Field Contributions:'
+            print '\tField Contributions:'
             for field in fieldContributions:
               if field['contribution'] > 0:
-                print('\tUsing ' + field['name'] + ' improved accuracy by ' +
+                print('\t\tUsing ' + field['name'] + ' improved accuracy by ' +
                       str(field['contribution']) + ' percent.')
 
-          print 'With an Error of: ' + str(results['bestValue'])
-          print 'You win! Your Grok Swarm is complete.'
           # Exit the loop
           return False
         if jobStatus == grokpy.Status.RUNNING and self.started == False:
