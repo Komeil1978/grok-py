@@ -1,6 +1,7 @@
 import grokpy
 import unittest
 import socket
+import requests
 import grokpy.httplib2 as httplib2
 from mock import Mock
 

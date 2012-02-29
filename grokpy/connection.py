@@ -3,21 +3,23 @@ import urllib2
 import httplib2
 import json
 import socket
+import requests
+import base64
 
 from exceptions import GrokError, AuthenticationError
 
-VERBOSITY = 0
+VERBOSITY = 1
 
 class Connection(object):
   '''
   Connection object for the Grok Prediction Service
   '''
 
-  def __init__(self, key = None, baseURL = 'http://grok-api.numenta.com', httpClient = None):
+  def __init__(self, key = None, baseURL = 'http://api.grok.numenta.com/', session = None):
     '''
-    httpClient - An instance of an HTTP Client Object
     key - Grok API Key
     baseURL - Grok server request target
+    session - A requests lib Session instance. Useful for testing.
     '''
 
     # Search for API key in environment
@@ -52,101 +54,56 @@ class Connection(object):
     self.key = key
 
     # The base path for all our HTTP calls
-    self.baseURL = baseURL + '/version/1/'
+    self.baseURL = baseURL + 'v1'
 
     # The HTTP Client we'll use to make requests
-    if not httpClient:
-      httpClient = httplib2.Http(".cache", 20)
+    if not session:
+      base64string = base64.encodestring(self.key + ':').replace('\n', '')
+      headers = {"Authorization": "Basic %s" % base64string,
+                 "Content-Type": 'application/json; charset=UTF-8'}
+      session = requests.session(headers=headers)
 
-    self.h = httpClient
+    self.s = session
 
-  def request(self, requestDef, method = 'POST', body = False, headers = None):
+  def request(self, method, url, requestDef = None):
     '''
     Interface for all HTTP requests made to the Grok API
     '''
 
-    '''
-    Create our HTTP client
+    print method
+    print url
+    if url[:4] != 'http':
+      url = self.baseURL + url
+    print url
 
-    NOTE: Timeout is set by default. As this is a socket level timeout it may
-    cause longpolling problems later. TODO: Re-visit
-    '''
-
-    # Build the request
-    ## GETS
-    if method == 'GET':
-      uri = self._requestDefToURL(requestDef)
-      # Our request
-      kwargs = {'uri': uri,
-                'method': method,
-                'headers': {}}
-    ## POSTS
-    elif method == 'POST':
-      if body:
-        # We've been given explicit body content, probably an upload
-        uri = self._requestDefToURL(requestDef)
-      else:
-        uri = self.baseURL
-        body = {'version': '1'}
-        body.update(requestDef)
-        # Serialize the dict
-        body = json.dumps(body)
-
-      # Default to JSON for POSTs
-      if not headers:
-        headers = {'content-type':'application/json'}
-
-      # Our request
-      kwargs = {'uri': uri,
-                'method': method,
-                'body': body,
-                'headers': headers
-                }
-    else:
-      raise GrokError('Only GET and POST methods are currently supported.')
-
-    # Add in the API key to the header of each request
-    kwargs['headers'].update({'API-Key': self.key})
+    # JSON serialize the requestDef object
+    requestDef = json.dumps(requestDef, ensure_ascii=False)
+    print requestDef
 
     # Make the request, handle initial connection errors
-    try:
-      httpResponse, content = self.h.request(**kwargs)
-    except socket.error, e:
-      if 'timed out' in e:
-        raise GrokError("Request timed out. Please check the "
-                        "server URL if specified, or status.numenta.com "
-                        "(coming soon) if default.")
-      else:
-        raise GrokError(e)
+    if method == 'GET':
+      response = self.s.get(url)
+    elif method == 'POST':
+      response = self.s.post(url, requestDef)
+    elif method == 'PUT':
+      response = self.s.put(url)
+    elif method == 'DELETE':
+      response = self.s.delete(url)
+    else:
+      raise GrokError('Unrecognised HTTP method: %s' % method)
 
-    # Handle HTTP errors (redirects are handled by httplib2)
-    if httpResponse['status'] != '200':
-      raise GrokError(httpResponse)
+    # Handle HTTP errors
+    if response.status_code != 200:
+      print response.headers
+      raise GrokError(response)
 
     # Load info from returned JSON strings
-    content = json.loads(content)
+    content = json.loads(response.text)
 
     if VERBOSITY >= 1:
       print content
 
-    # Some service requests don't return anything. :(
-    if content != None:
-      # Handle service errors
-      if 'errors' in content:
-        self._handleGrokErrors(content['errors'])
-      # Return good results
-      try:
-        result = content['result']
-      # Handle non-error messages
-      except KeyError:
-        try:
-          result = content['information'][0]
-        except KeyError:
-          raise GrokError('Unexpected request response:' + str(content))
-    else:
-      result = None
-
-    return result
+    return content
 
   ###########################################################################
   # Private Methods

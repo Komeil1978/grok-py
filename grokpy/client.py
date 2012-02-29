@@ -2,6 +2,7 @@ import threading
 import httplib2
 
 from connection import Connection
+from user import User
 from project import Project
 from stream import Stream
 from field import Field
@@ -35,11 +36,129 @@ class Client(object):
     else:
       self.c = connection
 
-    # Minimal connection test
-    self.testConnection()
+    # Test the connection works and get the User info
+    self.user = self.getUser()
 
   #############################################################################
   # High Level Operations
+
+  def createModel(self, name = None):
+    '''
+    Create a model associated with this project
+    '''
+
+    print dir(self.user)
+    url = self.user.modelsUrl
+    requestDef = {'model': {'name':'My Model'}}
+
+    result = self.c.request('POST', url, requestDef)
+
+    return Model(result)
+
+  def getModel(self, modelId):
+    '''
+    Returns the model corresponding to the given modelId
+    '''
+    if modelId == 'YOUR_MODEL_ID':
+      raise GrokError('Please supply a valid Model Id')
+
+    # Determine if this is a search or production model
+    productionModels = [model['id'] for model in self._listProductionModels()]
+    searchModels = [model['id'] for model in self._listSearchModels()]
+
+    if modelId in productionModels and modelId in searchModels:
+      raise GrokError('Ruh-ro, model id collision between prod and search.')
+    elif modelId in productionModels:
+      modelType = 'production'
+    elif modelId in searchModels:
+      modelType = 'search'
+    else:
+      raise GrokError('Model Id not found.')
+
+    # Get the model definition and create a new Model object with that.
+    service = modelType + 'ModelRead'
+    idParam = modelType + 'ModelId'
+
+    requestDef = {'service': service,
+                  idParam: modelId}
+
+    modelDef = self.c.request(requestDef, 'POST')
+
+    return Model(self, modelDef = modelDef)
+
+  def listModels(self):
+    '''
+    Returns a list of Models that exist in this project
+    '''
+    modelDescriptions = self._listSearchModels()
+
+    modelDescriptions.extend(self._listProductionModels())
+
+    if modelDescriptions:
+      models = [Model(self, desc) for desc in modelDescriptions]
+    else:
+      models = []
+
+    return models
+
+  def stopAllModels(self, verbose = False):
+    '''
+    A convenience method to stop all models that have been promoted.
+
+    This method can take many seconds to return depending on how many
+    models are being stopped.
+    '''
+
+    productionModels = self._listProductionModels()
+
+    stoppedModelIds = []
+    for model in productionModels:
+      if model['running']:
+        id = model['id']
+        stoppedModelIds.append(id)
+        if verbose: print 'Stopping model: ' + str(id)
+        requestDef = {'service': 'productionModelStop',
+                      'productionModelId': id}
+        self.c.request(requestDef)
+
+    return stoppedModelIds
+
+  def createStream(self):
+    '''
+    Returns an instance of the Stream object
+    '''
+
+    return Stream(self)
+
+  #############################################################################
+  # Private methods
+
+
+  def _listProductionModels(self):
+    '''
+    Returns a list of all production models.
+    '''
+
+    requestDef = {'service': 'productionModelList',
+                  'projectId': self.id,
+                  'includeTotalCount': False}
+
+    response = self.c.request(requestDef, 'POST')
+
+    return response['productionModels']
+
+  def _listSearchModels(self):
+    '''
+    Returns a list of all search models
+    '''
+
+    requestDef = {'service': 'searchModelList',
+                  'projectId': self.id,
+                  'includeTotalCount': False}
+
+    response = self.c.request(requestDef, 'POST')
+
+    return response['searchModels']
 
   def createProject(self, projectName):
     '''
@@ -127,14 +246,29 @@ class Client(object):
     # Code not found
     raise GrokError('A Public Data Source with id "%s" was not found.' % id)
 
-  def testConnection(self):
+  def getUser(self, userId = None):
     '''
-    Makes a minimial service call to test the API connection
+    Retrieves the dict representation of a user from the list of users
+    associated with the current API key.
+
+    Returns a User object.
     '''
+    url = '/users'
+    rv = self.c.request('GET', url)
 
-    requestDef = {'service': 'projectList'}
+    # By default return the first user.
+    if not userId:
+      user = User(rv['users'][0])
+      return user
+    # Otherwise return the first user with a matching Id
+    else:
+      for userDict in rv['users']:
+        if int(userDict['userId']) == userId:
+          return User(userDict)
 
-    self.c.request(requestDef)
+    # We didn't find the user
+    raise GrokError('There were no users, or the userId you specified was not '
+                    'found.')
 
   def about(self):
     '''
