@@ -12,7 +12,6 @@
 #
 # In this application we will:
 #
-# * Create a Project
 # * Create a Model
 # * Create a Stream of our energy use data
 # * Configure how we want our Model to use our Stream
@@ -36,7 +35,7 @@ import grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'YOUR_KEY_HERE'
+API_KEY = 'e1gCaM3PLRze9wuCaqSqQb5l41k06h3r'
 STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
@@ -61,15 +60,9 @@ def HelloGrok():
   print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY)
 
-  # Create a project to hold our predictive models
-  now = time.time()
-  projectName = 'HelloGrok ' + str(now)
-  print 'Creating an initial project: ' + projectName
-  myProject = grok.createProject(projectName)
-
   # Create a blank model in that project
   print 'Creating an empty model ...'
-  recCenterEnergyModel = myProject.createModel()
+  recCenterEnergyModel = grok.createModel()
 
   # Create an empty stream
   print 'Creating an empty stream ...'
