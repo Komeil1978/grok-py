@@ -1,0 +1,723 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>1. Classes &mdash; Grokpy 0.1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Grokpy 0.1.0 documentation" href="index.html" />
+    <link rel="prev" title="Grokpy Documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Grokpy Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Grokpy 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="classes">
+<h1>1. Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<div class="section" id="module-grokpy.client">
+<span id="client"></span><h2>1.1. Client<a class="headerlink" href="#module-grokpy.client" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.client.Aggregation">
+<em class="property">class </em><tt class="descclassname">grokpy.client.</tt><tt class="descname">Aggregation</tt><a class="headerlink" href="#grokpy.client.Aggregation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum-like class to specify valid aggregation strings</p>
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.DAYS">
+<tt class="descname">DAYS</tt><em class="property"> = 'DAYS'</em><a class="headerlink" href="#grokpy.client.Aggregation.DAYS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.HOURS">
+<tt class="descname">HOURS</tt><em class="property"> = 'HOURS'</em><a class="headerlink" href="#grokpy.client.Aggregation.HOURS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.MINUTES">
+<tt class="descname">MINUTES</tt><em class="property"> = 'MINUTES'</em><a class="headerlink" href="#grokpy.client.Aggregation.MINUTES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.MINUTES_15">
+<tt class="descname">MINUTES_15</tt><em class="property"> = 'MINUTES_15'</em><a class="headerlink" href="#grokpy.client.Aggregation.MINUTES_15" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.MONTHS">
+<tt class="descname">MONTHS</tt><em class="property"> = 'MONTHS'</em><a class="headerlink" href="#grokpy.client.Aggregation.MONTHS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.RECORD">
+<tt class="descname">RECORD</tt><em class="property"> = 'RECORD'</em><a class="headerlink" href="#grokpy.client.Aggregation.RECORD" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.SECONDS">
+<tt class="descname">SECONDS</tt><em class="property"> = 'SECONDS'</em><a class="headerlink" href="#grokpy.client.Aggregation.SECONDS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Aggregation.WEEKS">
+<tt class="descname">WEEKS</tt><em class="property"> = 'WEEKS'</em><a class="headerlink" href="#grokpy.client.Aggregation.WEEKS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="grokpy.client.Client">
+<em class="property">class </em><tt class="descclassname">grokpy.client.</tt><tt class="descname">Client</tt><big>(</big><em>key=None</em>, <em>baseURL=None</em>, <em>connection=None</em><big>)</big><a class="headerlink" href="#grokpy.client.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Top level object for interacting with the Grok Prediction Service.</p>
+<p>Contains:</p>
+<p>High Level Opertions
+Helper Methods</p>
+<dl class="method">
+<dt id="grokpy.client.Client.about">
+<tt class="descname">about</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.about" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get current build and server information from API server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.alignPredictions">
+<tt class="descname">alignPredictions</tt><big>(</big><em>headers</em>, <em>resultRows</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.alignPredictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Puts prediction on the same row as the actual value for easy comparison in
+external tools like Excel.</p>
+<p>Example Transformation:</p>
+<p>RowID   ActualValue     PredictedValue
+0       3               5
+1       5               7
+2       7               9</p>
+<p>RowID   ActualValue     PredictedValue
+0       3
+1       5               5
+2       7               7</p>
+<blockquote>
+<div>9</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.createProject">
+<tt class="descname">createProject</tt><big>(</big><em>projectName</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.createProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a project through the Grok API</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.getProject">
+<tt class="descname">getProject</tt><big>(</big><em>projectId</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.getProject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a Project with the given id</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.getPublicDataSource">
+<tt class="descname">getPublicDataSource</tt><big>(</big><em>id</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.getPublicDataSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Looks up and returns a PDS by its code.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.listProjects">
+<tt class="descname">listProjects</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.listProjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all the projects currently associated with this account</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.listPublicDataSources">
+<tt class="descname">listPublicDataSources</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.listPublicDataSources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lists all the public data sources registered with Grok</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.testConnection">
+<tt class="descname">testConnection</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.testConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes a minimial service call to test the API connection</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="grokpy.client.DataFlag">
+<em class="property">class </em><tt class="descclassname">grokpy.client.</tt><tt class="descname">DataFlag</tt><a class="headerlink" href="#grokpy.client.DataFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum-like class to specify valid data flag strings</p>
+<dl class="attribute">
+<dt id="grokpy.client.DataFlag.NONE">
+<tt class="descname">NONE</tt><em class="property"> = 'NONE'</em><a class="headerlink" href="#grokpy.client.DataFlag.NONE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.DataFlag.RESET">
+<tt class="descname">RESET</tt><em class="property"> = 'RESET'</em><a class="headerlink" href="#grokpy.client.DataFlag.RESET" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.DataFlag.SEQUENCE">
+<tt class="descname">SEQUENCE</tt><em class="property"> = 'SEQUENCE'</em><a class="headerlink" href="#grokpy.client.DataFlag.SEQUENCE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.DataFlag.TIMESTAMP">
+<tt class="descname">TIMESTAMP</tt><em class="property"> = 'TIMESTAMP'</em><a class="headerlink" href="#grokpy.client.DataFlag.TIMESTAMP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="grokpy.client.GrokData">
+<em class="property">class </em><tt class="descclassname">grokpy.client.</tt><tt class="descname">GrokData</tt><a class="headerlink" href="#grokpy.client.GrokData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum-like class to specify valid Grok data type strings</p>
+<dl class="attribute">
+<dt id="grokpy.client.GrokData.DATETIME">
+<tt class="descname">DATETIME</tt><em class="property"> = 'DATETIME'</em><a class="headerlink" href="#grokpy.client.GrokData.DATETIME" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.GrokData.ENUMERATION">
+<tt class="descname">ENUMERATION</tt><em class="property"> = 'ENUMERATION'</em><a class="headerlink" href="#grokpy.client.GrokData.ENUMERATION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.GrokData.IP_ADDRESS">
+<tt class="descname">IP_ADDRESS</tt><em class="property"> = 'IP_ADDRESS'</em><a class="headerlink" href="#grokpy.client.GrokData.IP_ADDRESS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.GrokData.LAT_LONG">
+<tt class="descname">LAT_LONG</tt><em class="property"> = 'LAT_LONG'</em><a class="headerlink" href="#grokpy.client.GrokData.LAT_LONG" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.GrokData.SCALAR">
+<tt class="descname">SCALAR</tt><em class="property"> = 'SCALAR'</em><a class="headerlink" href="#grokpy.client.GrokData.SCALAR" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.GrokData.ZIP_CODE">
+<tt class="descname">ZIP_CODE</tt><em class="property"> = 'ZIP_CODE'</em><a class="headerlink" href="#grokpy.client.GrokData.ZIP_CODE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="grokpy.client.Status">
+<em class="property">class </em><tt class="descclassname">grokpy.client.</tt><tt class="descname">Status</tt><a class="headerlink" href="#grokpy.client.Status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enum-like class to specify valid Swarm status strings</p>
+<dl class="attribute">
+<dt id="grokpy.client.Status.CANCELED">
+<tt class="descname">CANCELED</tt><em class="property"> = 'CANCELED'</em><a class="headerlink" href="#grokpy.client.Status.CANCELED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Status.COMPLETED">
+<tt class="descname">COMPLETED</tt><em class="property"> = 'COMPLETED'</em><a class="headerlink" href="#grokpy.client.Status.COMPLETED" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="grokpy.client.Status.RUNNING">
+<tt class="descname">RUNNING</tt><em class="property"> = 'RUNNING'</em><a class="headerlink" href="#grokpy.client.Status.RUNNING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-grokpy.connection">
+<span id="connection"></span><h2>1.2. Connection<a class="headerlink" href="#module-grokpy.connection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.connection.Connection">
+<em class="property">class </em><tt class="descclassname">grokpy.connection.</tt><tt class="descname">Connection</tt><big>(</big><em>key=None</em>, <em>baseURL='http://grok-api.numenta.com'</em>, <em>httpClient=None</em><big>)</big><a class="headerlink" href="#grokpy.connection.Connection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Connection object for the Grok Prediction Service</p>
+<dl class="method">
+<dt id="grokpy.connection.Connection.request">
+<tt class="descname">request</tt><big>(</big><em>requestDef</em>, <em>method='POST'</em>, <em>body=False</em>, <em>headers=None</em><big>)</big><a class="headerlink" href="#grokpy.connection.Connection.request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface for all HTTP requests made to the Grok API</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-grokpy.exceptions">
+<span id="exceptions"></span><h2>1.3. Exceptions<a class="headerlink" href="#module-grokpy.exceptions" title="Permalink to this headline">¶</a></h2>
+<p>Base exceptions for the Grok Client Library</p>
+</div>
+<div class="section" id="module-grokpy.field">
+<span id="field"></span><h2>1.4. Field<a class="headerlink" href="#module-grokpy.field" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.field.Field">
+<em class="property">class </em><tt class="descclassname">grokpy.field.</tt><tt class="descname">Field</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#grokpy.field.Field" title="Permalink to this definition">¶</a></dt>
+<dd><p>A complex object specification which allows Grok to properly interpret
+input data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-grokpy.model">
+<span id="model"></span><h2>1.5. Model<a class="headerlink" href="#module-grokpy.model" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.model.Model">
+<em class="property">class </em><tt class="descclassname">grokpy.model.</tt><tt class="descname">Model</tt><big>(</big><em>parentProject</em>, <em>modelDef={}</em><big>)</big><a class="headerlink" href="#grokpy.model.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a Grok Model</p>
+<dl class="method">
+<dt id="grokpy.model.Model.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permanently deletes the model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.disableLearning">
+<tt class="descname">disableLearning</tt><big>(</big><em>retries=3</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.disableLearning" title="Permalink to this definition">¶</a></dt>
+<dd><p>Puts the model into a predictions only state where it will not learn from
+new data.</p>
+<dl class="docutils">
+<dt>Retries - If this method is called immediately after model promotion it may</dt>
+<dd>fail. By default we will retry a few times.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.enableLearning">
+<tt class="descname">enableLearning</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.enableLearning" title="Permalink to this definition">¶</a></dt>
+<dd><p>New records will be integrated into the models future predictions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.getDescription">
+<tt class="descname">getDescription</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.getDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current state of the model from Grok</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.getMultiStepPredictions">
+<tt class="descname">getMultiStepPredictions</tt><big>(</big><em>buffer</em>, <em>timesteps</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.getMultiStepPredictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets predictions for the next N timesteps</p>
+<dl class="docutils">
+<dt>buffer - A set of actual values to send in to prime predictions. This buffer</dt>
+<dd>should be sent in with each call and updated as new actual values
+are measured.</dd>
+</dl>
+<p>timesteps - The number of steps into the future to predict.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.getPredictions">
+<tt class="descname">getPredictions</tt><big>(</big><em>startRow=-1</em>, <em>endRow=-1</em>, <em>retries=20</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.getPredictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves all the predictions from the models output from startRow to
+endRow.</p>
+<p>Defaults to getting all predictions. Warning: This could be up to 50k rows.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.getSwarmProgress">
+<tt class="descname">getSwarmProgress</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.getSwarmProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Polls the server for progress of a running Swarm</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.getSwarmResults">
+<tt class="descname">getSwarmResults</tt><big>(</big><em>startRow=-1</em>, <em>endRow=-1</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.getSwarmResults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the data in the output cache of the best model found during
+a Grok Swarm</p>
+<p>The default start/end row values request all the data available.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.monitorPredictions">
+<tt class="descname">monitorPredictions</tt><big>(</big><em>endRow=False</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.monitorPredictions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continually polls for new predictions until endRow is hit.</p>
+<p>TODO: Move from polling to async streaming when API server supports</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.monitorSwarm">
+<tt class="descname">monitorSwarm</tt><big>(</big><em>swarmMonitor</em>, <em>async=False</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.monitorSwarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>swarmMonitor - An instance of the grokpy.streaming.StreamMonitor class.
+async - Toggle to run this as a separate thread</p>
+<p>swarmMonitor methods should return False to exit the loop.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.monitorSwarmProgress">
+<tt class="descname">monitorSwarmProgress</tt><big>(</big><em>newStateCallback</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.monitorSwarmProgress" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listens to a stream of output from the API server</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.promote">
+<tt class="descname">promote</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.promote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Promotes the model to production ready status. This transitions a model
+that has gone through a Swarm to a model ready to accept new streaming
+records.</p>
+<p>NOTE: This may have ongoing charges if you don&#8217;t call stop on the model
+when not in use.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.sendRecords">
+<tt class="descname">sendRecords</tt><big>(</big><em>data</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.sendRecords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends data directly to a model rather than having the model listen to a
+stream. Only available on promoted models.
+TODO: Remove this method, as it is incompatible with new object model</p>
+<p>Data: A list of lists representing rows of data</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setLocationField">
+<tt class="descname">setLocationField</tt><big>(</big><em>fieldName</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setLocationField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for setLocationFieldIndex()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setName">
+<tt class="descname">setName</tt><big>(</big><em>newName</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename the model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setNote">
+<tt class="descname">setNote</tt><big>(</big><em>newNote</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setNote" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds or updates a note for this model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setPredictionField">
+<tt class="descname">setPredictionField</tt><big>(</big><em>fieldName</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setPredictionField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for setPredictionFieldIndex()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setPredictionFieldIndex">
+<tt class="descname">setPredictionFieldIndex</tt><big>(</big><em>index</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setPredictionFieldIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>The stream field for which we are optimizing predictions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setStream">
+<tt class="descname">setStream</tt><big>(</big><em>stream</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Associates a stream with a model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setTemporalField">
+<tt class="descname">setTemporalField</tt><big>(</big><em>fieldName</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setTemporalField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for setTemporalFieldIndex()</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setTemporalFieldIndex">
+<tt class="descname">setTemporalFieldIndex</tt><big>(</big><em>index</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setTemporalFieldIndex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Which stream field provides temporal data for the model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.setTimeAggregation">
+<tt class="descname">setTimeAggregation</tt><big>(</big><em>aggregationType</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.setTimeAggregation" title="Permalink to this definition">¶</a></dt>
+<dd><p>How the model will aggregate data within the stream</p>
+<p>Valid Types:</p>
+<p>RECORD: no aggregation is done.
+SECONDS
+MINUTES
+15_MINUTES
+HOURS
+DAYS
+WEEKS
+MONTHS</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.start">
+<tt class="descname">start</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.start" title="Permalink to this definition">¶</a></dt>
+<dd><p>Starts up a model, readying it to receive new data from a stream</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.startSwarm">
+<tt class="descname">startSwarm</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.startSwarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs permutations on model parameters to find the optimal model
+characteristics for the given data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.stop">
+<tt class="descname">stop</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stops a model. Stopped models will not listen for new data or produce
+predictions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.stopSwarm">
+<tt class="descname">stopSwarm</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.stopSwarm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminates a Swarm in progress</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-grokpy.project">
+<span id="project"></span><h2>1.6. Project<a class="headerlink" href="#module-grokpy.project" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.project.Project">
+<em class="property">class </em><tt class="descclassname">grokpy.project.</tt><tt class="descname">Project</tt><big>(</big><em>connection</em>, <em>projectDef</em><big>)</big><a class="headerlink" href="#grokpy.project.Project" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing a Grok project</p>
+<dl class="method">
+<dt id="grokpy.project.Project.createModel">
+<tt class="descname">createModel</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.project.Project.createModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a model associated with this project</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.createStream">
+<tt class="descname">createStream</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.project.Project.createStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instance of the Stream object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.project.Project.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Permanently deletes the project, all its models, and data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.getDescription">
+<tt class="descname">getDescription</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.project.Project.getDescription" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current state of the project from Grok</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.getModel">
+<tt class="descname">getModel</tt><big>(</big><em>modelId</em><big>)</big><a class="headerlink" href="#grokpy.project.Project.getModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the model corresponding to the given modelId</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.listModels">
+<tt class="descname">listModels</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.project.Project.listModels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of Models that exist in this project</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.setName">
+<tt class="descname">setName</tt><big>(</big><em>newName</em><big>)</big><a class="headerlink" href="#grokpy.project.Project.setName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Rename the project</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.project.Project.stopAllModels">
+<tt class="descname">stopAllModels</tt><big>(</big><em>verbose=False</em><big>)</big><a class="headerlink" href="#grokpy.project.Project.stopAllModels" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience method to stop all models that have been promoted.</p>
+<p>This method can take many seconds to return depending on how many
+models are being stopped.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-grokpy.publicDataSource">
+<span id="public-data-source"></span><h2>1.7. Public Data Source<a class="headerlink" href="#module-grokpy.publicDataSource" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.publicDataSource.PublicDataSource">
+<em class="property">class </em><tt class="descclassname">grokpy.publicDataSource.</tt><tt class="descname">PublicDataSource</tt><big>(</big><em>connection</em>, <em>description</em><big>)</big><a class="headerlink" href="#grokpy.publicDataSource.PublicDataSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object describing a public data source</p>
+<p>Currently this lives only in the client. The intent is to have a server side
+object representing a PDS as well.</p>
+<dl class="method">
+<dt id="grokpy.publicDataSource.PublicDataSource.listFields">
+<tt class="descname">listFields</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.publicDataSource.PublicDataSource.listFields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the names of fields currently in the PDS</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.publicDataSource.PublicDataSource.setConfiguration">
+<tt class="descname">setConfiguration</tt><big>(</big><em>value=None</em>, <em>locationFieldName=None</em><big>)</big><a class="headerlink" href="#grokpy.publicDataSource.PublicDataSource.setConfiguration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Populates the &#8216;configuration&#8217; field within the provider. What this
+configuration should be varies from provider to provider.</p>
+<p>See the API Reference under providerDefinitionList</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.publicDataSource.PublicDataSource.useField">
+<tt class="descname">useField</tt><big>(</big><em>fieldName</em><big>)</big><a class="headerlink" href="#grokpy.publicDataSource.PublicDataSource.useField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets a field to be added to the data stream by this publicDataSource for
+every record passed into Grok</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-grokpy.stream">
+<span id="stream"></span><h2>1.8. Stream<a class="headerlink" href="#module-grokpy.stream" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.stream.Stream">
+<em class="property">class </em><tt class="descclassname">grokpy.stream.</tt><tt class="descname">Stream</tt><big>(</big><em>parentProject</em><big>)</big><a class="headerlink" href="#grokpy.stream.Stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Stream is the combination of data and the specification of those data
+that will be used by a model</p>
+<dl class="method">
+<dt id="grokpy.stream.Stream.addField">
+<tt class="descname">addField</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#grokpy.stream.Stream.addField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a field object to a stream</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.stream.Stream.addRecords">
+<tt class="descname">addRecords</tt><big>(</big><em>records</em><big>)</big><a class="headerlink" href="#grokpy.stream.Stream.addRecords" title="Permalink to this definition">¶</a></dt>
+<dd><p>Appends records to the input cache of the given stream.</p>
+<p>WARNING: HACK</p>
+<p>Due to the current object model we actually send the records in the
+model.startSwarm() method, using the _addRecords() method below.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.stream.Stream.configure">
+<tt class="descname">configure</tt><big>(</big><em>filePath</em><big>)</big><a class="headerlink" href="#grokpy.stream.Stream.configure" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads JSON from a given file and uses that to configure the stream</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.stream.Stream.useJoinFile">
+<tt class="descname">useJoinFile</tt><big>(</big><em>joinFile</em><big>)</big><a class="headerlink" href="#grokpy.stream.Stream.useJoinFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binds a Join File to the stream and tells it how to process incoming records
+using the file.</p>
+<p>joinFile - A JoinFile Object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.stream.Stream.usePublicDataSource">
+<tt class="descname">usePublicDataSource</tt><big>(</big><em>publicDataSource</em><big>)</big><a class="headerlink" href="#grokpy.stream.Stream.usePublicDataSource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a configured publicDataSource and attaches it to the stream</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="stream-monitor">
+<h2>1.9. Stream Monitor<a class="headerlink" href="#stream-monitor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="grokpy.streaming.StreamMonitor">
+<em class="property">class </em><tt class="descclassname">grokpy.streaming.</tt><tt class="descname">StreamMonitor</tt><a class="headerlink" href="#grokpy.streaming.StreamMonitor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="grokpy.streaming.StreamMonitor.on_error">
+<tt class="descname">on_error</tt><big>(</big><em>status_code</em><big>)</big><a class="headerlink" href="#grokpy.streaming.StreamMonitor.on_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a non-200 status code is returned</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.streaming.StreamMonitor.on_state">
+<tt class="descname">on_state</tt><big>(</big><em>state</em><big>)</big><a class="headerlink" href="#grokpy.streaming.StreamMonitor.on_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when a new state is received from connection.</p>
+<p>Override this method if you wish to manually handle
+the stream data. Return False to stop stream and close connection.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.streaming.StreamMonitor.on_timeout">
+<tt class="descname">on_timeout</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.streaming.StreamMonitor.on_timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when stream connection times out</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">1. Classes</a><ul>
+<li><a class="reference internal" href="#module-grokpy.client">1.1. Client</a></li>
+<li><a class="reference internal" href="#module-grokpy.connection">1.2. Connection</a></li>
+<li><a class="reference internal" href="#module-grokpy.exceptions">1.3. Exceptions</a></li>
+<li><a class="reference internal" href="#module-grokpy.field">1.4. Field</a></li>
+<li><a class="reference internal" href="#module-grokpy.model">1.5. Model</a></li>
+<li><a class="reference internal" href="#module-grokpy.project">1.6. Project</a></li>
+<li><a class="reference internal" href="#module-grokpy.publicDataSource">1.7. Public Data Source</a></li>
+<li><a class="reference internal" href="#module-grokpy.stream">1.8. Stream</a></li>
+<li><a class="reference internal" href="#stream-monitor">1.9. Stream Monitor</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Grokpy Documentation</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/classes.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Grokpy Documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">Grokpy 0.1.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Ian Danforth.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+    </div>
+  </body>
+</html>
