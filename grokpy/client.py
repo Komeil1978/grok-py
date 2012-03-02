@@ -11,12 +11,7 @@ from exceptions import GrokError, AuthenticationError
 
 class Client(object):
   '''
-  Top level object for interacting with the Grok Prediction Service.
-
-  Contains:
-
-  High Level Opertions
-  Helper Methods
+  A client to access the Grok HTTP API. Please use this for good and not evil!
   '''
 
   def __init__(self, key = None, baseURL = None, connection = None):

@@ -107,10 +107,7 @@
 <dl class="class">
 <dt id="grokpy.client.Client">
 <em class="property">class </em><tt class="descclassname">grokpy.client.</tt><tt class="descname">Client</tt><big>(</big><em>key=None</em>, <em>baseURL=None</em>, <em>connection=None</em><big>)</big><a class="headerlink" href="#grokpy.client.Client" title="Permalink to this definition">¶</a></dt>
-<dd><p>Top level object for interacting with the Grok Prediction Service.</p>
-<p>Contains:</p>
-<p>High Level Opertions
-Helper Methods</p>
+<dd><p>A client to access the Grok HTTP API. Please use this for good and not evil!</p>
 <dl class="method">
 <dt id="grokpy.client.Client.about">
 <tt class="descname">about</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.about" title="Permalink to this definition">¶</a></dt>
@@ -136,9 +133,27 @@ external tools like Excel.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="grokpy.client.Client.createModel">
+<tt class="descname">createModel</tt><big>(</big><em>name=None</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.createModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a model associated with this project</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="grokpy.client.Client.createProject">
 <tt class="descname">createProject</tt><big>(</big><em>projectName</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.createProject" title="Permalink to this definition">¶</a></dt>
 <dd><p>Creates a project through the Grok API</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.createStream">
+<tt class="descname">createStream</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.createStream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an instance of the Stream object</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.getModel">
+<tt class="descname">getModel</tt><big>(</big><em>modelId</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.getModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the model corresponding to the given modelId</p>
 </dd></dl>
 
 <dl class="method">
@@ -154,6 +169,20 @@ external tools like Excel.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="grokpy.client.Client.getUser">
+<tt class="descname">getUser</tt><big>(</big><em>userId=None</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.getUser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves the dict representation of a user from the list of users
+associated with the current API key.</p>
+<p>Returns a User object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.client.Client.listModels">
+<tt class="descname">listModels</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.listModels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of Models that exist in this project</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="grokpy.client.Client.listProjects">
 <tt class="descname">listProjects</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.listProjects" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lists all the projects currently associated with this account</p>
@@ -166,9 +195,11 @@ external tools like Excel.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="grokpy.client.Client.testConnection">
-<tt class="descname">testConnection</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.client.Client.testConnection" title="Permalink to this definition">¶</a></dt>
-<dd><p>Makes a minimial service call to test the API connection</p>
+<dt id="grokpy.client.Client.stopAllModels">
+<tt class="descname">stopAllModels</tt><big>(</big><em>verbose=False</em><big>)</big><a class="headerlink" href="#grokpy.client.Client.stopAllModels" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience method to stop all models that have been promoted.</p>
+<p>This method can take many seconds to return depending on how many
+models are being stopped.</p>
 </dd></dl>
 
 </dd></dl>
@@ -261,11 +292,11 @@ external tools like Excel.</p>
 <span id="connection"></span><h2>1.2. Connection<a class="headerlink" href="#module-grokpy.connection" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="grokpy.connection.Connection">
-<em class="property">class </em><tt class="descclassname">grokpy.connection.</tt><tt class="descname">Connection</tt><big>(</big><em>key=None</em>, <em>baseURL='http://grok-api.numenta.com'</em>, <em>httpClient=None</em><big>)</big><a class="headerlink" href="#grokpy.connection.Connection" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">grokpy.connection.</tt><tt class="descname">Connection</tt><big>(</big><em>key=None</em>, <em>baseURL='http://api.grok.numenta.com/'</em>, <em>session=None</em><big>)</big><a class="headerlink" href="#grokpy.connection.Connection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Connection object for the Grok Prediction Service</p>
 <dl class="method">
 <dt id="grokpy.connection.Connection.request">
-<tt class="descname">request</tt><big>(</big><em>requestDef</em>, <em>method='POST'</em>, <em>body=False</em>, <em>headers=None</em><big>)</big><a class="headerlink" href="#grokpy.connection.Connection.request" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">request</tt><big>(</big><em>method</em>, <em>url</em>, <em>requestDef=None</em><big>)</big><a class="headerlink" href="#grokpy.connection.Connection.request" title="Permalink to this definition">¶</a></dt>
 <dd><p>Interface for all HTTP requests made to the Grok API</p>
 </dd></dl>
 
@@ -291,11 +322,17 @@ input data.</p>
 <dl class="class">
 <dt id="grokpy.model.Model">
 <em class="property">class </em><tt class="descclassname">grokpy.model.</tt><tt class="descname">Model</tt><big>(</big><em>parentProject</em>, <em>modelDef={}</em><big>)</big><a class="headerlink" href="#grokpy.model.Model" title="Permalink to this definition">¶</a></dt>
-<dd><p>Object representing a Grok Model</p>
+<dd><p>Object representing a Grok Model.</p>
 <dl class="method">
 <dt id="grokpy.model.Model.delete">
 <tt class="descname">delete</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>Permanently deletes the model</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="grokpy.model.Model.demo">
+<tt class="descname">demo</tt><big>(</big><big>)</big><a class="headerlink" href="#grokpy.model.Model.demo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Numenta demo day rocks!</p>
 </dd></dl>
 
 <dl class="method">
@@ -324,13 +361,56 @@ new data.</p>
 <dl class="method">
 <dt id="grokpy.model.Model.getMultiStepPredictions">
 <tt class="descname">getMultiStepPredictions</tt><big>(</big><em>buffer</em>, <em>timesteps</em><big>)</big><a class="headerlink" href="#grokpy.model.Model.getMultiStepPredictions" title="Permalink to this definition">¶</a></dt>
-<dd><p>Gets predictions for the next N timesteps</p>
+<dd><p>WARNING - Experimental</p>
+<p>Gets predictions for the next N timesteps</p>
 <dl class="docutils">
 <dt>buffer - A set of actual values to send in to prime predictions. This buffer</dt>
 <dd>should be sent in with each call and updated as new actual values
 are measured.</dd>
 </dl>
 <p>timesteps - The number of steps into the future to predict.</p>
+<p>Example:</p>
+<p>&#8211;TIMESTEP 1 &#8211;
+buffer = [[0],</p>
+<blockquote>
+<div>[1],
+[2],
+[0],
+[1],
+[2]]</div></blockquote>
+<dl class="docutils">
+<dt>Call:</dt>
+<dd>model.getMultiStepPredictions(buffer, 3)</dd>
+<dt>Return:</dt>
+<dd><p class="first">3 rows of predictions, which when converted back to input format look like</p>
+<dl class="last docutils">
+<dt>results = [[.01],</dt>
+<dd>[1.01],
+[2.01]]</dd>
+</dl>
+</dd>
+</dl>
+<p>&#8211;TIMESTEP 2 &#8211;
+buffer = [[0],</p>
+<blockquote>
+<div>[1],
+[2],
+[0],
+[1],
+[2],
+[0]] # Note the extra actual value we have now</div></blockquote>
+<dl class="docutils">
+<dt>Call:</dt>
+<dd>model.getMultiStepPredictions(buffer, 3)</dd>
+<dt>Return:</dt>
+<dd><p class="first">3 rows of predictions, which when converted back to input format look like</p>
+<dl class="last docutils">
+<dt>results = [[1.01],</dt>
+<dd>[2.01],
+[.01]] # Predictions are now one more timestep into the future</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
