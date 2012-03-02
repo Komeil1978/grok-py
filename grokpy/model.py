@@ -11,7 +11,7 @@ VERBOSITY = 0
 
 class Model(object):
   '''
-  Object representing a Grok Model
+  Object representing a Grok Model.
   '''
 
   def __init__(self, parentProject, modelDef = {}):
@@ -44,6 +44,13 @@ class Model(object):
 
     # Where we last read from in the output cache
     self.outputCachePointer = 0
+
+  def demo(self):
+    """
+    Numenta demo day rocks!
+    """
+    return 'Awesome'
+
 
   def delete(self):
     '''
