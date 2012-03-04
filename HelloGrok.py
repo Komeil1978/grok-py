@@ -58,11 +58,19 @@ def HelloGrok():
 
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = grokpy.Client(API_KEY)
+  grok = grokpy.Client(API_KEY, 'http://api.grok.numenta.com/')
 
-  # Create a blank model in that project
+  ############ TEST CODE --- REMOVE ###############
+  # Create a project
+
+  projectName = 'v2 project ' + str(time.time())
+  myProject = grok.createProject(projectName)
+
+  # Create a blank model
   print 'Creating an empty model ...'
-  recCenterEnergyModel = grok.createModel()
+  recCenterEnergyModel = myProject.createModel()
+
+  print 'GOT HERE WOO!'
 
   # Create an empty stream
   print 'Creating an empty stream ...'

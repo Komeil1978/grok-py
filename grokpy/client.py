@@ -11,7 +11,7 @@ from exceptions import GrokError, AuthenticationError
 
 class Client(object):
   '''
-  A client to access the Grok HTTP API. Please use this for good and not evil!
+  A client to access the Grok HTTP API.
   '''
 
   def __init__(self, key = None, baseURL = None, connection = None):
@@ -35,22 +35,25 @@ class Client(object):
     self.user = self.getUser()
 
   #############################################################################
-  # High Level Operations
+  # Model Methods
 
-  def createModel(self, name = None):
+  def createModel(self, name = None, url = None):
     '''
-    Create a model associated with this project
+    Returns a Model object. This model will be listed
     '''
 
-    print dir(self.user)
-    url = self.user.modelsUrl
+    if not url:
+      url = self.user.modelsUrl
     requestDef = {'model': {'name':'My Model'}}
 
     result = self.c.request('POST', url, requestDef)
 
-    return Model(result)
+    print '=' * 40
+    print result
 
-  def getModel(self, modelId):
+    return Model(result['model'])
+
+  def getModel(self, modelId, url = None):
     '''
     Returns the model corresponding to the given modelId
     '''
@@ -81,7 +84,7 @@ class Client(object):
 
     return Model(self, modelDef = modelDef)
 
-  def listModels(self):
+  def listModels(self, url = None):
     '''
     Returns a list of Models that exist in this project
     '''
@@ -96,7 +99,7 @@ class Client(object):
 
     return models
 
-  def stopAllModels(self, verbose = False):
+  def stopAllModels(self, verbose = False, url = None):
     '''
     A convenience method to stop all models that have been promoted.
 
@@ -117,17 +120,6 @@ class Client(object):
         self.c.request(requestDef)
 
     return stoppedModelIds
-
-  def createStream(self):
-    '''
-    Returns an instance of the Stream object
-    '''
-
-    return Stream(self)
-
-  #############################################################################
-  # Private methods
-
 
   def _listProductionModels(self):
     '''
@@ -155,22 +147,36 @@ class Client(object):
 
     return response['searchModels']
 
+  #############################################################################
+  # Stream Methods
+
+  def createStream(self):
+    '''
+    Returns an instance of the Stream object
+    '''
+
+    return Stream(self)
+
+
+  #############################################################################
+  # Project Methods
+
   def createProject(self, projectName):
     '''
-    Creates a project through the Grok API
+    Returns a Project object.
     '''
 
     # A dictionary describing the request
-    requestDef = {
-      'service': 'projectCreate',
-      'name': projectName,
-    }
+    requestDef = {'project': {'name': projectName}}
+
+    # The URL target for our request
+    url = self.user.projectsUrl
 
     # Make the API request
-    result = self.c.request(requestDef)
+    result = self.c.request('POST', url, requestDef)
 
     # Use the results to instantiate a new Project object
-    project = Project(self.c, result)
+    project = Project(self, result['project'])
 
     return project
 
@@ -209,6 +215,9 @@ class Client(object):
       projects = []
 
     return projects
+
+  #############################################################################
+  # Public Data Source Methods
 
   def listPublicDataSources(self):
     '''
@@ -313,6 +322,7 @@ class Client(object):
     resultRows = zip(*columns)
 
     return resultRows
+
 
 #############################################################################
 # Enums
