@@ -14,36 +14,17 @@ class Model(object):
   Object representing a Grok Model.
   '''
 
-  def __init__(self, parentProject, modelDef = {}):
-    # Our connection to the Grok API
-    self.c = parentProject.c
+  def __init__(self, stream, parent, modelDef):
 
-    # The project this model belongs to
-    self.parentProject = parentProject
+    # Give streams access to the parent client/project and its connection
+    self.parent = parent
+    self.c = self.parent.c
 
-    # The Id of this model
-    if modelDef:
-      self.id = modelDef['id']
-    else:
-      self.id = None
+    # Define the stream we're attached to
+    self.stream = stream
 
-    # The Stream this model will listen to
-    self.stream = None
-
-    # Whether this is a search or production model
-    if 'running' in modelDef:
-      self.type = 'production'
-    else:
-      self.type = 'search'
-
-    # Where we are in the stream of outputs
-    self._outputStreamPosition = -1
-
-    # How many times we'll try to promote a model before giving up
-    self.maxPromoteRetries = 3
-
-    # Where we last read from in the output cache
-    self.outputCachePointer = 0
+    # Take everything we're passed and make it an instance property.
+    self.__dict__.update(modelDef)
 
   def demo(self):
     """
