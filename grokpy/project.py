@@ -59,12 +59,15 @@ class Project(object):
   #
   # Thin wrappers for Model methods on the Client object.
 
-  def createModel(self, name = None):
+  def createModel(self, stream, name = None):
     '''
     Return a new Model object. The model will be created under this project.
     '''
 
-    return self.parentClient.createModel(name, url = self.modelsUrl)
+    return self.parentClient.createModel(stream,
+                                         name,
+                                         parent = self,
+                                         url = self.modelsUrl)
 
   def getModel(self, modelId):
     '''
@@ -92,9 +95,9 @@ class Project(object):
   #
   # Thin wrappers for Stream methods on the Client object.
 
-  def createStream(self, name = None):
+  def createStream(self, spec, name = None):
     '''
     Returns a new Stream object. The stream will be created under this project.
     '''
 
-    return self.parentClient.createStream(name, url = self.streamsUrl)
+    return self.parentClient.createStream(spec, name, self, url = self.streamsUrl)

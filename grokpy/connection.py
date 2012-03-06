@@ -92,16 +92,19 @@ class Connection(object):
     else:
       raise GrokError('Unrecognised HTTP method: %s' % method)
 
-    # Handle HTTP errors
-    if response.status_code != 200:
-      print response.headers
-      raise GrokError(response)
-
     # Load info from returned JSON strings
     content = json.loads(response.text)
 
     if VERBOSITY >= 1:
       print content
+
+    # Handle HTTP errors
+    if response.status_code != 200:
+      msg = str(response)
+      if 'errors' in content:
+        msg += ' %s' % content['errors']
+
+      raise GrokError(msg)
 
     return content
 

@@ -15,19 +15,14 @@ class Stream(object):
   that will be used by a model
   '''
 
-  def __init__(self, parentProject):
+  def __init__(self, parent, streamDef):
 
-    # Our connection to the Grok API
-    self.c = parentProject.c
+    # Give streams access to the parent client/project and its connection
+    self.parent = parent
+    self.c = self.parent.c
 
-    # Our stream description
-    self.streamDescription = {'fields': []}
-
-    # HACK: Our local data store
-    # In API v2 this should go away
-    self.records = None
-
-    self.parentProject = parentProject
+    # Take everything we're passed and make it an instance property.
+    self.__dict__.update(streamDef)
 
   def addField(self, **kwargs):
     '''

@@ -35,7 +35,7 @@ import grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'e1gCaM3PLRze9wuCaqSqQb5l41k06h3r'
+API_KEY = 'fakeApiKey'
 STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
@@ -47,6 +47,9 @@ OUTPUT_CSV = 'output/SwarmOutput.csv'
 # From the command line:
 #  echo "export GROK_API_KEY=YOUR_KEY_HERE" >> ~/.bashrc
 #  source ~/.bashrc
+#
+# After doing so you do not need to pass a key to instantiate a client.
+# e.g. grok = grokpy.Client()
 
 def HelloGrok():
 
@@ -58,33 +61,22 @@ def HelloGrok():
 
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = grokpy.Client(API_KEY, 'http://api.grok.numenta.com/')
+  grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
 
-  ############ TEST CODE --- REMOVE ###############
   # Create a project
-
   projectName = 'v2 project ' + str(time.time())
   myProject = grok.createProject(projectName)
 
-  # Create a blank model
-  print 'Creating an empty model ...'
-  recCenterEnergyModel = myProject.createModel()
-
-  print 'GOT HERE WOO!'
-
-  # Create an empty stream
-  print 'Creating an empty stream ...'
-  myStream = myProject.createStream()
-
   ##############################################################################
-  # Define our Stream and add data
+  # Create and configure our Stream
   #
   # For Grok to use your data we need a careful specification of that data to
   # work with. The combination of your data and its specification is what
   # we call a 'Stream'.
 
-  # Specify the format of the stream using a JSON document
-  myStream.configure(STREAM_SPEC)
+  # Create an empty stream using our JSON definition
+  streamName = 'v2 stream ' + str(time.time())
+  myStream = myProject.createStream(STREAM_SPEC, streamName)
 
   # Add data to the stream from a local source
   print 'Adding records to stream ...'
@@ -93,17 +85,19 @@ def HelloGrok():
   fileHandle.close()
   myStream.addRecords(recCenterData)
 
-  # Associate our model with this stream.
-  print 'Attaching model to stream and configuring ...'
-  recCenterEnergyModel.setStream(myStream)
-
   ##############################################################################
-  # Define how our Model will use our Stream
+  # Create and configure our Model
   #
   # Your models can listen to your streams in many different ways. Here we
   # tell the model how to deal with each field and which field we want to
-  # optimize our predictions for etc.
+  # optimize our predictions for.
 
+  # Create a model for that stream of data
+  print 'Creating an empty model ...'
+  modelName = 'v2 model ' + str(time.time())
+  recCenterEnergyModel = myProject.createModel(myStream, modelName)
+
+  print 'Configuring that model ...'
   recCenterEnergyModel.setTemporalField('timestamp')
   recCenterEnergyModel.setPredictionField('consumption')
   recCenterEnergyModel.setTimeAggregation(grokpy.Aggregation.HOURS)

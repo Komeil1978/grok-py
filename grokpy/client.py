@@ -4,6 +4,7 @@ import httplib2
 from connection import Connection
 from user import User
 from project import Project
+from model import Model
 from stream import Stream
 from field import Field
 from publicDataSource import PublicDataSource
@@ -37,21 +38,31 @@ class Client(object):
   #############################################################################
   # Model Methods
 
-  def createModel(self, name = None, url = None):
+  def createModel(self, stream, name = None, parent = None, url = None):
     '''
-    Returns a Model object. This model will be listed
+    Returns a Model object.
+
+    TODO: Make everything optional.
     '''
+
+    if not parent:
+      parent = self
 
     if not url:
       url = self.user.modelsUrl
-    requestDef = {'model': {'name':'My Model'}}
+
+    requestDef = {'model': {'name': name,
+                            'streamId': stream.id,
+                            'predictedField':'Cos'
+                            }
+                  }
 
     result = self.c.request('POST', url, requestDef)
 
     print '=' * 40
     print result
 
-    return Model(result['model'])
+    return Model(stream, parent, result['model'])
 
   def getModel(self, modelId, url = None):
     '''
@@ -150,12 +161,63 @@ class Client(object):
   #############################################################################
   # Stream Methods
 
-  def createStream(self):
+  def createStream(self, spec, name = None, parent = None, url = None):
     '''
-    Returns an instance of the Stream object
+    Returns an instance of the Stream object.
+
+    spec - Can be EITHER a file path to a JSON document OR a Python dict
+    name - A name for the stream, used mainly for display.
+    parent - Either a Client object or Project object.
+    url - The URI target for creating this stream.
     '''
 
-    return Stream(self)
+    streamSpec = {}
+    # If we were given a dict directly, use that.
+    if type(spec) == type({}):
+      streamSpec = spec
+    # Otherwise pull the info out of a file.
+    else:
+      fileHandle = open(spec, 'rU')
+      try:
+        fields = json.load(fileHandle)
+      except:
+        msg = StringIO.StringIO()
+        print >>msg, ("Caught JSON parsing error. Your stream specification may "
+        "have errors. Original exception follows:")
+        traceback.print_exc(None, msg)
+        raise GrokError(msg.getvalue())
+
+      for field in fields:
+        field = self._safe_dict(field)
+        streamSpec.update(field)
+
+    if not parent:
+      parent = self
+
+    if not url:
+      url = self.user.streamsUrl
+
+    requestDef = {'stream': {'name':'Swarm Stream',
+                             'dataSources':[{'name':'My Data Source',
+                                             'dataSourceType':'local',
+                                             'fields':[{'name':'Sin',
+                                                        'dataFormat': {'dataType': 'SCALAR'}
+                                                        },
+                                                       {'name':'Cos',
+                                                        'dataFormat': {'dataType': 'SCALAR'}
+                                                        }
+                                                      ]
+                                              }
+                                            ]
+                              }
+                  }
+
+    result = self.c.request('POST', url, requestDef)
+
+    print '*' * 40
+    print result
+
+    return Stream(parent, result['stream'])
 
 
   #############################################################################
