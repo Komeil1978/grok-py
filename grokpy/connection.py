@@ -65,7 +65,7 @@ class Connection(object):
 
     self.s = session
 
-  def request(self, method, url, requestDef = None):
+  def request(self, method, url, requestDef = None, params = None):
     '''
     Interface for all HTTP requests made to the Grok API
     '''
@@ -82,7 +82,7 @@ class Connection(object):
 
     # Make the request, handle initial connection errors
     if method == 'GET':
-      response = self.s.get(url)
+      response = self.s.get(url, params = params)
     elif method == 'POST':
       response = self.s.post(url, requestDef)
     elif method == 'PUT':
@@ -91,6 +91,10 @@ class Connection(object):
       response = self.s.delete(url)
     else:
       raise GrokError('Unrecognised HTTP method: %s' % method)
+
+    if not response.ok:
+      raise response.raise_for_status()
+
 
     # Load info from returned JSON strings
     content = json.loads(response.text)

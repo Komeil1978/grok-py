@@ -3,18 +3,71 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Grokpy Documentation
-==================================
 
-Grokpy is the Python client for Grok, Numenta's Prediction Service. Grokpy
-wraps the HTTP API which is documented elsewhere.
+==========================
+Grok Python Client Library
+==========================
 
-Contents:
+Grokpy is the Python client for Grok, Numenta's Prediction Service. It wraps
+the `Grok HTTP API <http://grok.numenta.com/resources>`_ in a convenient Python
+library.
+
+.. _installation:
+
+Installation
+============
+
+Install using pip, a package manager for Python. ::
+
+    $ pip install grokpy
+
+Don't have pip installed? You should! ::
+
+    $ curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
+
+Or, you can grab `the latest stable build`_ and install it yourself. ::
+
+    $ python setup.py install
+
+.. _the latest stable build: http://github.com/numenta/grok-py/downloads
+
+Finally, you can clone the repo. (Master is always stable.) ::
+
+    $ git clone git@github.com:numenta/grok-py.git
+    $ cd grok-py
+    $ python setup.py install
+
+Getting Started
+================
+
+Here are some words
+
+.. _user-guide:
+
+User Guide
+==================
+
+these are more words
+
+API Reference
+==================
+
+A complete guide to all public APIs found in `grok-py`. Auto-generated.
 
 .. toctree::
    :numbered:
+   :maxdepth: 2
 
-   classes
+   grokpy
+
+Support
+==========================
+
+WHERE TO REPORT BUGS
+
+IRC CHANNEL
+
+CHANGELOG
 
 Indices and tables
 ==================
