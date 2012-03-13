@@ -28,16 +28,16 @@ import csv
 import os
 import signal
 import sys
-import json
 
 import grokpy
 
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'fakeApiKey'
+API_KEY = 'fKotFugElEafypvekMqPFUDM00xGtqet'
 STREAM_SPEC = 'data/streamSpecification.json'
-INPUT_CSV = 'data/rec-center-swarm.csv'
+MODEL_SPEC = 'data/modelSpecification.json'
+INPUT_CSV = 'data/rec-center-tiny.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
 ##############################################################################
@@ -63,10 +63,6 @@ def HelloGrok():
   print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
 
-  # Create a project
-  projectName = 'v2 project ' + str(time.time())
-  myProject = grok.createProject(projectName)
-
   ##############################################################################
   # Create and configure our Stream
   #
@@ -75,8 +71,7 @@ def HelloGrok():
   # we call a 'Stream'.
 
   # Create an empty stream using our JSON definition
-  streamName = 'v2 stream ' + str(time.time())
-  myStream = myProject.createStream(STREAM_SPEC, streamName)
+  myStream = grok.createStream(STREAM_SPEC)
 
   # Add data to the stream from a local source
   print 'Adding records to stream ...'
@@ -92,15 +87,16 @@ def HelloGrok():
   # tell the model how to deal with each field and which field we want to
   # optimize our predictions for.
 
-  # Create a model for that stream of data
-  print 'Creating an empty model ...'
-  modelName = 'v2 model ' + str(time.time())
-  recCenterEnergyModel = myProject.createModel(myStream, modelName)
+  # This time we'll build up a dictionary to spec out the model
+  # Both models and streams can take specs from either dictionaries or JSON
+  # files.
+  modelSpec = {"name": "Model of Fun " + str(time.time()),
+               "predictedField": "consumption"}
 
-  print 'Configuring that model ...'
-  recCenterEnergyModel.setTemporalField('timestamp')
-  recCenterEnergyModel.setPredictionField('consumption')
-  recCenterEnergyModel.setTimeAggregation(grokpy.Aggregation.HOURS)
+  # Create that model for the given stream
+  print 'Creating an empty model ...'
+  recCenterEnergyModel = grok.createModel(modelSpec, myStream.id)
+
 
   ##############################################################################
   # Start the Swarm
@@ -110,30 +106,44 @@ def HelloGrok():
   # configuration of our model to predict the data that exist in the stream.
 
   print 'Starting Grok Swarm'
-  recCenterEnergyModel.startSwarm()
+  print recCenterEnergyModel.startSwarm()
 
   ##############################################################################
   # Monitor Progress
   #
-  # Every second we want to get an update on the state of our swarm. We might
-  # want to know how many configurations the swarm has tried, or what the
-  # average error of the best configuration is. Below you'll find a definition
-  # of a SwarmMonitor which extends the general functionality of the
-  # grokpy.streaming.StreamMonitor class.
+  # To know when our Swarm is complete we will poll for the state of the swarm
 
-  # Catch ctrl-c to terminate remote long-running processes
-  signal.signal(signal.SIGINT, signal_handler)
+  swarmStarted = False
+  while True:
+    state = recCenterEnergyModel.getSwarmState()
+    jobStatus = state['status']
+    results = state['details']
+    recordsSeen = results['numRecords']
 
-  monitor = SwarmMonitor()
-  recCenterEnergyModel.monitorSwarm(monitor)
+    if jobStatus == grokpy.SwarmStatus.COMPLETED:
+      # Swarm is done
+      bestConfig = results['bestModel']
+      print 'You win! Your Grok Swarm is complete.'
+      print '\tBest Configuration: ' + str(bestConfig)
+      print '\tWith an Error of: ' + str(results['bestValue'])
+      # Exit the loop
+      break
+    elif jobStatus == grokpy.SwarmStatus.RUNNING and swarmStarted == False:
+      # The first time we see that the swarm is running
+      swarmStarted = True
+      print 'Swarm started.'
+    elif jobStatus == grokpy.SwarmStatus.STARTING:
+      print 'Swarm is starting up ...'
+      time.sleep(2)
+    else:
+      print "Latest record seen: " + str(recordsSeen)
+      time.sleep(2)
 
   ##############################################################################
   # Retrieve Swarm results
 
   print "\nGetting full results from Swarm ..."
-  swarmResults = recCenterEnergyModel.getSwarmResults()
-  headers = swarmResults['columnNames']
-  resultRows = swarmResults['rows']
+  headers, resultRows = recCenterEnergyModel.getModelOutput()
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)
@@ -163,85 +173,9 @@ On to Part Two!
   MODEL_ID: %s
   PROJECT_ID: %s
 
-Please edit HelloGrokPart2.py, adding in the MODEL_ID and PROJECT_ID.
+Please edit HelloGrokPart2.py, adding in the MODEL_ID.
 Then run:
-  python HelloGrokPart2.py""" % (recCenterEnergyModel.id,
-                                 myProject.id)
-
-class SwarmMonitor(grokpy.StreamMonitor):
-
-    def __init__(self):
-        # Loop information
-        self.started = False
-
-        self.configurations = {}
-        self.highestRecordCount = 0
-
-    def on_state(self, state):
-        '''
-        Called when a new state is received from connection.
-
-        Returns False to stop stream and close connection.
-        '''
-
-        jobStatus = state['jobStatus']
-        results = state['results']
-        configurations = state['models']
-
-        if jobStatus == grokpy.Status.COMPLETED:
-          bestConfig = results['bestModel']
-          fieldsUsed = self.configurations[bestConfig]['fields']
-          print 'You win! Your Grok Swarm is complete.'
-          print '\tBest Configuration: ' + str(bestConfig)
-          print '\tWith an Error of: ' + str(results['bestValue'])
-          print '\tUsing Field(s): ' + str(fieldsUsed)
-          if len(fieldsUsed) > 1:
-            fieldContributions = state['fieldContributions']
-            print '\tField Contributions:'
-            for field in fieldContributions:
-              if field['contribution'] > 0:
-                print('\t\tUsing ' + field['name'] + ' improved accuracy by ' +
-                      str(field['contribution']) + ' percent.')
-
-          # Exit the loop
-          return False
-        if jobStatus == grokpy.Status.RUNNING and self.started == False:
-          self.started = True
-          print 'Swarm started.'
-        if not self.started:
-          print 'Swarm is starting up ...'
-          time.sleep(2)
-          return True
-        if not results:
-          print 'Initial records are being loaded ...'
-          time.sleep(2)
-          return True
-
-        for config in configurations:
-          if config['numRecords'] > self.highestRecordCount:
-            self.highestRecordCount = config['numRecords']
-          if config['status'] == grokpy.Status.COMPLETED:
-            self.configurations[config['modelId']] = config
-
-        if self.configurations:
-          print ('Grok has evaluated ' + str(len(self.configurations)) +
-                 ' model configurations.')
-        else:
-          print ('First models are processing records. Latest record seen: ' +
-                 str(self.highestRecordCount))
-
-        time.sleep(2)
-        return True
-
-def signal_handler(signal, frame):
-  model = frame.f_locals.get('recCenterEnergyModel')
-  swarmStatus = frame.f_locals.get('jobStatus')
-  # Shut down any running swarms
-  if model and swarmStatus == grokpy.Status.RUNNING:
-    print 'Caught Ctrl-C during Swarm'
-    print 'Stopping in-progress Swarm ...'
-    model.stopSwarm()
-  sys.exit(0)
+  python HelloGrokPart2.py""" % recCenterEnergyModel.id
 
 if __name__ == '__main__':
   HelloGrok()

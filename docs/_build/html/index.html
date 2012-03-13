@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Grokpy Documentation &mdash; Grokpy 0.1.0 documentation</title>
+    <title>Grok Python Client Library &mdash; Grokpy 0.1.0 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -26,7 +26,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="top" title="Grokpy 0.1.0 documentation" href="#" />
-    <link rel="next" title="1. Classes" href="classes.html" /> 
+    <link rel="next" title="1. client Module" href="grokpy.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,7 @@
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="classes.html" title="1. Classes"
+          <a href="grokpy.html" title="1. client Module"
              accesskey="N">next</a> |</li>
         <li><a href="#">Grokpy 0.1.0 documentation</a> &raquo;</li> 
       </ul>
@@ -50,35 +50,74 @@
         <div class="bodywrapper">
           <div class="body">
             
-  <div class="section" id="grokpy-documentation">
-<h1>Grokpy Documentation<a class="headerlink" href="#grokpy-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Grokpy is the Python client for Grok, Numenta&#8217;s Prediction Service. Grokpy
-wraps the HTTP API which is documented elsewhere.</p>
-<p>Contents:</p>
+  <div class="section" id="grok-python-client-library">
+<h1>Grok Python Client Library<a class="headerlink" href="#grok-python-client-library" title="Permalink to this headline">¶</a></h1>
+<p>Grokpy is the Python client for Grok, Numenta&#8217;s Prediction Service. It wraps
+the <a class="reference external" href="http://grok.numenta.com/resources">Grok HTTP API</a> in a convenient Python
+library.</p>
+<div class="section" id="installation">
+<span id="id1"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Install using pip, a package manager for Python.</p>
+<div class="highlight-python"><pre>$ pip install grokpy</pre>
+</div>
+<p>Don&#8217;t have pip installed? You should!</p>
+<div class="highlight-python"><pre>$ curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python</pre>
+</div>
+<p>Or, you can grab <a class="reference external" href="http://github.com/numenta/grok-py/downloads">the latest stable build</a> and install it yourself.</p>
+<div class="highlight-python"><pre>$ python setup.py install</pre>
+</div>
+<p>Finally, you can clone the repo. (Master is always stable.)</p>
+<div class="highlight-python"><pre>$ git clone git@github.com:numenta/grok-py.git
+$ cd grok-py
+$ python setup.py install</pre>
+</div>
+</div>
+<div class="section" id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
+<p>Here are some words</p>
+</div>
+<div class="section" id="user-guide">
+<span id="id2"></span><h2>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h2>
+<p>these are more words</p>
+</div>
+<div class="section" id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
+<p>A complete guide to all public APIs found in <cite>grok-py</cite>. Auto-generated.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="classes.html">1. Classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.client">1.1. Client</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.connection">1.2. Connection</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.exceptions">1.3. Exceptions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.field">1.4. Field</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.model">1.5. Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.project">1.6. Project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.publicDataSource">1.7. Public Data Source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#module-grokpy.stream">1.8. Stream</a></li>
-<li class="toctree-l2"><a class="reference internal" href="classes.html#stream-monitor">1.9. Stream Monitor</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html">1. <tt class="docutils literal"><span class="pre">client</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.connection">2. <tt class="docutils literal"><span class="pre">connection</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.exceptions">3. <tt class="docutils literal"><span class="pre">exceptions</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.field">4. <tt class="docutils literal"><span class="pre">field</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.model">5. <tt class="docutils literal"><span class="pre">model</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.project">6. <tt class="docutils literal"><span class="pre">project</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.publicDataSource">7. <tt class="docutils literal"><span class="pre">publicDataSource</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.stream">8. <tt class="docutils literal"><span class="pre">stream</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.streaming">9. <tt class="docutils literal"><span class="pre">streaming</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.swarm">10. <tt class="docutils literal"><span class="pre">swarm</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.user">11. <tt class="docutils literal"><span class="pre">user</span></tt> Module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="grokpy.html#subpackages">12. Subpackages</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="grokpy.httplib2.html">12.1. httplib2 Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grokpy.requests.html">12.2. requests Package</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
+<div class="section" id="support">
+<h2>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h2>
+<p>WHERE TO REPORT BUGS</p>
+<p>IRC CHANNEL</p>
+<p>CHANGELOG</p>
+</div>
 <div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
 <li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
 <li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
 </ul>
+</div>
 </div>
 
 
@@ -89,15 +128,22 @@ wraps the HTTP API which is documented elsewhere.</p>
         <div class="sphinxsidebarwrapper">
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
-<li><a class="reference internal" href="#">Grokpy Documentation</a><ul>
+<li><a class="reference internal" href="#">Grok Python Client Library</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li><a class="reference internal" href="#user-guide">User Guide</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a><ul>
 </ul>
 </li>
+<li><a class="reference internal" href="#support">Support</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
 </ul>
 
   <h4>Next topic</h4>
-  <p class="topless"><a href="classes.html"
-                        title="next chapter">1. Classes</a></p>
+  <p class="topless"><a href="grokpy.html"
+                        title="next chapter">1. <tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">client</span></tt> Module</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"
@@ -130,14 +176,14 @@ wraps the HTTP API which is documented elsewhere.</p>
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="classes.html" title="1. Classes"
+          <a href="grokpy.html" title="1. client Module"
              >next</a> |</li>
         <li><a href="#">Grokpy 0.1.0 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
         &copy; Copyright 2012, Ian Danforth.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.2.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
 </html>

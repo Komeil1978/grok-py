@@ -1,5 +1,8 @@
 import threading
 import httplib2
+import StringIO
+import traceback
+import json
 
 from connection import Connection
 from user import User
@@ -8,20 +11,21 @@ from model import Model
 from stream import Stream
 from field import Field
 from publicDataSource import PublicDataSource
-from exceptions import GrokError, AuthenticationError
+from exceptions import (GrokError,
+                       AuthenticationError,
+                       NotYetImplementedError)
 
 class Client(object):
   '''
   A client to access the Grok HTTP API.
+
+  * [key] - Grok API Key
+  * [baseURL] - Grok server request target
+  * [connection] - An instance of the grokpy.Connection class. Used mainly for
+    testing.
   '''
 
   def __init__(self, key = None, baseURL = None, connection = None):
-    '''
-    Key - Grok API Key
-    baseURL - baseURL - Grok server request target
-    connection - An instance of the grokpy.Connection class. Used mainly for
-                 testing.
-    '''
 
     # Create a connection to the API
     if not connection:
@@ -36,288 +40,14 @@ class Client(object):
     self.user = self.getUser()
 
   #############################################################################
-  # Model Methods
-
-  def createModel(self, stream, name = None, parent = None, url = None):
-    '''
-    Returns a Model object.
-
-    TODO: Make everything optional.
-    '''
-
-    if not parent:
-      parent = self
-
-    if not url:
-      url = self.user.modelsUrl
-
-    requestDef = {'model': {'name': name,
-                            'streamId': stream.id,
-                            'predictedField':'Cos'
-                            }
-                  }
-
-    result = self.c.request('POST', url, requestDef)
-
-    print '=' * 40
-    print result
-
-    return Model(stream, parent, result['model'])
-
-  def getModel(self, modelId, url = None):
-    '''
-    Returns the model corresponding to the given modelId
-    '''
-    if modelId == 'YOUR_MODEL_ID':
-      raise GrokError('Please supply a valid Model Id')
-
-    # Determine if this is a search or production model
-    productionModels = [model['id'] for model in self._listProductionModels()]
-    searchModels = [model['id'] for model in self._listSearchModels()]
-
-    if modelId in productionModels and modelId in searchModels:
-      raise GrokError('Ruh-ro, model id collision between prod and search.')
-    elif modelId in productionModels:
-      modelType = 'production'
-    elif modelId in searchModels:
-      modelType = 'search'
-    else:
-      raise GrokError('Model Id not found.')
-
-    # Get the model definition and create a new Model object with that.
-    service = modelType + 'ModelRead'
-    idParam = modelType + 'ModelId'
-
-    requestDef = {'service': service,
-                  idParam: modelId}
-
-    modelDef = self.c.request(requestDef, 'POST')
-
-    return Model(self, modelDef = modelDef)
-
-  def listModels(self, url = None):
-    '''
-    Returns a list of Models that exist in this project
-    '''
-    modelDescriptions = self._listSearchModels()
-
-    modelDescriptions.extend(self._listProductionModels())
-
-    if modelDescriptions:
-      models = [Model(self, desc) for desc in modelDescriptions]
-    else:
-      models = []
-
-    return models
-
-  def stopAllModels(self, verbose = False, url = None):
-    '''
-    A convenience method to stop all models that have been promoted.
-
-    This method can take many seconds to return depending on how many
-    models are being stopped.
-    '''
-
-    productionModels = self._listProductionModels()
-
-    stoppedModelIds = []
-    for model in productionModels:
-      if model['running']:
-        id = model['id']
-        stoppedModelIds.append(id)
-        if verbose: print 'Stopping model: ' + str(id)
-        requestDef = {'service': 'productionModelStop',
-                      'productionModelId': id}
-        self.c.request(requestDef)
-
-    return stoppedModelIds
-
-  def _listProductionModels(self):
-    '''
-    Returns a list of all production models.
-    '''
-
-    requestDef = {'service': 'productionModelList',
-                  'projectId': self.id,
-                  'includeTotalCount': False}
-
-    response = self.c.request(requestDef, 'POST')
-
-    return response['productionModels']
-
-  def _listSearchModels(self):
-    '''
-    Returns a list of all search models
-    '''
-
-    requestDef = {'service': 'searchModelList',
-                  'projectId': self.id,
-                  'includeTotalCount': False}
-
-    response = self.c.request(requestDef, 'POST')
-
-    return response['searchModels']
-
-  #############################################################################
-  # Stream Methods
-
-  def createStream(self, spec, name = None, parent = None, url = None):
-    '''
-    Returns an instance of the Stream object.
-
-    spec - Can be EITHER a file path to a JSON document OR a Python dict
-    name - A name for the stream, used mainly for display.
-    parent - Either a Client object or Project object.
-    url - The URI target for creating this stream.
-    '''
-
-    streamSpec = {}
-    # If we were given a dict directly, use that.
-    if type(spec) == type({}):
-      streamSpec = spec
-    # Otherwise pull the info out of a file.
-    else:
-      fileHandle = open(spec, 'rU')
-      try:
-        fields = json.load(fileHandle)
-      except:
-        msg = StringIO.StringIO()
-        print >>msg, ("Caught JSON parsing error. Your stream specification may "
-        "have errors. Original exception follows:")
-        traceback.print_exc(None, msg)
-        raise GrokError(msg.getvalue())
-
-      for field in fields:
-        field = self._safe_dict(field)
-        streamSpec.update(field)
-
-    if not parent:
-      parent = self
-
-    if not url:
-      url = self.user.streamsUrl
-
-    requestDef = {'stream': {'name':'Swarm Stream',
-                             'dataSources':[{'name':'My Data Source',
-                                             'dataSourceType':'local',
-                                             'fields':[{'name':'Sin',
-                                                        'dataFormat': {'dataType': 'SCALAR'}
-                                                        },
-                                                       {'name':'Cos',
-                                                        'dataFormat': {'dataType': 'SCALAR'}
-                                                        }
-                                                      ]
-                                              }
-                                            ]
-                              }
-                  }
-
-    result = self.c.request('POST', url, requestDef)
-
-    print '*' * 40
-    print result
-
-    return Stream(parent, result['stream'])
-
-
-  #############################################################################
-  # Project Methods
-
-  def createProject(self, projectName):
-    '''
-    Returns a Project object.
-    '''
-
-    # A dictionary describing the request
-    requestDef = {'project': {'name': projectName}}
-
-    # The URL target for our request
-    url = self.user.projectsUrl
-
-    # Make the API request
-    result = self.c.request('POST', url, requestDef)
-
-    # Use the results to instantiate a new Project object
-    project = Project(self, result['project'])
-
-    return project
-
-  def getProject(self, projectId):
-    '''
-    Returns a Project with the given id
-    '''
-    if projectId == 'YOUR_PROJECT_ID':
-      raise GrokError('Please supply a valid Project Id')
-
-    requestDef = {
-      'service': 'projectRead',
-      'projectId': projectId,
-    }
-
-    # Make the API request
-    result = self.c.request(requestDef)
-
-    # Use the results to instantiate a new Project object
-    project = Project(self.c, result)
-
-    return project
-
-  def listProjects(self):
-    '''
-    Lists all the projects currently associated with this account
-    '''
-    requestDef = {'service': 'projectList'}
-
-    projectDescriptions = self.c.request(requestDef)
-
-    # Create objects out of the returned descriptions
-    if projectDescriptions:
-      projects = [Project(self.c, pDef) for pDef in projectDescriptions]
-    else:
-      projects = []
-
-    return projects
-
-  #############################################################################
-  # Public Data Source Methods
-
-  def listPublicDataSources(self):
-    '''
-    Lists all the public data sources registered with Grok
-    '''
-    requestDef = {'service': 'providerDefinitionList'}
-
-    dataSourceDescriptions = self.c.request(requestDef)
-
-    if dataSourceDescriptions:
-      publicDataSources = [PublicDataSource(self.c, dsd) for dsd in
-                           dataSourceDescriptions]
-    else:
-      publicDataSources = []
-
-    return publicDataSources
-
-  def getPublicDataSource(self, id):
-    '''
-    Looks up and returns a PDS by its code.
-    '''
-    pdsList = self.listPublicDataSources()
-
-    for pds in pdsList:
-      if pds.id == id:
-        return pds
-      else:
-        continue
-
-    # Code not found
-    raise GrokError('A Public Data Source with id "%s" was not found.' % id)
+  # User Methods
 
   def getUser(self, userId = None):
     '''
-    Retrieves the dict representation of a user from the list of users
-    associated with the current API key.
+    Returns a User object. By default returns the first user associated with
+    this API key.
 
-    Returns a User object.
+    * [userId]
     '''
     url = '/users'
     rv = self.c.request('GET', url)
@@ -336,41 +66,346 @@ class Client(object):
     raise GrokError('There were no users, or the userId you specified was not '
                     'found.')
 
-  def about(self):
-    '''
-    Get current build and server information from API server
-    '''
-    requestDef = {'service': 'about'}
+  #############################################################################
+  # Model Methods
 
-    return self.c.request(requestDef)
+  def createModel(self, spec, streamId, parent = None, url = None):
+    '''
+    Returns a Model object.
+
+    * spec - A configuration for this model. Can be EITHER a file path to a
+      JSON document OR a Python dict
+    * streamId - The Id of the stream to which this model should listen.
+    * [parent] - A Project object which associates this model with a specific
+      parent project.
+    * [url] - The target for creating this model. Automatically specified
+      when calling project.createModel() rather than client.createModel().
+    '''
+
+    # Process the given spec
+    modelSpec = self._handelAmbiguousSpec(spec)
+
+    # Add in the relevant streamId
+    modelSpec['streamId'] = streamId
+
+    if not parent:
+      parent = self
+
+    if not url:
+      url = self.user.modelsUrl
+
+    requestDef = {'model': modelSpec}
+
+    result = self.c.request('POST', url, requestDef)
+
+    print '=' * 40
+    print result
+
+    return Model(parent, result['model'])
+
+  def getModel(self, modelId, url = None):
+    '''
+    Returns a Model object corresponding to the given modelId
+
+    * modelId
+    * [url] - Usually only specified when calling the equivalent method on a
+      project.
+    '''
+
+    if not url:
+      url = self.user.modelsUrl
+
+    url += ('/' + str(modelId))
+    modelDef = self.c.request('GET', url)['model']
+
+    return Model(self, modelDef)
+
+  def listModels(self, url = None):
+    '''
+    Returns a list of Models. By default it will return a list of all models
+    tied to the current API key.
+
+    TODO: Update this once the list returned from the server contains info
+    about what projects the models belong to.
+
+    * [url] - Usually only specified when calling the equivalent method on a
+      project.
+    '''
+
+    params = None
+    if not url:
+      # The user hasn't specified a url (usually to limit values to a project)
+      url = self.user.modelsUrl
+      params = {'all': True}
+
+    modelDefs = self.c.request('GET', url, params = params)['models']
+
+    models = []
+    for modelDef in modelDefs:
+      models.append(Model(self, modelDef))
+
+    return models
+
+  def deleteAllModels(self, verbose = False):
+    '''
+    Permanently deletes all models associated with the current API key.
+
+    * [verbose] - If set, the model Id of each model being deleted will be
+      printed.
+
+    .. warning:: There is currently no way to recover from this opperation.
+    '''
+    for model in self.listModels():
+      if verbose:
+        print 'Deleting model: ' + str(model.id)
+      model.delete()
+
+  #############################################################################
+  # Stream Methods
+
+  def createStream(self, spec, name = None, parent = None, url = None):
+    '''
+    Returns an instance of the Stream object.
+
+    * spec - Can be EITHER a file path to a JSON document OR a Python dict
+    * [name] - A name for the stream, used mainly for display.
+    * [parent] - A Project object which associates this stream with a specific
+      parent project.
+    * [url] - The target for creating this stream. Automatically specified
+      when calling project.createStream() rather than client.createStream()
+    '''
+
+    # Process the given spec
+    streamSpec = self._handelAmbiguousSpec(spec)
+
+    # Default to the client as container if not passed a project
+    if not parent:
+      parent = self
+
+    # Streams created from projects will pass in a project streamsUrl
+    if not url:
+      url = self.user.streamsUrl
+
+    requestDef = {'stream': streamSpec}
+
+    result = self.c.request('POST', url, requestDef)
+
+    return Stream(parent, result['stream'])
+
+  def getStream(self, streamId, url = None):
+    '''
+    Returns a Stream object corresponding to the given streamId
+
+    * streamId
+    * [url] - Usually only specified when calling the equivalent method on a
+      project.
+    '''
+
+    if not url:
+      # The user hasn't specified a url (usually to limit values to a project)
+      url = self.user.streamsUrl
+
+    url += '/' + streamId
+
+    rv = self.c.request('GET', url)
+    streamDef = rv['stream']
+
+    return Stream(self, streamDef)
+
+  def listStreams(self, url = None):
+    '''
+    Returns a list of Stream objects. By default it will return a list of all
+    streams tied to the current API key.
+
+    * [url] - Usually only specified when calling the equivalent method on a
+      project.
+    '''
+
+    params = None
+    if not url:
+      # The user hasn't specified a url (usually to limit values to a project)
+      url = self.user.streamsUrl
+      params = {'all': True}
+
+    streams = []
+    for streamDef in self.c.request('GET', url, params = params)['streams']:
+      streams.append(Stream(self, streamDef))
+
+    return streams
+
+  def deleteAllStreams(self, url = None, verbose = False):
+    '''
+    Permanently deletes all streams associated with the current API key.
+
+    * [verbose] - If set, the stream Id of each stream being deleted will be
+      printed.
+
+    .. warning:: There is currently no way to recover from this opperation.
+    '''
+
+    for stream in self.listStreams(url):
+      if verbose:
+        print 'Deleting stream: ' + str(stream.id)
+      stream.delete()
+
+  def _safe_dict(self, d):
+    '''
+    Recursively clone json structure with UTF-8 dictionary keys
+
+    From: http://www.gossamer-threads.com/lists/python/python/684379
+    '''
+    if isinstance(d, dict):
+      return dict([(k.encode('utf-8'), self._safe_dict(v)) for k,v in d.iteritems()])
+    elif isinstance(d, list):
+      return [self._safe_dict(x) for x in d]
+    else:
+      return d
+
+  def _handelAmbiguousSpec(self, spec):
+    '''
+    Takes in either Python dicts or File paths to JSON docs and does the right
+    thing with them.
+    '''
+
+    processedSpec = {}
+    # If we were given a dict directly, use that.
+    if type(spec) == type({}):
+      processedSpec = spec
+    # Otherwise pull the info out of a file.
+    else:
+      fileHandle = open(spec, 'rU')
+      try:
+        specFromFile = json.load(fileHandle)
+      except:
+        msg = StringIO.StringIO()
+        print >>msg, ("Caught JSON parsing error. Your stream specification may "
+        "have errors. Original exception follows:")
+        traceback.print_exc(None, msg)
+        raise GrokError(msg.getvalue())
+
+      # Convert all unicode to normal
+      processedSpec = self._safe_dict(specFromFile)
+
+    return processedSpec
+
+  #############################################################################
+  # Project Methods
+
+  def createProject(self, projectName):
+    '''
+    Returns a Project object.
+
+    * projectName - Used primarly for display purposes
+    '''
+
+    # A dictionary describing the request
+    requestDef = {'project': {'name': projectName}}
+
+    # The URL target for our request
+    url = self.user.projectsUrl
+
+    # Make the API request
+    result = self.c.request('POST', url, requestDef)
+
+    # Use the results to instantiate a new Project object
+    project = Project(self, result['project'])
+
+    return project
+
+  def getProject(self, projectId):
+    '''
+    Returns a Project with the given Id
+
+    * projectId
+    '''
+    if projectId == 'YOUR_PROJECT_ID':
+      raise GrokError('Please supply a valid Project Id')
+
+    url = self.user.projectsUrl
+
+    url += ('/' + str(projectId))
+    projectDef = self.c.request('GET', url)['project']
+
+    return Project(self, projectDef)
+
+  def listProjects(self):
+    '''
+    Lists all the projects currently associated with this account
+    '''
+
+    params = {'all': True}
+
+    rv = self.c.request('GET', self.user.projectsUrl, params = params)
+    projectDefs = rv['projects']
+
+    projects = []
+    for projectDef in projectDefs:
+      projects.append(Project(self, projectDef))
+
+    return projects
+
+  def deleteAllProjects(self, verbose = False):
+    '''
+    Permanently deletes all projects
+
+    * [verbose] - If set, the model Id of each model being deleted will be
+      printed.
+
+    .. warning:: There is currently no way to recover from this opperation.
+    '''
+
+    for project in self.listProjects():
+      if verbose:
+        print 'Deleting project: ' + str(project.id)
+      project.delete()
+
+  #############################################################################
+  # Public Data Source Methods
+
+  def listPublicDataSources(self):
+    '''
+    Lists all the public data sources registered with Grok
+    '''
+    pass
+
+  def getPublicDataSource(self, id):
+    '''
+    Looks up and returns a PDS by its code.
+    '''
+    pass
 
   #############################################################################
   # Helper Methods
 
-  def alignPredictions(self, headers, resultRows):
+  @staticmethod
+  def alignPredictions(headers, resultRows):
     '''
-    Puts prediction on the same row as the actual value for easy comparison in
-    external tools like Excel.
+    Returns a list of list suitable for writing to a CSV file. Puts predictions
+    on the same row the actual value for easy comparison in external tools
+    like Excel.
 
-    Example Transformation:
+    * headers - A list of strings to use as column headers.
+    * resultRows - A list of lists representing the output data from a model.
 
-    RowID   ActualValue     PredictedValue
-    0       3               5
-    1       5               7
-    2       7               9
+    Example Transformation::
 
-    RowID   ActualValue     PredictedValue
-    0       3
-    1       5               5
-    2       7               7
-                            9
+      RowID   ActualValue     PredictedValue
+      0       3               5
+      1       5               7
+      2       7               9
+
+      RowID   ActualValue     PredictedValue
+      0       3
+      1       5               5
+      2       7               7
+                              9
     '''
 
     # Find columns that contain predictions / metrics
     predictionIndexes = [headers.index(header)
                        for header in headers
-                       if ('temporal_prediction' in header)
-                       or ('temporal_metric' in header)]
+                       if ('Metric temporal' in header)
+                       or ('Predicted' in header)]
 
     # Bump all predictions down one row
     columns = zip(*resultRows)
@@ -384,48 +419,3 @@ class Client(object):
     resultRows = zip(*columns)
 
     return resultRows
-
-
-#############################################################################
-# Enums
-
-class Aggregation(object):
-  '''
-  Enum-like class to specify valid aggregation strings
-  '''
-  RECORD = 'RECORD'
-  SECONDS = 'SECONDS'
-  MINUTES = 'MINUTES'
-  MINUTES_15 = 'MINUTES_15'
-  HOURS = 'HOURS'
-  DAYS = 'DAYS'
-  WEEKS = 'WEEKS'
-  MONTHS = 'MONTHS'
-
-class Status(object):
-  '''
-  Enum-like class to specify valid Swarm status strings
-  '''
-  RUNNING = 'RUNNING'
-  CANCELED = 'CANCELED'
-  COMPLETED = 'COMPLETED'
-
-class GrokData(object):
-  '''
-  Enum-like class to specify valid Grok data type strings
-  '''
-  DATETIME = 'DATETIME' # a point in time.
-  ENUMERATION = 'ENUMERATION' # a category.
-  IP_ADDRESS = 'IP_ADDRESS' # an IP address (V4).
-  LAT_LONG = 'LAT_LONG' # a latitude/longitude combination.
-  SCALAR = 'SCALAR' # a numeric value.
-  ZIP_CODE = 'ZIP_CODE' # a U.S. zip code. Aggregated with first or last.
-
-class DataFlag(object):
-  '''
-  Enum-like class to specify valid data flag strings
-  '''
-  NONE = 'NONE'
-  RESET = 'RESET'
-  SEQUENCE = 'SEQUENCE'
-  TIMESTAMP = 'TIMESTAMP'

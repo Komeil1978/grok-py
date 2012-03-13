@@ -7,3 +7,6 @@ class GrokError(Exception):
 
 class AuthenticationError(GrokError):
   pass
+
+class NotYetImplementedError(GrokError):
+  pass

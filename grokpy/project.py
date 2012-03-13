@@ -28,11 +28,11 @@ class Project(object):
   def delete(self):
     '''
     Permanently deletes the project, all its models, and data.
-    '''
-    requestDef = {'service': 'projectDelete',
-                  'projectId': self.id}
 
-    return self.c.request(requestDef)
+    WARNING: There is currently no way to recover from this opperation.
+    '''
+
+    self.c.request('DELETE', self.url)
 
   def setName(self, newName):
     '''
@@ -59,29 +59,31 @@ class Project(object):
   #
   # Thin wrappers for Model methods on the Client object.
 
-  def createModel(self, stream, name = None):
+  def createModel(self, spec, streamId):
     '''
     Return a new Model object. The model will be created under this project.
     '''
 
-    return self.parentClient.createModel(stream,
-                                         name,
+    return self.parentClient.createModel(spec,
+                                         streamId,
                                          parent = self,
                                          url = self.modelsUrl)
 
   def getModel(self, modelId):
     '''
     Returns the model corresponding to the given modelId
+
+    * modelId
     '''
 
-    return self.parentClient.getModel(name, url = self.modelsUrl)
+    return self.parentClient.getModel(modelId, self.modelsUrl)
 
   def listModels(self):
     '''
     Returns a list of Models that exist in this project
     '''
 
-    return self.parentClient.listModels(name, url = self.modelsUrl)
+    return self.parentClient.listModels(self.modelsUrl)
 
   def stopAllModels(self, verbose = False):
     '''
@@ -100,4 +102,28 @@ class Project(object):
     Returns a new Stream object. The stream will be created under this project.
     '''
 
-    return self.parentClient.createStream(spec, name, self, url = self.streamsUrl)
+    return self.parentClient.createStream(spec,
+                                          name,
+                                          self,
+                                          url = self.streamsUrl)
+
+  def getStream(self, streamId):
+    '''
+    Returns a Stream object from the given streamId. Assumes the stream is part
+    of this project.
+    '''
+    return self.parentClient.getStream(streamId, self.streamsUrl)
+
+  def listStreams(self):
+    '''
+    Returns a list of streams associated with the current project
+    '''
+    return self.parentClient.listStreams(self.streamsUrl)
+
+  def deleteAllStreams(self, verbose = False):
+    '''
+    Permanently deletes all streams associated with the current project
+
+    WARNING: There is currently no way to recover from this opperation.
+    '''
+    self.parentClient.deleteAllStreams(self.streamsUrl, verbose)

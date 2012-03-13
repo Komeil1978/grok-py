@@ -1,13 +1,13 @@
-from client import (Client,
-                   Aggregation,
-                   Status,
-                   GrokData,
-                   DataFlag)
+from client import Client
 from connection import Connection
 from field import Field
 from model import Model
 from project import Project
 from publicDataSource import PublicDataSource
+from enum import (Aggregation,
+                  SwarmStatus,
+                  DataType,
+                  DataFlag)
 from stream import Stream
 from streaming import StreamListener, StreamMonitor
 

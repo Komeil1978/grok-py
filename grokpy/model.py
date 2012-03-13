@@ -6,181 +6,101 @@ import warnings
 
 from exceptions import GrokError, AuthenticationError
 from streaming import StreamListener, Stream
+from swarm import Swarm
 
 VERBOSITY = 0
 
 class Model(object):
   '''
   Object representing a Grok Model.
+
+  * parent - **Either** a `Client` or `Project`.
+  * modelDef - A dict, usually returned from a model creation or get action.
+    Usually includes:
+
+    * id
+    * name
+    * streamId
+    * swarmsUrl
+    * url
   '''
 
-  def __init__(self, stream, parent, modelDef):
+  def __init__(self, parent, modelDef):
 
     # Give streams access to the parent client/project and its connection
     self.parent = parent
     self.c = self.parent.c
 
-    # Define the stream we're attached to
-    self.stream = stream
-
     # Take everything we're passed and make it an instance property.
     self.__dict__.update(modelDef)
 
-  def demo(self):
-    """
-    Numenta demo day rocks!
-    """
-    return 'Awesome'
-
+    # Prepare to have a swarm associated with the model
+    self.swarm = None
 
   def delete(self):
     '''
     Permanently deletes the model
+
+    .. warning:: There is currently no way to recover from this opperation.
     '''
-    service = self.type + 'ModelDelete'
-    idParam = self.type + 'ModelId'
-
-    requestDef = {'service': service,
-                  idParam: self.id}
-
-    self.c.request(requestDef)
-
-  def promote(self):
-    '''
-    Promotes the model to production ready status. This transitions a model
-    that has gone through a Swarm to a model ready to accept new streaming
-    records.
-
-    NOTE: This may have ongoing charges if you don't call stop on the model
-    when not in use.
-    '''
-    self._enforceType('search')
-
-    # Create production model
-    if VERBOSITY: print 'CREATING PRODUCTION MODEL'
-    requestDef = {'service': 'productionModelCreate',
-                  'searchModelId': self.id}
-
-    for i in range(self.maxPromoteRetries):
-      try:
-        modelDef = self.c.request(requestDef)
-        break
-      except GrokError:
-        warnings.warn('Promotion attempt failed. Retrying ...')
-        time.sleep(1)
-    else:
-      # Try one last time and don't catch the error
-      modelDef = self.c.request(requestDef)
-
-    # Start the model
-    self.id = modelDef['id']
-    self.type = 'production'
-
-    self.start()
+    self.c.request('DELETE', self.url)
 
   #############################################################################
   # Model Configuration
 
   def getDescription(self):
     '''
-    Get the current state of the model from Grok
+    Returns the current state of the model
     '''
-    service = self.type + 'ModelRead'
-    param = self.type + 'ModelId'
-
-    requestDef = {'service': service,
-                  param: self.id}
-
-    return self.c.request(requestDef)
+    pass
 
   def setStream(self, stream):
     '''
     Associates a stream with a model
     '''
-    # Store our Stream object for later use
-    self.stream = stream
+    pass
 
   def setName(self, newName):
     '''
-    Rename the model
+    Renames the model
     '''
-    # Get current description
-    desc = self.getDescription()
-
-    service = self.type + 'ModelUpdate'
-    idParam = self.type + 'ModelId'
-
-    requestDef = {'service': service,
-                  idParam: self.id,
-                  'name': newName,
-                  'note': desc['note']}
-
-    return self.c.request(requestDef)
+    pass
 
   def setNote(self, newNote):
     '''
     Adds or updates a note for this model
     '''
-    # Get current description
-    desc = self.getDescription()
-
-    service = self.type + 'ModelUpdate'
-    idParam = self.type + 'ModelId'
-
-    requestDef = {'service': service,
-                  idParam: self.id,
-                  'name': desc['name'],
-                  'note': newNote}
-
-    return self.c.request(requestDef)
+    pass
 
   def setLocationField(self, fieldName):
     '''
     Wrapper for setLocationFieldIndex()
     '''
-    self.setLocationFieldIndex(self._getFieldIndex(fieldName))
+    pass
 
   def setPredictionField(self, fieldName):
     '''
     Wrapper for setPredictionFieldIndex()
     '''
-    self.setPredictionFieldIndex(self._getFieldIndex(fieldName))
+    pass
 
   def setTemporalField(self, fieldName):
     '''
     Wrapper for setTemporalFieldIndex()
     '''
-    self.setTemporalFieldIndex(self._getFieldIndex(fieldName))
+    pass
 
   def setPredictionFieldIndex(self, index):
     '''
     The stream field for which we are optimizing predictions.
     '''
-    self._checkIndex(index)
-
-    projectDesc = self.parentProject.getDescription()
-
-    projectDesc['streamConfiguration']['predictionFieldIndex'] = index
-
-    requestDef = {'service': 'projectUpdate',
-                  'project': projectDesc}
-
-    self.c.request(requestDef, 'POST')
+    pass
 
   def setTemporalFieldIndex(self, index):
     '''
     Which stream field provides temporal data for the model
     '''
-    self._checkIndex(index)
-
-    projectDesc = self.parentProject.getDescription()
-
-    projectDesc['streamConfiguration']['temporalFieldIndex'] = index
-
-    requestDef = {'service': 'projectUpdate',
-                  'project': projectDesc}
-
-    self.c.request(requestDef, 'POST')
+    pass
 
   def setTimeAggregation(self, aggregationType):
     '''
@@ -197,18 +117,7 @@ class Model(object):
     WEEKS
     MONTHS
     '''
-    if not self.stream:
-      raise GrokError('You must set a Stream for this model to use before '
-                      'calling this method.')
-
-    projectDesc = self.parentProject.getDescription()
-
-    projectDesc['streamConfiguration']['timeAggregation'] = aggregationType
-
-    requestDef = {'service': 'projectUpdate',
-                  'project': projectDesc}
-
-    self.c.request(requestDef, 'POST')
+    pass
 
   #############################################################################
   # Model states
@@ -217,26 +126,14 @@ class Model(object):
     '''
     Starts up a model, readying it to receive new data from a stream
     '''
-    self._enforceType('production')
-
-    requestDef = {'service': 'productionModelStart',
-                  'productionModelId': self.id}
-
-    if VERBOSITY: print 'STARTING MODEL'
-    self.c.request(requestDef)
+    pass
 
   def stop(self):
     '''
     Stops a model. Stopped models will not listen for new data or produce
     predictions
     '''
-    self._enforceType('production')
-
-    requestDef = {'service': 'productionModelStop',
-                  'productionModelId': self.id}
-
-    if VERBOSITY: print 'STOPPING MODEL'
-    self.c.request(requestDef)
+    pass
 
   def disableLearning(self, retries = 3):
     '''
@@ -246,35 +143,13 @@ class Model(object):
     Retries - If this method is called immediately after model promotion it may
               fail. By default we will retry a few times.
     '''
-
-    self._enforceType('production')
-
-    requestDef = {'service': 'productionModelUpdate',
-                  'productionModelId': self.id,
-                  'inferenceOnly': True}
-
-    for i in range(retries):
-      try:
-        return self.c.request(requestDef)
-      except GrokError:
-        warnings.warn('Disable attempt failed. Retrying ...')
-        time.sleep(1)
-    else:
-      # Try one last time and don't catch the error
-      return self.c.request(requestDef)
+    pass
 
   def enableLearning(self):
     '''
     New records will be integrated into the models future predictions.
     '''
-
-    self._enforceType('production')
-
-    requestDef = {'service': 'productionModelUpdate',
-                  'productionModelId': self.id,
-                  'inferenceOnly': False}
-
-    return self.c.request(requestDef)
+    pass
 
   #############################################################################
   # Swarms
@@ -285,241 +160,98 @@ class Model(object):
     characteristics for the given data.
     '''
 
-    # WARNING: HACK
-    #
-    # Due to the current object model this is actually where:
-    #   - The project is configured server side
-    #   - The model is created
-    #   - Data is streamed to the model input cache
-    #   - If given join files are uploaded
-    if VERBOSITY >= 1: print '<OBJECT MODEL WORKAROUND>'
+    if self.swarm and self.swarm.getState() in ['Starting', 'Running']:
+      raise GrokError('This model is already swarming.')
 
-    # Create the model
-    if VERBOSITY >= 1: print 'CREATING MODEL'
+    url = self.swarmsUrl
+    requestDef = {}
+    result = self.c.request('POST', url, requestDef)
 
-    requestDef = {'service': 'searchModelCreate',
-                  'projectId': self.parentProject.projectDef['id']}
+    # Save the swarm object
+    self.swarm = Swarm(self, result['swarm'])
 
-    modelDef = self.c.request(requestDef)
-
-    self.id = modelDef['id']
-
-    # Upload data held temporarily in Stream object
-    if VERBOSITY >= 1: print 'APPENDING DATA'
-    service = self.type + 'ModelInputCacheAppend'
-    param = self.type + 'ModelId'
-
-    self.stream._addRecords(self.id, service, param)
-
-    if VERBOSITY >= 1: print '</WORKAROUND>'
-    ########## END HACK
-
-    param = self.type + 'ModelId'
-
-    requestDef = {'service': 'searchStart',
-                  param: self.id}
-
-    self.c.request(requestDef)
-
-    return
+    return result
 
   def stopSwarm(self):
     '''
     Terminates a Swarm in progress
     '''
-    param = self.type + 'ModelId'
+    pass
 
-    requestDef = {'service': 'searchCancel',
-                  param: self.id}
-
-    self.c.request(requestDef)
-
-  def getSwarmProgress(self):
+  def getSwarmState(self):
     '''
-    Polls the server for progress of a running Swarm
+    Returns the current state of a swarm.
+
+    TODO: Check this works when you get a model that's already created and swarming
     '''
 
-    param = self.type + 'ModelId'
+    if not self.swarm:
+      raise GrokError('There is no swarm associated with this model.')
 
-    requestDef = {'service': 'searchProgress',
-                  param: self.id,
-                  'stream': False}
+    return self.swarm.getState()
 
-    return self.c.request(requestDef)
-
-  def monitorSwarm(self, swarmMonitor, async = False):
+  def getModelOutput(self):
     '''
-    swarmMonitor - An instance of the grokpy.streaming.StreamMonitor class.
-    async - Toggle to run this as a separate thread
-
-    swarmMonitor methods should return False to exit the loop.
+    Returns the data in the output cache of the best model found during Swarm.
     '''
-    while True:
-      SwarmState = self.getSwarmProgress()
-      if not swarmMonitor.on_state(SwarmState):
-        break
+    result = self.c.request('GET', self.dataUrl)['output']
 
-  def monitorSwarmProgress(self, newStateCallback):
-    '''
-    Listens to a stream of output from the API server
-    '''
-    listener = StreamListener(newStateCallback)
+    headers = result['names']
+    data = result['data']
 
-    headers = {'content-type':'application/json',
-               'API-Key': self.c.key}
-
-    param = self.type + 'ModelId'
-    requestDef = {'version': '1',
-                  'service': 'searchProgress',
-                  param: self.id,
-                  'stream': True}
-
-    # Serialize the dict
-    body = json.dumps(requestDef)
-
-    config = {'method': 'POST',
-               'body': body,
-               'url': self.c.baseURL,
-               'headers': headers}
-    swarmProgress = Stream(listener, **config)
-
-    swarmProgress.listen(async=True)
-
-  def getSwarmResults(self, startRow = -1, endRow = -1):
-    '''
-    Returns the data in the output cache of the best model found during
-    a Grok Swarm
-
-    The default start/end row values request all the data available.
-    '''
-
-    service = self.type + 'ModelOutputCacheData'
-    idParam = self.type + 'ModelId'
-
-    requestDef = {'service': service,
-                  idParam: self.id,
-                  'startRow': startRow,
-                  'endRow': endRow}
-
-    return self.c.request(requestDef)
+    return headers, data
 
   #############################################################################
   # Basic Interaction - Live/On/Production Models
 
-  def sendRecords(self, data):
-    '''
-    Sends data directly to a model rather than having the model listen to a
-    stream. Only available on promoted models.
-    TODO: Remove this method, as it is incompatible with new object model
-
-    Data: A list of lists representing rows of data
-    '''
-    self._enforceType('production')
-
-    if len(data) > 5000:
-      i = 0
-      step = 5000
-      while i < len(data):
-        requestDef = {'service': 'productionModelInputCacheAppend',
-                  'productionModelId': self.id,
-                  'data': data[i:(i+step)]}
-
-        self.c.request(requestDef)
-        i += step
-
-    else:
-      requestDef = {'service': 'productionModelInputCacheAppend',
-                  'productionModelId': self.id,
-                  'data': data}
-
-      self.c.request(requestDef)
-
-  def getPredictions(self, startRow = -1, endRow = -1, retries = 20):
-    '''
-    Retrieves all the predictions from the models output from startRow to
-    endRow.
-
-    Defaults to getting all predictions. Warning: This could be up to 50k rows.
-    '''
-    self._enforceType('production')
-
-    requestDef = {'service': 'productionModelOutputCacheData',
-                  'productionModelId': self.id,
-                  'startRow': startRow,
-                  'endRow': endRow}
-
-    for i in range(retries):
-      try:
-        response = self.c.request(requestDef)
-      except GrokError:
-        desc = self.getDescription()
-        if desc.get('running') == False:
-          raise GrokError('Model seems to have terminated prematurely, please '
-                          'contact support.')
-        else:
-          raise
-      # Case: Output cache doesn't exist yet
-      if 'code' in response and response['code'] == 'I00003':
-        if VERBOSITY: print 'Predictions not yet ready'
-        time.sleep(2)
-      elif response['rows']:
-        if VERBOSITY: print 'Got next prediction ...'
-        return response
-      else:
-        if VERBOSITY: print 'No prediction yet ...'
-        time.sleep(.5)
-
-    raise GrokError('Could not get requested prediction with ' + str(retries)
-                    + ' retries.')
-
   def getMultiStepPredictions(self, buffer, timesteps):
     '''
-    WARNING - Experimental
+    .. warning:: Experimental.
 
     Gets predictions for the next N timesteps
 
-    buffer - A set of actual values to send in to prime predictions. This buffer
+    * buffer - A set of actual values to send in to prime predictions. This buffer
              should be sent in with each call and updated as new actual values
              are measured.
-    timesteps - The number of steps into the future to predict.
+    * timesteps - The number of steps into the future to predict.
 
 
-    Example:
+    Example::
 
-    --TIMESTEP 1 --
-    buffer = [[0],
-              [1],
-              [2],
-              [0],
-              [1],
-              [2]]
+      --TIMESTEP 1 --
+      buffer = [[0],
+                [1],
+                [2],
+                [0],
+                [1],
+                [2]]
 
-    Call:
-      model.getMultiStepPredictions(buffer, 3)
-    Return:
-      3 rows of predictions, which when converted back to input format look like
+      Call:
+        model.getMultiStepPredictions(buffer, 3)
+      Return:
+        3 rows of predictions, which are then converted back to input format
 
-      results = [[.01],
-                 [1.01],
-                 [2.01]]
+        results = [[.01],
+                   [1.01],
+                   [2.01]]
 
-    --TIMESTEP 2 --
-    buffer = [[0],
-              [1],
-              [2],
-              [0],
-              [1],
-              [2],
-              [0]] # Note the extra actual value we have now
+      --TIMESTEP 2 --
+      buffer = [[0],
+                [1],
+                [2],
+                [0],
+                [1],
+                [2],
+                [0]] # Note the extra actual value we have now
 
-    Call:
-      model.getMultiStepPredictions(buffer, 3)
-    Return:
-      3 rows of predictions, which when converted back to input format look like
+      Call:
+        model.getMultiStepPredictions(buffer, 3)
+      Return:
+        3 rows of predictions, which are then converted back to input format
 
-      results = [[1.01],
-                 [2.01],
-                 [.01]] # Predictions are now one more timestep into the future
+        results = [[1.01],
+                   [2.01],
+                   [.01]] # Predictions are now one more timestep in the future
     '''
 
     # Send in our buffer
@@ -553,34 +285,6 @@ class Model(object):
 
     return headers, results
 
-  def monitorPredictions(self, endRow = False):
-    '''
-    Continually polls for new predictions until endRow is hit.
-
-    TODO: Move from polling to async streaming when API server supports
-    '''
-    self._enforceType('production')
-
-    while True:
-      response = self.getPredictions(-1, -1)
-      resultRows = response['rows']
-      headers = response['columnNames']
-      try:
-        latestRow = int(response['rows'][-1][0])
-        if endRow:
-          if latestRow >= endRow:
-            break
-          else:
-            if VERBOSITY: print ('Waiting on more predictions.'
-                          'Total so far: %d Target: %d' % (latestRow, endRow))
-            pass
-        self._outputStreamPosition = latestRow
-        time.sleep(1)
-      except IndexError:
-        pass
-
-    return headers, resultRows
-
   #############################################################################
   # Private methods
 
@@ -589,23 +293,7 @@ class Model(object):
     Finds a field with a matching name and throws an error if there are more
     than one matches
     '''
-    if not self.stream:
-      raise GrokError('You must set a Stream for this model to use before '
-                      'calling this method.')
-
-    counter = 0
-    index = 0
-    for field in self.stream.streamDescription['fields']:
-      if field['name'] == fieldName:
-        counter += 1
-        index = field['index']
-
-    if not counter:
-      raise GrokError('Field not found: ' + fieldName)
-    if counter > 1:
-      raise GrokError('Duplicate Field Name: ' + fieldName + ' More than one '
-                      'field with this name was found. Please use the '
-                      'set*FieldIndex() methods directly.')
+    pass
 
     return index
 
@@ -613,47 +301,13 @@ class Model(object):
     '''
     Ensures that specified indexes are possible for the current stream
     '''
-
-    if not self.stream:
-      raise GrokError('Please configure and add a Stream to this model before '
-                      'specifying how you want the model to use the stream')
-
-    if not self.stream.streamDescription['fields']:
-      raise GrokError('Please configure and add a stream to this model before'
-                      'specifying which fields to use.')
-
-    if index >= len(self.stream.streamDescription['fields']):
-      raise IndexError('The specified index is out of range for the given '
-                       'stream.')
-
-  def _enforceType(self, type):
-    '''
-    As an artifact of the current object model some methods can only be called
-    if a model is one type or the other
-    '''
-
-    if self.type != type:
-      if type == 'search':
-        raise GrokError('This method is not available on promoted models.')
-      elif type == 'production':
-        raise GrokErrror('You must promote this model before calling this '
-                         'method.')
-      else:
-        raise ValueError('Unrecognised model type.')
+    pass
 
   def _getInputCache(self, startRow = -1, endRow = -1):
     '''
     Returns the contents of the model's input cache
     '''
-    service = self.type + 'ModelInputCacheData'
-    idParam = self.type + 'ModelId'
-
-    requestDef = {'service': service,
-                  idParam: self.id,
-                  'startRow': startRow,
-                  'endRow': endRow}
-
-    return self.c.request(requestDef)
+    pass
 
   def _predictionToInput(self, headers, prediction):
     '''

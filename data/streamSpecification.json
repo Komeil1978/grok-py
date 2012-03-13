@@ -1,22 +1,16 @@
-[
- {
-  "name": "timestamp",
-  "index": 0,
-  "aggregationFunction": "first",
-  "flag": "TIMESTAMP",
-  "dataFormat": {"dataType": "DATETIME", "formatString": "sdf/yyyy-MM-dd H:m:s.S"},
-  "fieldRange": null,
-  "fieldSubset": null,
-  "useField": true
-  },
-  {
-   "name": "consumption",
-   "index": 1,
-   "aggregationFunction": "sum",
-   "flag": "NONE",
-   "dataFormat": {"dataType": "SCALAR", "formatString": null},
-   "fieldRange": null,
-   "fieldSubset": null,
-   "useField": true
-  }
-]
+{"name":"Swarm Stream",
+ "dataSources":[
+                {"name":"My Data Source",
+                 "dataSourceType":"local",
+                 "fields":[{"name":"timestamp",
+                            "dataFormat": {"dataType": "DATETIME",
+                                           "formatString": "sdf/yyyy-MM-dd H:m:s.S"
+                                            }
+                            },
+                           {"name":"consumption",
+                            "dataFormat": {"dataType": "SCALAR"}
+                            }
+                          ]
+                }
+               ]
+}
