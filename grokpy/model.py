@@ -154,7 +154,7 @@ class Model(object):
   #############################################################################
   # Swarms
 
-  def startSwarm(self):
+  def startSwarm(self, size = None):
     '''
     Runs permutations on model parameters to find the optimal model
     characteristics for the given data.
@@ -165,6 +165,12 @@ class Model(object):
 
     url = self.swarmsUrl
     requestDef = {}
+    if size:
+      requestDef.update({'options': size})
+
+    print requestDef
+    quit()
+
     result = self.c.request('POST', url, requestDef)
 
     # Save the swarm object

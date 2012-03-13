@@ -63,6 +63,11 @@ def HelloGrok():
   print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
 
+  grok.deleteAllModels()
+
+  for model in grok.listModels():
+    print model.id
+
   ##############################################################################
   # Create and configure our Stream
   #
@@ -87,16 +92,19 @@ def HelloGrok():
   # tell the model how to deal with each field and which field we want to
   # optimize our predictions for.
 
-  # This time we'll build up a dictionary to spec out the model
+  # This time we'll build up a dictionary to spec out the model.
+  #
   # Both models and streams can take specs from either dictionaries or JSON
   # files.
+
   modelSpec = {"name": "Model of Fun " + str(time.time()),
-               "predictedField": "consumption"}
+               "predictedField": "consumption",
+               "streamId": myStream.id,
+               'aggregation': {'interval': grokpy.Aggregation.HOURS}}
 
   # Create that model for the given stream
   print 'Creating an empty model ...'
-  recCenterEnergyModel = grok.createModel(modelSpec, myStream.id)
-
+  recCenterEnergyModel = grok.createModel(modelSpec)
 
   ##############################################################################
   # Start the Swarm
@@ -106,7 +114,7 @@ def HelloGrok():
   # configuration of our model to predict the data that exist in the stream.
 
   print 'Starting Grok Swarm'
-  print recCenterEnergyModel.startSwarm()
+  print recCenterEnergyModel.startSwarm(grokpy.SwarmSize.SMALL)
 
   ##############################################################################
   # Monitor Progress
@@ -169,9 +177,8 @@ def HelloGrok():
   print """
 =====================================================================
 On to Part Two!
-  Take these, the wizard will ask for them:
+  Take this, the wizard will ask for it:
   MODEL_ID: %s
-  PROJECT_ID: %s
 
 Please edit HelloGrokPart2.py, adding in the MODEL_ID.
 Then run:

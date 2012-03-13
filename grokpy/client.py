@@ -69,13 +69,12 @@ class Client(object):
   #############################################################################
   # Model Methods
 
-  def createModel(self, spec, streamId, parent = None, url = None):
+  def createModel(self, spec, parent = None, url = None):
     '''
     Returns a Model object.
 
     * spec - A configuration for this model. Can be EITHER a file path to a
       JSON document OR a Python dict
-    * streamId - The Id of the stream to which this model should listen.
     * [parent] - A Project object which associates this model with a specific
       parent project.
     * [url] - The target for creating this model. Automatically specified
@@ -84,9 +83,6 @@ class Client(object):
 
     # Process the given spec
     modelSpec = self._handelAmbiguousSpec(spec)
-
-    # Add in the relevant streamId
-    modelSpec['streamId'] = streamId
 
     if not parent:
       parent = self

@@ -59,13 +59,12 @@ class Project(object):
   #
   # Thin wrappers for Model methods on the Client object.
 
-  def createModel(self, spec, streamId):
+  def createModel(self, spec):
     '''
     Return a new Model object. The model will be created under this project.
     '''
 
     return self.parentClient.createModel(spec,
-                                         streamId,
                                          parent = self,
                                          url = self.modelsUrl)
 
