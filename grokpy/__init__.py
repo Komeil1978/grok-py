@@ -5,6 +5,7 @@ from model import Model
 from project import Project
 from publicDataSource import PublicDataSource
 from enum import (Aggregation,
+                  SwarmSize,
                   SwarmStatus,
                   DataType,
                   DataFlag)
