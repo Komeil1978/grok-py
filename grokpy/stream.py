@@ -24,16 +24,6 @@ class Stream(object):
     # Take everything we're passed and make it an instance property.
     self.__dict__.update(streamDef)
 
-  def addField(self, **kwargs):
-    '''
-    Add a field object to a stream
-    '''
-    newField = Field(**kwargs)
-
-    self.streamDescription['fields'].append(newField.fieldDescription)
-
-    return newField
-
   def addRecords(self, records, step = 5000):
     '''
     Appends records to the input cache of the given stream.
@@ -61,12 +51,6 @@ class Stream(object):
       step = int(math.floor(step / 2))
       self.addRecords(records, step)
 
-  def configure(self, filePath):
-    '''
-    Reads JSON from a given file and uses that to configure the stream
-    '''
-    pass
-
   def delete(self):
     '''
     Permanently deletes this stream.
@@ -74,24 +58,6 @@ class Stream(object):
     WARNING: There is currently no way to recover from this opperation.
     '''
     self.c.request('DELETE', self.url)
-
-  def usePublicDataSource(self, publicDataSource):
-    '''
-    Takes a configured publicDataSource and attaches it to the stream
-    '''
-
-    # Check if there is configuration we need to complete
-    if publicDataSource.locationFieldName:
-      publicDataSource.description['configuration'] = \
-      str(self._getFieldIndex(publicDataSource.locationFieldName))
-
-    projDesc = self.parentProject.getDescription()
-    projDesc['providers'].append(publicDataSource.description)
-
-    requestDef = {'service': 'projectUpdate',
-                  'project': projDesc}
-
-    self.parentProject.projectDef = self.c.request(requestDef)
 
   #############################################################################
   # Private methods
@@ -115,7 +81,6 @@ class Stream(object):
       raise GrokError('Duplicate Field Name: ' + fieldName + ' More than one '
                       'field with this name was found. Please use the '
                       'set*FieldIndex() methods directly.')
-
 
     return index
 

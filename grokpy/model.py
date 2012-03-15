@@ -4,7 +4,7 @@ import httplib
 import json
 import warnings
 
-from exceptions import GrokError, AuthenticationError
+from exceptions import GrokError, AuthenticationError, NotYetImplementedError
 from streaming import StreamListener, Stream
 from swarm import Swarm
 
@@ -48,108 +48,91 @@ class Model(object):
   #############################################################################
   # Model Configuration
 
-  def getDescription(self):
-    '''
-    Returns the current state of the model
-    '''
-    pass
-
-  def setStream(self, stream):
-    '''
-    Associates a stream with a model
-    '''
-    pass
-
   def setName(self, newName):
     '''
-    Renames the model
+    Renames the model.
+
+    * newName - String
     '''
-    pass
+
+    raise NotYetImplementedError()
+
+    # Get the current model state
+    url = self.url
+    modelDef = self.c.request('GET', url)['model']
+
+    # Update the definition
+    modelDef['name'] = newName
+
+    # Update remote state
+    self.c.request('POST', url, {'model': modelDef})
+
+    # Update local state
+    self.name = newName
 
   def setNote(self, newNote):
     '''
-    Adds or updates a note for this model
-    '''
-    pass
+    Adds or updates a note for this model.
 
-  def setLocationField(self, fieldName):
+    * newNote - A String describing this model.
     '''
-    Wrapper for setLocationFieldIndex()
-    '''
-    pass
 
-  def setPredictionField(self, fieldName):
-    '''
-    Wrapper for setPredictionFieldIndex()
-    '''
-    pass
+    raise NotYetImplementedError
 
-  def setTemporalField(self, fieldName):
-    '''
-    Wrapper for setTemporalFieldIndex()
-    '''
-    pass
+    # Get the current model state
+    url = self.url
+    modelDef = self.c.request('GET', url)['model']
 
-  def setPredictionFieldIndex(self, index):
-    '''
-    The stream field for which we are optimizing predictions.
-    '''
-    pass
+    # Update the definition
+    modelDef['note'] = newNote
 
-  def setTemporalFieldIndex(self, index):
-    '''
-    Which stream field provides temporal data for the model
-    '''
-    pass
+    # Update remote state
+    self.c.request('POST', url, {'model': modelDef})
 
-  def setTimeAggregation(self, aggregationType):
-    '''
-    How the model will aggregate data within the stream
-
-    Valid Types:
-
-    RECORD: no aggregation is done.
-    SECONDS
-    MINUTES
-    15_MINUTES
-    HOURS
-    DAYS
-    WEEKS
-    MONTHS
-    '''
-    pass
+    # Update local state
+    self.note = newNote
 
   #############################################################################
   # Model states
 
+  def promote(self):
+    '''
+    Puts the model into a production ready mode.
+
+    .. note: This may take several seconds.
+    '''
+    pass
+  
   def start(self):
     '''
     Starts up a model, readying it to receive new data from a stream
     '''
-    pass
-
-  def stop(self):
-    '''
-    Stops a model. Stopped models will not listen for new data or produce
-    predictions
-    '''
-    pass
+    raise NotYetImplementedError()
 
   def disableLearning(self, retries = 3):
     '''
     Puts the model into a predictions only state where it will not learn from
     new data.
 
-    Retries - If this method is called immediately after model promotion it may
+    * retries - If this method is called immediately after model promotion it may
               fail. By default we will retry a few times.
     '''
-    pass
+    raise NotYetImplementedError()
 
   def enableLearning(self):
     '''
     New records will be integrated into the models future predictions.
     '''
-    pass
+    raise NotYetImplementedError()
+
+  #############################################################################
+  # Stream
+
+  def getStream(self):
+    '''
+    Returns the Stream that this model is associated with.
+    '''
+    return self.parent.getStream(self.streamId)
 
   #############################################################################
   # Swarms
@@ -158,6 +141,10 @@ class Model(object):
     '''
     Runs permutations on model parameters to find the optimal model
     characteristics for the given data.
+
+    * size - A value from grokpy.SwarmSize. Initially, small, medium, or large.
+      the default is medium. Small is only good for testing, whereas large can
+      take a very long time.
     '''
 
     if self.swarm and self.swarm.getState() in ['Starting', 'Running']:
@@ -166,10 +153,7 @@ class Model(object):
     url = self.swarmsUrl
     requestDef = {}
     if size:
-      requestDef.update({'options': size})
-
-    print requestDef
-    quit()
+      requestDef.update({'options': {"size": size}})
 
     result = self.c.request('POST', url, requestDef)
 
@@ -182,7 +166,7 @@ class Model(object):
     '''
     Terminates a Swarm in progress
     '''
-    pass
+    raise NotYetImplementedError()
 
   def getSwarmState(self):
     '''
@@ -294,33 +278,12 @@ class Model(object):
   #############################################################################
   # Private methods
 
-  def _getFieldIndex(self, fieldName):
-    '''
-    Finds a field with a matching name and throws an error if there are more
-    than one matches
-    '''
-    pass
-
-    return index
-
-  def _checkIndex(self, index):
-    '''
-    Ensures that specified indexes are possible for the current stream
-    '''
-    pass
-
-  def _getInputCache(self, startRow = -1, endRow = -1):
-    '''
-    Returns the contents of the model's input cache
-    '''
-    pass
-
   def _predictionToInput(self, headers, prediction):
     '''
     Converts predictions back into inputs for multi-step prediction
 
-    headers: The column names for each prediction
-    prediction: A list of inputs, predictions, and metrics
+    * headers - The column names for each prediction
+    * prediction - A list of inputs, predictions, and metrics
     '''
 
     if not len(headers) == len(prediction):

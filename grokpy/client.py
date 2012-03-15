@@ -159,12 +159,12 @@ class Client(object):
   #############################################################################
   # Stream Methods
 
-  def createStream(self, spec, name = None, parent = None, url = None):
+  def createStream(self, spec, parent = None, url = None):
     '''
     Returns an instance of the Stream object.
 
-    * spec - Can be EITHER a file path to a JSON document OR a Python dict
-    * [name] - A name for the stream, used mainly for display.
+    * spec - A configuration for this stream. Can be EITHER a file path to a
+      JSON document OR a Python dict.
     * [parent] - A Project object which associates this stream with a specific
       parent project.
     * [url] - The target for creating this stream. Automatically specified
@@ -233,6 +233,8 @@ class Client(object):
     '''
     Permanently deletes all streams associated with the current API key.
 
+    * [url] - Usually only specified when calling the equivalent method on a
+      project.
     * [verbose] - If set, the stream Id of each stream being deleted will be
       printed.
 

@@ -3,6 +3,7 @@
                 {"name":"My Data Source",
                  "dataSourceType":"local",
                  "fields":[{"name":"timestamp",
+                            "flag": "TIMESTAMP",
                             "dataFormat": {"dataType": "DATETIME",
                                            "formatString": "sdf/yyyy-MM-dd H:m:s.S"
                                             }

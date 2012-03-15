@@ -5,6 +5,16 @@ from exceptions import GrokError, AuthenticationError
 class Project(object):
   '''
   Object representing a Grok project
+
+  * parentClient - A Client object.
+  * projectDef - A dict, usually returned from a model creation or get action.
+    Usually includes:
+
+    * streamsUrl
+    * name
+    * url
+    * modelsUrl
+    * id
   '''
 
   def __init__(self, parentClient, projectDef):
@@ -16,43 +26,34 @@ class Project(object):
     # Take everything we're passed and make it an instance property.
     self.__dict__.update(projectDef)
 
-  def getDescription(self):
+  def setName(self, newName):
     '''
-    Returns the current state of the project from Grok
-    '''
-    requestDef = {'service': 'projectRead',
-                  'projectId': self.id}
+    Renames the project.
 
-    return self.c.request(requestDef)
+    * newName - String
+    '''
+
+    # Get the current project description
+    url = self.url
+    projectDef = self.c.request('GET', url)['project']
+
+    # Update the definition
+    projectDef['name'] = newName
+
+    # Update remote state
+    self.c.request('POST', url, {'project': projectDef})
+
+    # Update local state
+    self.name = newName
 
   def delete(self):
     '''
     Permanently deletes the project, all its models, and data.
 
-    WARNING: There is currently no way to recover from this opperation.
+    .. warning:: There is currently no way to recover from this opperation.
     '''
 
     self.c.request('DELETE', self.url)
-
-  def setName(self, newName):
-    '''
-    Rename the project
-    '''
-    # Get current description
-    desc = self.getDescription()
-
-    # Modify the dictionary
-    desc['name'] = newName
-
-    requestDef = {'service': 'projectUpdate',
-                  'project': desc}
-
-    response = self.c.request(requestDef, 'POST')
-
-    # Update locals
-    self.name = newName
-
-    return response
 
   #############################################################################
   # Model Methods
@@ -62,6 +63,9 @@ class Project(object):
   def createModel(self, spec):
     '''
     Return a new Model object. The model will be created under this project.
+
+    * spec - A configuration for this model. Can be EITHER a file path to a
+      JSON document OR a Python dict.
     '''
 
     return self.parentClient.createModel(spec,
@@ -96,13 +100,15 @@ class Project(object):
   #
   # Thin wrappers for Stream methods on the Client object.
 
-  def createStream(self, spec, name = None):
+  def createStream(self, spec):
     '''
     Returns a new Stream object. The stream will be created under this project.
+
+    * spec - A configuration for this stream. Can be EITHER a file path to a
+      JSON document OR a Python dict.
     '''
 
     return self.parentClient.createStream(spec,
-                                          name,
                                           self,
                                           url = self.streamsUrl)
 

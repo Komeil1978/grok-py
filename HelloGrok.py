@@ -63,11 +63,6 @@ def HelloGrok():
   print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
 
-  grok.deleteAllModels()
-
-  for model in grok.listModels():
-    print model.id
-
   ##############################################################################
   # Create and configure our Stream
   #
@@ -100,7 +95,7 @@ def HelloGrok():
   modelSpec = {"name": "Model of Fun " + str(time.time()),
                "predictedField": "consumption",
                "streamId": myStream.id,
-               'aggregation': {'interval': grokpy.Aggregation.HOURS}}
+               "aggregation": {"interval": grokpy.Aggregation.HOURS}}
 
   # Create that model for the given stream
   print 'Creating an empty model ...'
@@ -114,7 +109,7 @@ def HelloGrok():
   # configuration of our model to predict the data that exist in the stream.
 
   print 'Starting Grok Swarm'
-  print recCenterEnergyModel.startSwarm(grokpy.SwarmSize.SMALL)
+  print recCenterEnergyModel.startSwarm()
 
   ##############################################################################
   # Monitor Progress
@@ -150,7 +145,7 @@ def HelloGrok():
   ##############################################################################
   # Retrieve Swarm results
 
-  print "\nGetting full results from Swarm ..."
+  print "Getting full results from Swarm ..."
   headers, resultRows = recCenterEnergyModel.getModelOutput()
 
   # Align predictions with actuals

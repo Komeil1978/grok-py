@@ -23,7 +23,7 @@ from math import floor
 # Configuration Settings
 
 API_KEY = 'fKotFugElEafypvekMqPFUDM00xGtqet'
-MODEL_ID = '245d71bf91ec4e38a94eb91252c7'
+MODEL_ID = '30c6c89b1f1d4db4967c8d5979e6'
 NEW_RECORDS = 'data/rec-center-stream-training.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
 
@@ -39,7 +39,6 @@ def HelloGrokPart2():
 
   ##############################################################################
   # Setup
-  #
 
   print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
@@ -47,51 +46,57 @@ def HelloGrokPart2():
   print 'Retrieving Model ...'
   recCenterEnergyModel = grok.getModel(MODEL_ID)
 
-  ##############################################################################
-  # Promote our model
-  #
-  # Production models are long running processes.
-  # Once started you can:
-  #       - Send new data directly and get back predictions (Shown below)
-  #       - Set a stream to which the model will continually listen.
-  #
-  # NOTE: Production models may incur charges even if not being sent new data.
-  #       Please remember to stop your models if you do not intend to use them.
-
-  # Create and start a production model
-  print 'Promoting model and updating model id ...'
-  recCenterEnergyModel.promote()
+  print 'Retrieving Stream ...'
+  myStream = recCenterEnergyModel.getStream()
 
   ##############################################################################
   # Sending new records
 
+  # Get the records from a local file
   fileHandle= open(NEW_RECORDS)
   newRecords = [row for row in csv.reader(fileHandle)]
   fileHandle.close()
 
-  # Send data. (Recall that this model will aggregate into hourly buckets)
+  # Send data. (Recall that our model will aggregate into hourly buckets)
   print 'Sending new data ...'
   # This method will send a maximum of 5k records per request.
-  recCenterEnergyModel.sendRecords(newRecords)
+  myStream.addRecords(newRecords)
 
   ##############################################################################
   # Retrieving predictions
   #
-  # Currently you need to know how many records you expect to get out
-  # when you start monitoring the production model. This is awkward and ugly
-  # and will be improved.
-
-  # How many records are we sending? -1 since we're dealing with indexes here.
-  totalRecords = len(newRecords)
-  # In this example we aggregate 15 minute intervals to 1 hour intervals
-  expectedRows = int(floor(totalRecords / 4)) - 1
-  # We need at least 4 records in for every one out
-  expectedRows = expectedRows - (expectedRows % 4)
+  # We will poll for new predictions. We will time out if we haven't seen
+  # new predictions in a while and call this 'done.' In the near future this
+  # will be replaced with a more definitive mechanism.
+  #
+  # This method is only for batch processing. In a streaming case you would
+  # continually poll the model output and parse the data as it came in.
 
   print 'Monitoring predictions ...'
-  headers, resultRows = recCenterEnergyModel.monitorPredictions(expectedRows)
+  lastRecordSeen = None
+  counter = 0
+  while True:
+    headers, resultRows = recCenterEnergyModel.getModelOutput()
+    latestRowId = resultRows[-1][0]
+
+    if latestRowId == lastRecordSeen:
+      if counter > 15:
+        print 'Looks like we will not get any more predictions'
+        break
+      else:
+        print 'No new records in this step ...'
+        counter += 1
+        time.sleep(1)
+        continue
+    else:
+      lastRecordSeen = latestRowId
+      counter = 0
+      # Don't spam the server
+      time.sleep(0.1)
+
 
   # Align predictions with actuals
+  print 'Aligning predictions ...'
   resultRows = grok.alignPredictions(headers, resultRows)
 
   #############################################################################
