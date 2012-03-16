@@ -1,8 +1,9 @@
 import grokpy
 import unittest
 import socket
-import requests
-import grokpy.httplib2 as httplib2
+import base64
+import grokpy.requests as requests
+
 from mock import Mock
 
 from groktestcase import GrokTestCase
@@ -14,7 +15,10 @@ class ConnectionTestCase(GrokTestCase):
   def setUp(self):
     self.mockKey = 'SeQ9AhK57vOeoySQn1EvwElhZV1X87AB'
 
-    self.h = httplib2.Http(".cache", 20)
+    base64string = base64.encodestring(self.mockKey + ':').replace('\n', '')
+    headers = {"Authorization": "Basic %s" % base64string,
+                 "Content-Type": 'application/json; charset=UTF-8'}
+    self.s = requests.session(headers=headers)
 
   def testGoodKey(self):
     '''
@@ -201,10 +205,10 @@ class ConnectionTestCase(GrokTestCase):
     self.assertRaisesRegexp(GrokError, 'Unexpected request response:{}', c.request, requestDef)
 
 if __name__ == '__main__':
-  debug = 0
+  debug = 1
   if debug:
     single = unittest.TestSuite()
-    single.addTest(ConnectionTestCase('testAPIInformationResponse'))
+    single.addTest(ConnectionTestCase('testGoodKey'))
     unittest.TextTestRunner().run(single)
   else:
     unittest.main()

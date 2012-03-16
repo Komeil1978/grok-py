@@ -54,7 +54,7 @@ class Connection(object):
     self.key = key
 
     # The base path for all our HTTP calls
-    self.baseURL = baseURL + 'v1'
+    self.baseURL = baseURL + 'v2'
 
     # The HTTP Client we'll use to make requests
     if not session:

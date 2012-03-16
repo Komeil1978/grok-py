@@ -1,7 +1,7 @@
 import grokpy
 import unittest
 import socket
-import grokpy.httplib2 as httplib2
+import grokpy.requests
 
 from mock import Mock
 
@@ -203,10 +203,10 @@ class ClientTestCase(GrokTestCase):
     self.assertEqual(g.alignPredictions(inputHeaders, inputRows), expectedOut)
 
 if __name__ == '__main__':
-  debug = 0
+  debug = 1
   if debug:
     single = unittest.TestSuite()
-    single.addTest(ClientTestCase('testBadConnection'))
+    single.addTest(ClientTestCase('testGoodInstantiation'))
     unittest.TextTestRunner().run(single)
   else:
     unittest.main()

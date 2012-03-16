@@ -3,6 +3,7 @@ import time
 import httplib
 import json
 import warnings
+import grokpy
 
 from exceptions import GrokError, AuthenticationError, NotYetImplementedError
 from streaming import StreamListener, Stream
@@ -101,8 +102,62 @@ class Model(object):
 
     .. note: This may take several seconds.
     '''
-    pass
-  
+
+    # Check how many records are in the swarm model output cache
+    headers, data = self.getModelOutput()
+    swarmOutputCacheLen = len(data)
+
+    # Promotion command
+    command = {'command': 'promote'}
+
+    self.c.request('POST', self.commandsUrl, command)
+
+    ##### WARNING: Ugly hack that will go away #####
+
+    # Check if the state of the model changes
+    timeoutCounter = 0
+    while True:
+      modelDef = self.c.request('GET', self.url)['model']
+      status = modelDef['status']
+      if timeoutCounter >= 20:
+        raise GrokError('The production model did not start in a reasonable '
+                        'amount of time. Please try again or contact support.')
+      elif status == 'running':
+        # The production model has turned on
+        break
+      else:
+        print 'Waiting for the production model to become ready ...'
+        time.sleep(.5)
+        timeoutCounter += 1
+
+    # Check that the production model has at least caught up to where we were
+    # at the end of swarm.
+    timeoutCounter = 0
+    while True:
+      # Production Model Output Cache Length
+      try:
+        headers, data = self.getModelOutput()
+        pmocLen = len(data)
+      except grokpy.response.exceptions.HTTPError:
+        print 'Whoops 500'
+        time.sleep(.5)
+        timoutCounter += 1
+        continue
+
+      if timeoutCounter >= 40:
+        raise GrokError("The production model did not catch up to the swarm "
+                        "in a reasonable amount of time. Please try again or "
+                        "contact support.")
+      elif pmocLen >= swarmOutputCacheLen:
+        break
+      else:
+        print 'Waiting for the production model to catch up with the data ...'
+        time.sleep(1)
+        timeoutCounter += 1
+
+    ##### END UGLY HACK
+
+
   def start(self):
     '''
     Starts up a model, readying it to receive new data from a stream

@@ -22,8 +22,8 @@ from math import floor
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'fKotFugElEafypvekMqPFUDM00xGtqet'
-MODEL_ID = '30c6c89b1f1d4db4967c8d5979e6'
+API_KEY = 'YOUR_API_KEY_HERE'
+MODEL_ID = 'YOUR_MODEL_ID'
 NEW_RECORDS = 'data/rec-center-stream-training.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
 
@@ -41,13 +41,26 @@ def HelloGrokPart2():
   # Setup
 
   print 'Connecting to Grok ...'
-  grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
+  grok = grokpy.Client(baseURL = 'http://localhost:8081/')
 
   print 'Retrieving Model ...'
   recCenterEnergyModel = grok.getModel(MODEL_ID)
 
   print 'Retrieving Stream ...'
   myStream = recCenterEnergyModel.getStream()
+
+  ##############################################################################
+  # Promote the model
+  #
+  # Note: This will soon go away in favor of automatic promotion
+  #
+  # When you promote a model you are taking it from the swarm into a
+  # production ready state. You can then train the model further by sending
+  # it more records (as we will do below) or you can start streaming your
+  # live data right away.
+
+  print 'Promoting our model. This may take a few seconds ...'
+  recCenterEnergyModel.promote()
 
   ##############################################################################
   # Sending new records
@@ -92,7 +105,7 @@ def HelloGrokPart2():
       lastRecordSeen = latestRowId
       counter = 0
       # Don't spam the server
-      time.sleep(0.1)
+      time.sleep(1)
 
 
   # Align predictions with actuals

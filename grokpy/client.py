@@ -402,7 +402,7 @@ class Client(object):
     # Find columns that contain predictions / metrics
     predictionIndexes = [headers.index(header)
                        for header in headers
-                       if ('Metric temporal' in header)
+                       if ('Score' in header)
                        or ('Predicted' in header)]
 
     # Bump all predictions down one row

@@ -34,10 +34,10 @@ import grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'fKotFugElEafypvekMqPFUDM00xGtqet'
+API_KEY = 'YOUR_API_KEY'
 STREAM_SPEC = 'data/streamSpecification.json'
 MODEL_SPEC = 'data/modelSpecification.json'
-INPUT_CSV = 'data/rec-center-tiny.csv'
+INPUT_CSV = 'data/rec-center.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
 ##############################################################################
@@ -61,7 +61,7 @@ def HelloGrok():
 
   # Connect to Grok
   print 'Connecting to Grok ...'
-  grok = grokpy.Client(API_KEY, 'http://localhost:8081/')
+  grok = grokpy.Client(API_KEY)
 
   ##############################################################################
   # Create and configure our Stream
