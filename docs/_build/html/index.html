@@ -57,24 +57,38 @@ the <a class="reference external" href="http://grok.numenta.com/resources">Grok 
 library.</p>
 <div class="section" id="installation">
 <span id="id1"></span><h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="with-example-apps-recommended">
+<h3>With Example Apps (Recommended)<a class="headerlink" href="#with-example-apps-recommended" title="Permalink to this headline">¶</a></h3>
+<p>Grab <a class="reference external" href="http://github.com/numenta/grok-py/downloads">the latest stable build</a> and install it.</p>
+<div class="highlight-python"><pre>$ python setup.py install</pre>
+</div>
+<p>Or, you can clone the repo. (Master is always stable.)</p>
+<div class="highlight-python"><pre>$ git clone git@github.com:numenta/grok-py.git
+$ cd grok-py
+$ python setup.py install</pre>
+</div>
+</div>
+<div class="section" id="just-the-client-library">
+<h3>Just the Client Library<a class="headerlink" href="#just-the-client-library" title="Permalink to this headline">¶</a></h3>
 <p>Install using pip, a package manager for Python.</p>
 <div class="highlight-python"><pre>$ pip install grokpy</pre>
 </div>
 <p>Don&#8217;t have pip installed? You should!</p>
 <div class="highlight-python"><pre>$ curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python</pre>
 </div>
-<p>Or, you can grab <a class="reference external" href="http://github.com/numenta/grok-py/downloads">the latest stable build</a> and install it yourself.</p>
-<div class="highlight-python"><pre>$ python setup.py install</pre>
-</div>
-<p>Finally, you can clone the repo. (Master is always stable.)</p>
-<div class="highlight-python"><pre>$ git clone git@github.com:numenta/grok-py.git
-$ cd grok-py
-$ python setup.py install</pre>
 </div>
 </div>
 <div class="section" id="getting-started">
 <h2>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h2>
-<p>Here are some words</p>
+<p>After you have installed the client library you should read through the source
+of the sample application HelloGrok.</p>
+<p>The sample app is laid out as a tutorial and has extensive comments to get you
+up to speed on using Grok.</p>
+<p>Once you have read through the code please run:</p>
+<div class="highlight-python"><pre>$ python HelloGrok.py</pre>
+</div>
+<p>Hopefully with minor modifications to the sample app you will be able to build
+useful predictive models of your data.</p>
 </div>
 <div class="section" id="user-guide">
 <span id="id2"></span><h2>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h2>
@@ -97,18 +111,21 @@ $ python setup.py install</pre>
 <li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.swarm">10. <tt class="docutils literal"><span class="pre">swarm</span></tt> Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="grokpy.html#module-grokpy.user">11. <tt class="docutils literal"><span class="pre">user</span></tt> Module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="grokpy.html#subpackages">12. Subpackages</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="grokpy.httplib2.html">12.1. httplib2 Package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="grokpy.requests.html">12.2. requests Package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="grokpy.requests.html">12.1. requests Package</a></li>
 </ul>
 </li>
 </ul>
 </div>
 </div>
-<div class="section" id="support">
-<h2>Support<a class="headerlink" href="#support" title="Permalink to this headline">¶</a></h2>
-<p>WHERE TO REPORT BUGS</p>
-<p>IRC CHANNEL</p>
-<p>CHANGELOG</p>
+<div class="section" id="support-and-development">
+<h2>Support and Development<a class="headerlink" href="#support-and-development" title="Permalink to this headline">¶</a></h2>
+<p>Bug reports and questions: <a class="reference external" href="mailto:support&#37;&#52;&#48;numenta&#46;com">support<span>&#64;</span>numenta<span>&#46;</span>com</a></p>
+<p>A note about releases:</p>
+<p>Development of Grok client libraries happens internally and are then released
+to github master at the same time as we release server side code. Github master</p>
+<blockquote>
+<div>can thus be considered STABLE.</div></blockquote>
+<p>Changelog: <a class="reference external" href="https://github.com/numenta/grok-py/blob/master/CHANGES">https://github.com/numenta/grok-py/blob/master/CHANGES</a></p>
 </div>
 <div class="section" id="indices-and-tables">
 <h2>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h2>
@@ -129,13 +146,17 @@ $ python setup.py install</pre>
   <h3><a href="#">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Grok Python Client Library</a><ul>
-<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#with-example-apps-recommended">With Example Apps (Recommended)</a></li>
+<li><a class="reference internal" href="#just-the-client-library">Just the Client Library</a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#getting-started">Getting Started</a></li>
 <li><a class="reference internal" href="#user-guide">User Guide</a></li>
 <li><a class="reference internal" href="#api-reference">API Reference</a><ul>
 </ul>
 </li>
-<li><a class="reference internal" href="#support">Support</a></li>
+<li><a class="reference internal" href="#support-and-development">Support and Development</a></li>
 <li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
 </ul>
 </li>
@@ -143,7 +164,7 @@ $ python setup.py install</pre>
 
   <h4>Next topic</h4>
   <p class="topless"><a href="grokpy.html"
-                        title="next chapter">1. <tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">client</span></tt> Module</a></p>
+                        title="next chapter">1. <tt class="docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal docutils literal"><span class="pre">client</span></tt> Module</a></p>
   <h3>This Page</h3>
   <ul class="this-page-menu">
     <li><a href="_sources/index.txt"

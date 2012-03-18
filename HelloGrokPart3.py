@@ -4,7 +4,7 @@
 # Hello Grok - Part Three
 #
 # In this tutorial we will explore advanced streams. We will:
-#  Join data with a file we upload, using it as a lookup table
+#  Create a Project to organise our models.
 #  Join data with Grok's public data sources:
 #    Weather
 #    Twitter
@@ -20,14 +20,12 @@ import json
 import grokpy
 
 from math import floor
-from grokpy import Client
 
 ##############################################################################
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
 SWARM_INPUT_CSV = 'data/rec-center-advanced-swarm.csv'
-STREAM_SPEC = 'data/advancedSpec.json'
 SWARM_OUTPUT_CSV = 'output/advancedSwarmOutput.csv'
 PRODUCTION_INPUT_CSV = 'data/rec-center-advanced-stream.csv'
 PRODUCTION_OUTPUT_CSV = 'output/advancedStreamOutput.csv'
@@ -43,34 +41,64 @@ PRODUCTION_OUTPUT_CSV = 'output/advancedStreamOutput.csv'
 def HelloGrokPart3():
 
   # Setup
-  grok = Client(API_KEY)
+  grok = grokpy.Client(API_KEY)
   now = time.time()
+
+  ##############################################################################
+  # Create a Project
+  #
+  # Projects are an organizational structure like folders for models. They
+  # provide all the same methods as the top level client.
+
   myProject = grok.createProject('Hello Grok Part 3' + str(now))
 
   ##############################################################################
-  # Create a new model
+  # Local Data Sources
   #
-  # When dealing with new ways to look at data in a stream you will need to
-  # create a new model to work with. In this case we're adding in new types of
-  # data so we'll need a new stream as well.
-  print 'Creating a new model ...'
-  advancedModel = myProject.createModel()
+  # Previously we pulled the specification for our stream out of json file.
+  # Here we will build it up as a python dict, both to demonstrate the alternate
+  # method and so we can explain each step as we add in public data sources
 
-  print 'Creating a new stream ...'
-  newStream = myProject.createStream()
-  newStream.configure(STREAM_SPEC)
+  streamSpec =  {"name": "Advanced Stream " + str(now),
+                 "dataSources": [
+                      {"name": "My Local Source",
+                        "dataSourceType": grokpy.DataSourceType.LOCAL,
+                        "fields": [{"flag": grokpy.DataFlag.TIMESTAMP,
+                                    "name": "timestamp",
+                                    "dataFormat": {"dataType":
+                                          grokpy.DataType.DATETIME}
+                                    },
+                                   {"name": "consumption",
+                                    "dataFormat": {"dataType":
+                                          grokpy.DataType.SCALAR}
+                                    },
+                                   {"flag": grokpy.DataFlag.LOCATION,
+                                     "name": "zipcode",
+                                     "dataFormat": {"dataType":
+                                          grokpy.DataType.CATEGORY}
+                                     },
+                                   {"name": "dayOfWeek",
+                                     "dataFormat": {"dataType":
+                                          grokpy.DataType.CATEGORY}
+                                    }
+                                  ]
+                        }
+                      ]
+                  }
 
   ##############################################################################
   # Public Data Sources
   #
   # Grok provides a few Public Data Sources. These are databases from which
-  # we can pull useful information to be joined with your stream. Let's take
-  # a look at what Public Data Sources are available.
-
-  publicDataSources = grok.listPublicDataSources()
-  print 'Available Public Data Sources:'
-  for pds in publicDataSources:
-    print '\t', pds.name, ':', pds.longDescription, 'Id:', pds.id
+  # we can pull useful information to be joined with your stream.
+  #
+  # Today we have public data sources for:
+  #     Weather
+  #     Twitter
+  #     Stocks
+  #     Holidays
+  #
+  # We'll use weather and twitter data in this example.
 
   ##############################################################################
   # Add weather data to the stream
@@ -81,19 +109,17 @@ def HelloGrokPart3():
   # temperature, or visibility.
   #
   # For each record that we send in with location and time, we get weather
-  # data with very little effort!
-  #
-  # * Or a 'lat,long' pair, or an IP address.
+  # data with very little effort! Here we will add in the average temperature.
 
-  weather = grok.getPublicDataSource('weather')
-  weather.useField('TEMP')
-  # Weather provider needs to know where the location field is, you can also
-  # pass in the field index if you know it.
-  weather.setConfiguration(locationFieldName = 'zipcode')
+  weatherSpec = {"name": grokpy.PublicDataSources.WEATHER,
+                   "dataSourceType": grokpy.DataSourceType.PUBLIC,
+                   "fields": [{"name": grokpy.WeatherDataType.TEMPERATURE,
+                              "dataFormat": {"dataType":
+                                                grokpy.DataType.SCALAR}}]}
 
   # Add it to the stream
   print 'Adding Public Data Source: Weather'
-  newStream.usePublicDataSource(weather)
+  streamSpec['dataSources'].append(weatherSpec)
 
   ##############################################################################
   # Add twitter data to the stream
@@ -103,14 +129,24 @@ def HelloGrokPart3():
   # the data you provide. Here we will ask Grok to count how many mentions
   # the words 'gym' and 'excercise' appeared on Twitter for the time period of
   # each record.
+  #
+  # The field name specifies what word to search for and the return value
+  # is the count of how many times that word was used in the given period.
 
-  twitter = grok.getPublicDataSource('twitter')
-
-  keywords = ['gym','exercise']
-  twitter.setConfiguration(keywords)
+  twitterSpec = {"name": grokpy.PublicDataSources.TWITTER,
+                 "dataSourceType": grokpy.DataSourceType.PUBLIC,
+                 "fields": [{"name": "gym",
+                            "dataFormat": {"dataType":
+                                              grokpy.DataType.SCALAR}},
+                            {"name": "exercise",
+                            "dataFormat": {"dataType":
+                                              grokpy.DataType.SCALAR}}]}
 
   print 'Adding Public Data Source: Twitter'
-  newStream.usePublicDataSource(twitter)
+  streamSpec['dataSources'].append(twitterSpec)
+
+  # Create and configure our Stream within this project.
+  newStream = myProject.createStream(streamSpec)
 
   ##############################################################################
   # Add local data to the stream
@@ -125,31 +161,48 @@ def HelloGrokPart3():
   fileHandle.close()
   newStream.addRecords(recCenterData)
 
-  # Set which stream this model will listen to.
-  print 'Attaching model to stream ...'
-  advancedModel.setStream(newStream)
+  # Create and configure our Model within this project.
+  print 'Creating a model ...'
+  modelSpec = {"name": "Advanced Model" + str(now),
+               "predictedField": "consumption",
+               "streamId": newStream.id,
+               "aggregation": {"interval": grokpy.Aggregation.HOURS}}
 
-  # Define how our Model will use our Stream
-  advancedModel.setTemporalField('timestamp')
-  advancedModel.setPredictionField('consumption')
-  advancedModel.setTimeAggregation('HOURS')
+  advancedModel = myProject.createModel(modelSpec)
 
   # Start the Swarm
   print 'Starting Grok Swarm'
-  advancedModel.startSwarm()
+  print advancedModel.startSwarm()
 
-  # Catch ctrl-c to terminate remote long-running processes
-  signal.signal(signal.SIGINT, signal_handler)
+  # Monitor Progress
+  swarmStarted = False
+  while True:
+    state = advancedModel.getSwarmState()
+    jobStatus = state['status']
+    results = state['details']
+    recordsSeen = results['numRecords']
 
-  # Monitor the Swarm
-  monitor = SwarmMonitor()
-  advancedModel.monitorSwarm(monitor)
+    if jobStatus == grokpy.SwarmStatus.COMPLETED:
+      # Swarm is done
+      bestConfig = results['bestModel']
+      print 'You win! Your Grok Swarm is complete.'
+      print '\tBest Configuration: ' + str(bestConfig)
+      print '\tWith an Error of: ' + str(results['bestValue'])
+      # Exit the loop
+      break
+    elif jobStatus == grokpy.SwarmStatus.RUNNING and swarmStarted == False:
+      # The first time we see that the swarm is running
+      swarmStarted = True
+      print 'Swarm started.'
+    elif jobStatus == grokpy.SwarmStatus.STARTING:
+      print 'Swarm is starting up ...'
+      time.sleep(2)
+    else:
+      print "Latest record seen: " + str(recordsSeen)
+      time.sleep(2)
 
-  # Retrieve Swarm results
-  print "Getting results from Swarm ..."
-  swarmResults = advancedModel.getSwarmResults()
-  headers = swarmResults['columnNames']
-  resultRows = swarmResults['rows']
+  print "Getting full results from Swarm ..."
+  headers, resultRows = advancedModel.getModelOutput()
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)
@@ -168,6 +221,10 @@ def HelloGrokPart3():
   ##############################################################################
   # Promote and use your advanced model
 
+  #### HACK ####
+  print 'Sleep a bit ...'
+  time.sleep(5)
+
   print 'Promoting model and updating model id ...'
   advancedModel.promote()
 
@@ -176,16 +233,30 @@ def HelloGrokPart3():
   newRecords = [row for row in csv.reader(fileHandle)]
   fileHandle.close()
 
-  print 'Sending new data ...'
-  advancedModel.sendRecords(newRecords)
-
-  # Get all the new predictions
-  totalRecords = len(newRecords)
-  expectedRows = int(floor(totalRecords / 4)) - 1
-  expectedRows = expectedRows - (expectedRows % 4)
+  print 'Adding new data ...'
+  newStream.addRecords(newRecords)
 
   print 'Monitoring predictions ...'
-  headers, resultRows = advancedModel.monitorPredictions(expectedRows)
+  lastRecordSeen = None
+  counter = 0
+  while True:
+    headers, resultRows = advancedModel.getModelOutput()
+    latestRowId = resultRows[-1][0]
+
+    if latestRowId == lastRecordSeen:
+      if counter > 15:
+        print 'Looks like we will not get any more predictions'
+        break
+      else:
+        print 'No new records in this step ...'
+        counter += 1
+        time.sleep(1)
+        continue
+    else:
+      lastRecordSeen = latestRowId
+      counter = 0
+      # Don't spam the server
+      time.sleep(0.5)
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)
@@ -201,85 +272,8 @@ def HelloGrokPart3():
   writer.writerows(resultRows)
   fileHandle.close()
 
-  # Cleanup
-  myProject.stopAllModels()
-
   print "\n\nFantasmic! You've completed Part Three."
   print ("Now it's time to start working with your own data. Get to it!")
-
-class SwarmMonitor(grokpy.StreamMonitor):
-
-    def __init__(self):
-        # Loop information
-        self.started = False
-
-        self.configurations = {}
-        self.highestRecordCount = 0
-
-    def on_state(self, state):
-        '''
-        Called when a new state is received from connection.
-
-        Override this method if you wish to manually handle
-        the stream data. Return False to stop stream and close connection.
-        '''
-
-        jobStatus = state['jobStatus']
-        results = state['results']
-        configurations = state['models']
-
-        if jobStatus == grokpy.Status.COMPLETED:
-          bestConfig = results['bestModel']
-          fieldsUsed = self.configurations[bestConfig]['fields']
-          print 'Best Configuration: ' + str(bestConfig)
-          print 'Using Field(s): ' + str(fieldsUsed)
-          if len(fieldsUsed) > 1:
-            fieldContributions = state['fieldContributions']
-            print 'Field Contributions:'
-            for field in fieldContributions:
-              if field['contribution'] > 0:
-                print('\tUsing ' + field['name'] + ' improved accuracy by ' +
-                      str(field['contribution']) + ' percent.')
-
-          print 'With an Error of: ' + str(results['bestValue'])
-          print 'You win! Your Grok Swarm is complete.'
-          # Exit the loop
-          return False
-        if jobStatus == grokpy.Status.RUNNING and self.started == False:
-          self.started = True
-          print 'Swarm started.'
-        if not self.started:
-          print 'Swarm is starting up ...'
-          time.sleep(2)
-          return True
-        if not results:
-          print 'Initial records are being loaded ...'
-          time.sleep(2)
-          return True
-
-        for config in configurations:
-          if config['numRecords'] > self.highestRecordCount:
-            self.highestRecordCount = config['numRecords']
-          if config['status'] == grokpy.Status.COMPLETED:
-            self.configurations[config['modelId']] = config
-
-        if self.configurations:
-          print ('Grok has evaluated ' + str(len(self.configurations)) +
-                 ' model configurations.')
-        else:
-          print ('First models are processing records. Latest record seen: ' +
-                 str(self.highestRecordCount))
-
-        time.sleep(2)
-        return True
-
-def signal_handler(signal, frame):
-  model = frame.f_locals.get('advancedModel')
-  if model:
-    model.stopSwarm()
-  else:
-    print 'Caught ctrl-c but failed to stop in progress swarm. :('
-  sys.exit(0)
 
 if __name__ == '__main__':
   HelloGrokPart3()

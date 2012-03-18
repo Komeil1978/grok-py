@@ -34,10 +34,9 @@ import grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'YOUR_API_KEY'
+API_KEY = 'YOUR_KEY_HERE'
 STREAM_SPEC = 'data/streamSpecification.json'
-MODEL_SPEC = 'data/modelSpecification.json'
-INPUT_CSV = 'data/rec-center.csv'
+INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
 ##############################################################################

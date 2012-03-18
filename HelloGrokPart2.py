@@ -22,9 +22,9 @@ from math import floor
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'YOUR_API_KEY_HERE'
+API_KEY = 'YOUR_KEY_HERE'
 MODEL_ID = 'YOUR_MODEL_ID'
-NEW_RECORDS = 'data/rec-center-stream-training.csv'
+NEW_RECORDS = 'data/rec-center-stream.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
 
 ##############################################################################
@@ -41,7 +41,7 @@ def HelloGrokPart2():
   # Setup
 
   print 'Connecting to Grok ...'
-  grok = grokpy.Client(baseURL = 'http://localhost:8081/')
+  grok = grokpy.Client(API_KEY)
 
   print 'Retrieving Model ...'
   recCenterEnergyModel = grok.getModel(MODEL_ID)
@@ -104,9 +104,9 @@ def HelloGrokPart2():
     else:
       lastRecordSeen = latestRowId
       counter = 0
+      print lastRecordSeen
       # Don't spam the server
       time.sleep(1)
-
 
   # Align predictions with actuals
   print 'Aligning predictions ...'
