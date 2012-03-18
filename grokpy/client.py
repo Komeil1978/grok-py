@@ -15,6 +15,8 @@ from exceptions import (GrokError,
                        AuthenticationError,
                        NotYetImplementedError)
 
+VERBOSITY = 0
+
 class Client(object):
   '''
   A client to access the Grok HTTP API.
@@ -94,8 +96,7 @@ class Client(object):
 
     result = self.c.request('POST', url, requestDef)
 
-    print '=' * 40
-    print result
+    if VERBOSITY: print result
 
     return Model(parent, result['model'])
 
@@ -152,7 +153,7 @@ class Client(object):
     .. warning:: There is currently no way to recover from this opperation.
     '''
     for model in self.listModels():
-      if verbose:
+      if verbose or VERBOSITY:
         print 'Deleting model: ' + str(model.id)
       model.delete()
 

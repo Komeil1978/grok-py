@@ -3,12 +3,16 @@ from connection import Connection
 from field import Field
 from model import Model
 from project import Project
-from publicDataSource import PublicDataSource
 from enum import (Aggregation,
                   SwarmSize,
                   SwarmStatus,
                   DataType,
-                  DataFlag)
+                  DataFlag,
+                  DataSourceType,
+                  PublicDataSources,
+                  WeatherDataType,
+                  StockDataTypes,
+                  HolidayLocale)
 from stream import Stream
 from streaming import StreamListener, StreamMonitor
 
@@ -19,4 +23,3 @@ __version__ = '0.1.0'
 
 __all__ = ['Client', 'Connection','Field','Model','Project',
            'PublicDataSource','Stream','StreamListener', 'StreamMonitor']
-

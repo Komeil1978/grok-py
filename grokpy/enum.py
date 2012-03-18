@@ -30,15 +30,43 @@ class SwarmStatus(object):
 class DataType(object):
 
   DATETIME = 'DATETIME' # a point in time.
-  ENUMERATION = 'ENUMERATION' # a category.
-  IP_ADDRESS = 'IP_ADDRESS' # an IP address (V4).
-  LAT_LONG = 'LAT_LONG' # a latitude/longitude combination.
+  CATEGORY = 'CATEGORY' # a category.
   SCALAR = 'SCALAR' # a numeric value.
-  ZIP_CODE = 'ZIP_CODE' # a U.S. zip code. Aggregated with first or last.
 
 class DataFlag(object):
 
   NONE = 'NONE'
-  RESET = 'RESET'
-  SEQUENCE = 'SEQUENCE'
   TIMESTAMP = 'TIMESTAMP'
+  LOCATION = 'LOCATION'
+
+class DataSourceType(object):
+
+  LOCAL = 'local'
+  PUBLIC = 'public'
+
+class PublicDataSources(object):
+
+  WEATHER = 'weather'
+  TWITTER = 'twitter'
+  STOCKS = 'stocks'
+  EVENTS = 'events'
+
+class WeatherDataType(object):
+
+  TEMPERATURE = "TEMP"
+  PRECIPITATION = "PRCP"
+  WIND_SPEED = "WDSP"
+
+class StockDataTypes(object):
+
+  OPEN_PRICE = "OpenPrice"
+  HIGH_PRICE = "HighPrice"
+  LOW_PRICE = "LowPrice"
+  LAST_PRICE = "LastPrice"
+  VOLUME = "Volume"
+
+class HolidayLocale(object):
+
+  US_HOLIDAYS = "US-HOLIDAYS"
+  UK_HOLIDAYS = "UK-HOLIDAYS"
+  CA_HOLIDAYS = "CA-HOLIDAYS"

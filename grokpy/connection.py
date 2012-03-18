@@ -54,6 +54,8 @@ class Connection(object):
     self.key = key
 
     # The base path for all our HTTP calls
+    if baseURL[-1] != '/':
+      baseURL += '/'
     self.baseURL = baseURL + 'v2'
 
     # The HTTP Client we'll use to make requests
@@ -70,15 +72,17 @@ class Connection(object):
     Interface for all HTTP requests made to the Grok API
     '''
 
-    print method
-    print url
+
     if url[:4] != 'http':
       url = self.baseURL + url
-    print url
 
     # JSON serialize the requestDef object
     requestDef = json.dumps(requestDef, ensure_ascii=False)
-    print requestDef
+
+    if VERBOSITY:
+      print method
+      print url
+      print requestDef
 
     # Make the request, handle initial connection errors
     if method == 'GET':
@@ -93,8 +97,8 @@ class Connection(object):
       raise GrokError('Unrecognised HTTP method: %s' % method)
 
     if not response.ok:
-      raise response.raise_for_status()
-
+      print response.text
+      raise response.raise_for_status(response.text)
 
     # Load info from returned JSON strings
     content = json.loads(response.text)
