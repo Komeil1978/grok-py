@@ -1,9 +1,3 @@
-.. Grokpy documentation master file, created by
-   sphinx-quickstart on Wed Feb 29 11:45:06 2012.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-
 ==========================
 Grok Python Client Library
 ==========================
@@ -20,7 +14,9 @@ Installation
 With Example Apps (Recommended)
 -------------------------------
 
-Grab `the latest stable build`_ and install it. ::
+Grab `the latest stable build`_ by clicking either 'Download as zip' or
+'Download as tar.gz' on the linked page. After uncompressing that file you
+can then install the grokpy library.::
 
     $ python setup.py install
 
@@ -43,6 +39,11 @@ Don't have pip installed? You should! ::
 
     $ curl https://raw.github.com/pypa/pip/master/contrib/get-pip.py | python
 
+`Send Feedback on Installation <mailto:support@numenta.com?subject=Python-docs
+-feedback:Installation>`_
+
+.. _getting started:
+
 Getting Started
 ================
 
@@ -59,12 +60,10 @@ Once you have read through the code please run::
 Hopefully with minor modifications to the sample app you will be able to build
 useful predictive models of your data.
 
-.. _user-guide:
+`Send Feedback on Getting Started <mailto:support@numenta.com?subject=Python-docs
+-feedback:GettingStarted>`_
 
-User Guide
-==================
-
-these are more words
+.. _api reference:
 
 API Reference
 ==================
@@ -77,18 +76,33 @@ A complete guide to all public APIs found in `grok-py`. Auto-generated.
 
    grokpy
 
+`Send Feedback on API Reference <mailto:support@numenta.com?subject=Python-docs
+-feedback:APIReference>`_
+
+.. _support and development:
+
 Support and Development
 ==========================
 
-Bug reports and questions: support@numenta.com
+Questions? Bugs?
+----------------
 
-A note about releases:
+We welcome all feedback and bug reports! Please send us an email at:
+support@numenta.com
+
+Releases
+--------
 
 Development of Grok client libraries happens internally and are then released
 to github master at the same time as we release server side code. Github master
- can thus be considered STABLE.
+can thus be considered STABLE.
 
-Changelog: `<https://github.com/numenta/grok-py/blob/master/CHANGES>`_
+Code is pushed Tuesday afternoons (pst).
+
+Changelog
+---------
+
+`<https://github.com/numenta/grok-py/blob/master/CHANGES>`_
 
 Indices and tables
 ==================

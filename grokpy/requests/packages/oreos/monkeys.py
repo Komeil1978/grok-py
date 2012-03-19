@@ -254,7 +254,7 @@ class CookieError(Exception):
 #       _Translator       hash-table for fast quoting
 #
 _RFC2965Forbidden = "[]:{}="
-_LegalChars       = ( string.ascii_letters + string.digits + 
+_LegalChars       = ( string.ascii_letters + string.digits +
                       "!#$%&'*+-.^_`|~_" + _RFC2965Forbidden )
 _Translator       = {
     '\000' : '\\000',  '\001' : '\\001',  '\002' : '\\002',
@@ -637,7 +637,8 @@ class BaseCookie(dict):
     def load(self, rawdata):
         """Load cookies from a string (presumably HTTP_COOKIE) or
         from a dictionary.  Loading cookies from a dictionary 'd'
-        is equivalent to calling:
+        is equivalent to calling::
+        
             map(Cookie.__setitem__, d.keys(), d.values())
         """
         if type(rawdata) == type(""):

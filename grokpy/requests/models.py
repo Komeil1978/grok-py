@@ -384,7 +384,8 @@ class Request(object):
         Once a request is successfully sent, `sent` will equal True.
 
         :param anyway: If True, request will be sent, even if it has
-        already been sent.
+            already been sent.
+            
         """
 
         # Build the URL

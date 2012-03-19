@@ -132,7 +132,8 @@ class RequestMethods(object):
     def get_url(self, url, fields=None, **urlopen_kw):
         """
         .. deprecated:: 1.0
-           Use :meth:`request` instead.
+
+        Use :meth:`request` instead
         """
         return self.request_encode_url('GET', url, fields=fields,
                                        **urlopen_kw)
@@ -140,7 +141,8 @@ class RequestMethods(object):
     def post_url(self, url, fields=None, headers=None, **urlopen_kw):
         """
         .. deprecated:: 1.0
-           Use :meth:`request` instead.
+
+        Use :meth:`request` instead
         """
         return self.request_encode_body('POST', url, fields=fields,
                                         headers=headers,

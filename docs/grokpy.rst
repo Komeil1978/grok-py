@@ -91,5 +91,4 @@ Subpackages
 
 .. toctree::
 
-    grokpy.httplib2
     grokpy.requests
