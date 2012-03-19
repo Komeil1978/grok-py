@@ -1,5 +1,3 @@
-import threading
-import httplib2
 import StringIO
 import traceback
 import json
@@ -9,8 +7,7 @@ from user import User
 from project import Project
 from model import Model
 from stream import Stream
-from field import Field
-from publicDataSource import PublicDataSource
+from stream_specification import StreamSpecification
 from exceptions import (GrokError,
                        AuthenticationError,
                        NotYetImplementedError)
@@ -165,7 +162,7 @@ class Client(object):
     Returns an instance of the Stream object.
 
     * spec - A configuration for this stream. Can be EITHER a file path to a
-      JSON document OR a Python dict.
+      JSON document OR a Python dict OR a StreamSpecification object.
     * [parent] - A Project object which associates this stream with a specific
       parent project.
     * [url] - The target for creating this stream. Automatically specified
@@ -270,6 +267,9 @@ class Client(object):
     # If we were given a dict directly, use that.
     if type(spec) == type({}):
       processedSpec = spec
+    # If we are given a StreamSpecification object, pull its spec and use that.
+    elif isinstance(spec, StreamSpecification):
+      processedSpec = spec.getSpec()
     # Otherwise pull the info out of a file.
     else:
       fileHandle = open(spec, 'rU')

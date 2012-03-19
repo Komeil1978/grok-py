@@ -1,8 +1,5 @@
 import os
-import urllib2
-import httplib2
 import json
-import socket
 import requests
 import base64
 
@@ -15,7 +12,7 @@ class Connection(object):
   Connection object for the Grok Prediction Service
   '''
 
-  def __init__(self, key = None, baseURL = 'http://api.grok.numenta.com/', session = None):
+  def __init__(self, key = None, baseURL = 'http://localhost:8081/', session = None):
     '''
     key - Grok API Key
     baseURL - Grok server request target

@@ -1,6 +1,5 @@
 from client import Client
 from connection import Connection
-from field import Field
 from model import Model
 from project import Project
 from enum import (Aggregation,
@@ -14,7 +13,15 @@ from enum import (Aggregation,
                   StockDataTypes,
                   HolidayLocale)
 from stream import Stream
-from streaming import StreamListener, StreamMonitor
+
+from stream_specification import StreamSpecification
+from local_data_source import LocalDataSource
+from weather_data_source import WeatherDataSource
+from twitter_data_source import TwitterDataSource
+#from events_data_source import EventsDataSource
+#from stocks_data_source import StocksDataSource
+from data_source_field import DataSourceField
+
 
 from exceptions import (AuthenticationError,
                         GrokError)

@@ -1,12 +1,10 @@
 import os
 import time
-import httplib
 import json
 import warnings
 import grokpy
 
 from exceptions import GrokError, AuthenticationError, NotYetImplementedError
-from streaming import StreamListener, Stream
 from swarm import Swarm
 
 VERBOSITY = 0
@@ -251,7 +249,7 @@ class Model(object):
 
   def getMultiStepPredictions(self, buffer, timesteps):
     '''
-    .. warning:: Experimental.
+    .. warning:: Not implemented for API V2 yet.
 
     Gets predictions for the next N timesteps
 
@@ -298,6 +296,8 @@ class Model(object):
                    [2.01],
                    [.01]] # Predictions are now one more timestep in the future
     '''
+
+    raise NotYetImplementedError()
 
     # Send in our buffer
     self.sendRecords(buffer)

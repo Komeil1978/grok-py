@@ -53,38 +53,51 @@ def HelloGrokPart3():
   myProject = grok.createProject('Hello Grok Part 3' + str(now))
 
   ##############################################################################
-  # Local Data Sources
+  # Create our stream specification
   #
   # Previously we pulled the specification for our stream out of json file.
-  # Here we will build it up as a python dict, both to demonstrate the alternate
+  # Here we will build it up as an object, both to demonstrate the alternate
   # method and so we can explain each step as we add in public data sources
+  #
+  # Note: Until we call createStream(streamSpec) all these operations are local.
 
-  streamSpec =  {"name": "Advanced Stream " + str(now),
-                 "dataSources": [
-                      {"name": "My Local Source",
-                        "dataSourceType": grokpy.DataSourceType.LOCAL,
-                        "fields": [{"flag": grokpy.DataFlag.TIMESTAMP,
-                                    "name": "timestamp",
-                                    "dataFormat": {"dataType":
-                                          grokpy.DataType.DATETIME}
-                                    },
-                                   {"name": "consumption",
-                                    "dataFormat": {"dataType":
-                                          grokpy.DataType.SCALAR}
-                                    },
-                                   {"flag": grokpy.DataFlag.LOCATION,
-                                     "name": "zipcode",
-                                     "dataFormat": {"dataType":
-                                          grokpy.DataType.CATEGORY}
-                                     },
-                                   {"name": "dayOfWeek",
-                                     "dataFormat": {"dataType":
-                                          grokpy.DataType.CATEGORY}
-                                    }
-                                  ]
-                        }
-                      ]
-                  }
+  streamSpec = grokpy.StreamSpecification()
+  streamSpec.setName('Advanced Stream ' + str(now))
+
+  ##############################################################################
+  # Local Data
+
+  # Create our local data source
+  local = grokpy.LocalDataSource()
+  local.setName('Local CSV Data')
+
+  # Create each of our fields
+  timestamp = grokpy.DataSourceField()
+  timestamp.setName('timestamp')
+  timestamp.setType(grokpy.DataType.DATETIME)
+  timestamp.setFlag(grokpy.DataFlag.TIMESTAMP)
+
+  consumption = grokpy.DataSourceField()
+  consumption.setName('consumption')
+  consumption.setType(grokpy.DataType.SCALAR)
+
+  zipcode = grokpy.DataSourceField()
+  zipcode.setName('zipcode')
+  zipcode.setType(grokpy.DataType.CATEGORY)
+  zipcode.setFlag(grokpy.DataFlag.LOCATION)
+
+  dayOfWeek = grokpy.DataSourceField()
+  dayOfWeek.setName('dayOfWeek')
+  dayOfWeek.setType(grokpy.DataType.CATEGORY)
+
+  # Add our fields to our source
+  local.addField(timestamp)
+  local.addField(consumption)
+  local.addField(zipcode)
+  local.addField(dayOfWeek)
+
+  # Add our source to the stream specification
+  streamSpec.addDataSource(local)
 
   ##############################################################################
   # Public Data Sources
@@ -104,22 +117,19 @@ def HelloGrokPart3():
   # Add weather data to the stream
   #
   # Our advanced dataset contains a location field. In this case a
-  # zipcode. Using a zipcode* Grok can look up what the weather was like near
+  # zipcode. Using a zipcode Grok can look up what the weather was like near
   # that location for a given timestamp and return a set of weather values like
   # temperature, or visibility.
   #
   # For each record that we send in with location and time, we get weather
   # data with very little effort! Here we will add in the average temperature.
 
-  weatherSpec = {"name": grokpy.PublicDataSources.WEATHER,
-                   "dataSourceType": grokpy.DataSourceType.PUBLIC,
-                   "fields": [{"name": grokpy.WeatherDataType.TEMPERATURE,
-                              "dataFormat": {"dataType":
-                                                grokpy.DataType.SCALAR}}]}
+  weather = grokpy.WeatherDataSource()
+  weather.addMeasurement(grokpy.WeatherDataType.TEMPERATURE)
 
-  # Add it to the stream
+  # Update the stream spec
   print 'Adding Public Data Source: Weather'
-  streamSpec['dataSources'].append(weatherSpec)
+  streamSpec.addDataSource(weather)
 
   ##############################################################################
   # Add twitter data to the stream
@@ -133,19 +143,20 @@ def HelloGrokPart3():
   # The field name specifies what word to search for and the return value
   # is the count of how many times that word was used in the given period.
 
-  twitterSpec = {"name": grokpy.PublicDataSources.TWITTER,
-                 "dataSourceType": grokpy.DataSourceType.PUBLIC,
-                 "fields": [{"name": "gym",
-                            "dataFormat": {"dataType":
-                                              grokpy.DataType.SCALAR}},
-                            {"name": "exercise",
-                            "dataFormat": {"dataType":
-                                              grokpy.DataType.SCALAR}}]}
 
+  twitter = grokpy.TwitterDataSource()
+  twitter.addKeyword('gym')
+  twitter.addKeyword('excercise')
+
+  # Update the stream spec
   print 'Adding Public Data Source: Twitter'
-  streamSpec['dataSources'].append(twitterSpec)
+  streamSpec.addDataSource(twitter)
 
+  ##############################################################################
   # Create and configure our Stream within this project.
+  #
+  # Note this makes an actual call to the API
+
   newStream = myProject.createStream(streamSpec)
 
   ##############################################################################

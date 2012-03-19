@@ -105,7 +105,7 @@ class Project(object):
     Returns a new Stream object. The stream will be created under this project.
 
     * spec - A configuration for this stream. Can be EITHER a file path to a
-      JSON document OR a Python dict.
+      JSON document OR a Python dict OR a StreamSpecification object.
     '''
 
     return self.parentClient.createStream(spec,
