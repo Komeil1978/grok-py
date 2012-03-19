@@ -5,7 +5,7 @@ import base64
 
 from exceptions import GrokError, AuthenticationError
 
-VERBOSITY = 1
+VERBOSITY = 0
 
 class Connection(object):
   '''
@@ -94,6 +94,7 @@ class Connection(object):
       raise GrokError('Unrecognised HTTP method: %s' % method)
 
     if not response.ok:
+      # TODO: This should be logged or otherwise handled better
       print response.text
       raise response.raise_for_status(response.text)
 

@@ -1,3 +1,14 @@
+grokpy Package
+==============
+
+:mod:`grokpy` Package
+---------------------
+
+.. automodule:: grokpy.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`client` Module
 --------------------
 
@@ -14,6 +25,22 @@
     :undoc-members:
     :show-inheritance:
 
+:mod:`data_source_field` Module
+-------------------------------
+
+.. automodule:: grokpy.data_source_field
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`enum` Module
+------------------
+
+.. automodule:: grokpy.enum
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`exceptions` Module
 ------------------------
 
@@ -22,10 +49,10 @@
     :undoc-members:
     :show-inheritance:
 
-:mod:`field` Module
--------------------
+:mod:`local_data_source` Module
+-------------------------------
 
-.. automodule:: grokpy.field
+.. automodule:: grokpy.local_data_source
     :members:
     :undoc-members:
     :show-inheritance:
@@ -46,14 +73,6 @@
     :undoc-members:
     :show-inheritance:
 
-:mod:`publicDataSource` Module
-------------------------------
-
-.. automodule:: grokpy.publicDataSource
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`stream` Module
 --------------------
 
@@ -62,10 +81,10 @@
     :undoc-members:
     :show-inheritance:
 
-:mod:`streaming` Module
------------------------
+:mod:`stream_specification` Module
+----------------------------------
 
-.. automodule:: grokpy.streaming
+.. automodule:: grokpy.stream_specification
     :members:
     :undoc-members:
     :show-inheritance:
@@ -78,10 +97,26 @@
     :undoc-members:
     :show-inheritance:
 
+:mod:`twitter_data_source` Module
+---------------------------------
+
+.. automodule:: grokpy.twitter_data_source
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`user` Module
 ------------------
 
 .. automodule:: grokpy.user
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`weather_data_source` Module
+---------------------------------
+
+.. automodule:: grokpy.weather_data_source
     :members:
     :undoc-members:
     :show-inheritance:
@@ -92,3 +127,4 @@ Subpackages
 .. toctree::
 
     grokpy.requests
+

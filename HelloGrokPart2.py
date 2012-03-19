@@ -104,7 +104,6 @@ def HelloGrokPart2():
     else:
       lastRecordSeen = latestRowId
       counter = 0
-      print lastRecordSeen
       # Don't spam the server
       time.sleep(1)
 

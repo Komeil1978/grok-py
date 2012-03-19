@@ -183,7 +183,7 @@ def HelloGrokPart3():
 
   # Start the Swarm
   print 'Starting Grok Swarm'
-  print advancedModel.startSwarm()
+  advancedModel.startSwarm()
 
   # Monitor Progress
   swarmStarted = False

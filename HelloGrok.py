@@ -108,7 +108,7 @@ def HelloGrok():
   # configuration of our model to predict the data that exist in the stream.
 
   print 'Starting Grok Swarm'
-  print recCenterEnergyModel.startSwarm()
+  recCenterEnergyModel.startSwarm()
 
   ##############################################################################
   # Monitor Progress

@@ -93,7 +93,8 @@ class Client(object):
 
     result = self.c.request('POST', url, requestDef)
 
-    if VERBOSITY: print result
+    if VERBOSITY:
+      print result
 
     return Model(parent, result['model'])
 

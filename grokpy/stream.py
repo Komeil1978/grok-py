@@ -7,6 +7,8 @@ import traceback
 
 from exceptions import GrokError, AuthenticationError
 
+VERBOSITY = 0
+
 class Stream(object):
   '''
   A Stream is the combination of data and the specification of those data
@@ -35,7 +37,8 @@ class Stream(object):
         i = 0
         while i < len(records):
           requestDef = {"input": records[i:(i+step)]}
-          print len(requestDef['input'])
+          if VERBOSITY:
+            print len(requestDef['input'])
           self.c.request('POST', url, requestDef)
           i += step
       # If it's small enough send everything
