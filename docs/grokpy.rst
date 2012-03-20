@@ -1,21 +1,9 @@
-grokpy Package
-==============
-
-:mod:`grokpy` Package
----------------------
-
-.. automodule:: grokpy.__init__
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`client` Module
 --------------------
 
 .. automodule:: grokpy.client
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`connection` Module
 ------------------------
@@ -23,7 +11,6 @@ grokpy Package
 .. automodule:: grokpy.connection
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`data_source_field` Module
 -------------------------------
@@ -31,7 +18,6 @@ grokpy Package
 .. automodule:: grokpy.data_source_field
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`enum` Module
 ------------------
@@ -39,7 +25,6 @@ grokpy Package
 .. automodule:: grokpy.enum
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`exceptions` Module
 ------------------------
@@ -47,7 +32,6 @@ grokpy Package
 .. automodule:: grokpy.exceptions
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`local_data_source` Module
 -------------------------------
@@ -55,7 +39,6 @@ grokpy Package
 .. automodule:: grokpy.local_data_source
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`model` Module
 -------------------
@@ -63,7 +46,6 @@ grokpy Package
 .. automodule:: grokpy.model
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`project` Module
 ---------------------
@@ -71,7 +53,6 @@ grokpy Package
 .. automodule:: grokpy.project
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`stream` Module
 --------------------
@@ -79,7 +60,6 @@ grokpy Package
 .. automodule:: grokpy.stream
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`stream_specification` Module
 ----------------------------------
@@ -87,7 +67,6 @@ grokpy Package
 .. automodule:: grokpy.stream_specification
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`swarm` Module
 -------------------
@@ -95,7 +74,6 @@ grokpy Package
 .. automodule:: grokpy.swarm
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`twitter_data_source` Module
 ---------------------------------
@@ -103,7 +81,6 @@ grokpy Package
 .. automodule:: grokpy.twitter_data_source
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`user` Module
 ------------------
@@ -111,7 +88,6 @@ grokpy Package
 .. automodule:: grokpy.user
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`weather_data_source` Module
 ---------------------------------
@@ -119,7 +95,6 @@ grokpy Package
 .. automodule:: grokpy.weather_data_source
     :members:
     :undoc-members:
-    :show-inheritance:
 
 Subpackages
 -----------
@@ -127,4 +102,3 @@ Subpackages
 .. toctree::
 
     grokpy.requests
-
