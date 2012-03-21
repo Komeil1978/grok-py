@@ -24,6 +24,9 @@ from data_source_field import DataSourceField
 from exceptions import (AuthenticationError,
                         GrokError)
 
+# Debug variable
+DEBUG = False
+
 __version__ = '0.1.0'
 
 __all__ = ['Client', 'Connection', 'Model', 'Project', 'Stream',

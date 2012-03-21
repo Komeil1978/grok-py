@@ -57,6 +57,8 @@ def HelloGrok():
   #
   # This is where we will create all the top level objects we'll be working
   # with in this application.
+  #
+  # grokpy.DEBUG = True # Uncomment this line if you want more verbose output
 
   # Connect to Grok
   print 'Connecting to Grok ...'

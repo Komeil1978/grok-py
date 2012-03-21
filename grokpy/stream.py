@@ -4,10 +4,9 @@ import json
 import math
 import StringIO
 import traceback
+import grokpy
 
 from exceptions import GrokError, AuthenticationError
-
-VERBOSITY = 0
 
 class Stream(object):
   '''
@@ -37,7 +36,7 @@ class Stream(object):
         i = 0
         while i < len(records):
           requestDef = {"input": records[i:(i+step)]}
-          if VERBOSITY:
+          if grokpy.DEBUG:
             print len(requestDef['input'])
           self.c.request('POST', url, requestDef)
           i += step

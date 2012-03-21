@@ -1,6 +1,7 @@
 import StringIO
 import traceback
 import json
+import grokpy
 
 from connection import Connection
 from user import User
@@ -11,8 +12,6 @@ from stream_specification import StreamSpecification
 from exceptions import (GrokError,
                        AuthenticationError,
                        NotYetImplementedError)
-
-VERBOSITY = 0
 
 class Client(object):
   '''
@@ -93,7 +92,7 @@ class Client(object):
 
     result = self.c.request('POST', url, requestDef)
 
-    if VERBOSITY:
+    if grokpy.DEBUG:
       print result
 
     return Model(parent, result['model'])
@@ -151,7 +150,7 @@ class Client(object):
     .. warning:: There is currently no way to recover from this opperation.
     '''
     for model in self.listModels():
-      if verbose or VERBOSITY:
+      if verbose or grokpy.DEBUG:
         print 'Deleting model: ' + str(model.id)
       model.delete()
 

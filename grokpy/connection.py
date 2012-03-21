@@ -2,17 +2,16 @@ import os
 import json
 import requests
 import base64
+import grokpy
 
 from exceptions import GrokError, AuthenticationError
-
-VERBOSITY = 0
 
 class Connection(object):
   '''
   Connection object for the Grok Prediction Service
   '''
 
-  def __init__(self, key = None, baseURL = 'http://localhost:8081/', session = None):
+  def __init__(self, key = None, baseURL = 'http://dailystaging.numenta.com:8081/', session = None):
     '''
     key - Grok API Key
     baseURL - Grok server request target
@@ -76,7 +75,7 @@ class Connection(object):
     # JSON serialize the requestDef object
     requestDef = json.dumps(requestDef, ensure_ascii=False)
 
-    if VERBOSITY:
+    if grokpy.DEBUG:
       print method
       print url
       print requestDef
@@ -101,7 +100,7 @@ class Connection(object):
     # Load info from returned JSON strings
     content = json.loads(response.text)
 
-    if VERBOSITY >= 1:
+    if grokpy.DEBUG >= 1:
       print content
 
     # Handle HTTP errors
