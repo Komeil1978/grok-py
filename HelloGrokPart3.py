@@ -143,7 +143,6 @@ def HelloGrokPart3():
   # The field name specifies what word to search for and the return value
   # is the count of how many times that word was used in the given period.
 
-
   twitter = grokpy.TwitterDataSource()
   twitter.addKeyword('gym')
   twitter.addKeyword('excercise')
@@ -191,7 +190,10 @@ def HelloGrokPart3():
     state = advancedModel.getSwarmState()
     jobStatus = state['status']
     results = state['details']
-    recordsSeen = results['numRecords']
+    if 'numRecords' in results:
+      recordsSeen = results['numRecords']
+    else:
+      recordsSeen = 0
 
     if jobStatus == grokpy.SwarmStatus.COMPLETED:
       # Swarm is done

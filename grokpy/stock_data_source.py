@@ -1,11 +1,12 @@
-
 import grokpy
 
 from grokpy.exceptions import GrokError
 
-class TwitterDataSource(object):
+class StockDataSource(object):
   '''
-  A specification object for adding Twitter data to your stream
+  A specification object for adding Stock data to your stream
+
+  Stock data is available as daily records.
   '''
 
   def __init__(self):
@@ -13,28 +14,13 @@ class TwitterDataSource(object):
     # Our list of fields in this source
     self.fields = []
 
-  def addKeyword(self, keyword):
+  def addSymbol(self, symbol):
     '''
-    Adds a keyword to the list of keywords to be merged with the parent stream.
+    Adds a ticker symbol to the list of symbols to be merged with the parent
+    stream.
 
-    * keyword - A string without spaces or boolean logic.
-
-    Valid Examples::
-
-      twitter = TwitterDataSource()
-      twitter.addKeyword('happy')
-      twitter.addKeyword('@google')
-      twitter.addKeyword('#ThingsThatRule)
-
-    Invalid Examples::
-
-      twitter = TwitterDataSource()
-      twitter.addKeyword('this has spaces')
-      twitter.addKeyword('george AND sally')
+    * symbol - A valid ticker symbol
     '''
-
-    if keyword.find(' ') != -1:
-      raise GrokError('Twitter keywords cannot contain spaces')
 
     fieldSpec = {"name": keyword,
                   "dataFormat": {"dataType":
@@ -42,7 +28,7 @@ class TwitterDataSource(object):
 
     self.fields.append(fieldSpec)
 
-  def addKeywords(self, keywords):
+  def addSymbols(self, keywords):
     '''
     Adds each keyword in the list `keywords` to the datasource
 
