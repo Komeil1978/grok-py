@@ -11,7 +11,7 @@ class Connection(object):
   Connection object for the Grok Prediction Service
   '''
 
-  def __init__(self, key = None, baseURL = 'http://dailystaging.numenta.com:8081/', session = None):
+  def __init__(self, key = None, baseURL = 'http://api.numenta.com/', session = None):
     '''
     key - Grok API Key
     baseURL - Grok server request target
