@@ -26,7 +26,7 @@ from grokpy import Client, GrokError
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-MODEL_ID = 'YOUR_MODEL_ID'
+MODEL_ID = '2799de3da4c94df494e3406df1bd'
 NEW_RECORDS = 'data/rec-center-stream.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
 
@@ -94,7 +94,6 @@ def HelloGrokPart2():
   while True:
     headers, resultRows = recCenterEnergyModel.getModelOutput()
     latestRowId = resultRows[-1][0]
-
     if latestRowId == lastRecordSeen:
       if counter > 15:
         print 'Looks like we will not get any more predictions'
@@ -106,6 +105,7 @@ def HelloGrokPart2():
         continue
     else:
       lastRecordSeen = latestRowId
+      print 'Records seen ' + str(lastRecordSeen)
       counter = 0
       # Don't spam the server
       time.sleep(1)

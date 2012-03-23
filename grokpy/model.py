@@ -296,54 +296,6 @@ class Model(object):
     '''
     raise NotYetImplementedError()
 
-    WARNING - Experimental
-
-    Gets predictions for the next N timesteps
-
-    buffer - A set of actual values to send in to prime predictions. This buffer
-             should be sent in with each call and updated as new actual values
-             are measured.
-    timesteps - The number of steps into the future to predict.
-
-
-    Example:
-
-    --TIMESTEP 1 --
-    buffer = [[0],
-              [1],
-              [2],
-              [0],
-              [1],
-              [2]]
-
-    Call:
-      model.getMultiStepPredictions(buffer, 3)
-    Return:
-      3 rows of predictions, which when converted back to input format look like
-
-      results = [[.01],
-                 [1.01],
-                 [2.01]]
-
-    --TIMESTEP 2 --
-    buffer = [[0],
-              [1],
-              [2],
-              [0],
-              [1],
-              [2],
-              [0]] # Note the extra actual value we have now
-
-    Call:
-      model.getMultiStepPredictions(buffer, 3)
-    Return:
-      3 rows of predictions, which when converted back to input format look like
-
-      results = [[1.01],
-                 [2.01],
-                 [.01]] # Predictions are now one more timestep into the future
-    '''
-
     # Send in our buffer
     self.sendRecords(buffer)
 
