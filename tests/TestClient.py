@@ -203,10 +203,10 @@ class ClientTestCase(GrokTestCase):
     self.assertEqual(g.alignPredictions(inputHeaders, inputRows), expectedOut)
 
 if __name__ == '__main__':
-  debug = 1
+  debug = 0
   if debug:
     single = unittest.TestSuite()
-    single.addTest(ClientTestCase('testGoodInstantiation'))
+    single.addTest(ClientTestCase('testBadConnection'))
     unittest.TextTestRunner().run(single)
   else:
     unittest.main()

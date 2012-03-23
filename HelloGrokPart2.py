@@ -19,6 +19,9 @@ import grokpy
 
 from math import floor
 
+from grokpy import Client, GrokError
+
+
 ##############################################################################
 # Configuration Settings
 

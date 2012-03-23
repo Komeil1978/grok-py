@@ -91,6 +91,9 @@ class Project(object):
   def stopAllModels(self, verbose = False):
     '''
     Stops all running models in this project.
+
+    This method can take many seconds to return depending on how many
+    models are being stopped.
     '''
 
     return self.parentClient.stopAllModels(name, url = self.modelsUrl)

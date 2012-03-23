@@ -97,6 +97,24 @@ class Connection(object):
       print response.text
       raise response.raise_for_status(response.text)
 
+    # Add in the API key to the header of each request
+    kwargs['headers'].update({'API-Key': self.key})
+
+    # Make the request, handle initial connection errors
+    try:
+      httpResponse, content = self.h.request(**kwargs)
+    except socket.error, e:
+      if 'timed out' in e:
+        raise GrokError("Request timed out. Please check the "
+                        "server URL if specified, or status.numenta.com "
+                        "(coming soon) if default.")
+      else:
+        raise GrokError(e)
+
+    # Handle HTTP errors (redirects are handled by httplib2)
+    if httpResponse['status'] != '200':
+      raise GrokError(httpResponse)
+
     # Load info from returned JSON strings
     content = json.loads(response.text)
 

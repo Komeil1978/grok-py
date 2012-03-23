@@ -205,7 +205,7 @@ class ConnectionTestCase(GrokTestCase):
     self.assertRaisesRegexp(GrokError, 'Unexpected request response:{}', c.request, requestDef)
 
 if __name__ == '__main__':
-  debug = 1
+  debug = 0
   if debug:
     single = unittest.TestSuite()
     single.addTest(ConnectionTestCase('testGoodKey'))

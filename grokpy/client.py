@@ -3,6 +3,7 @@ import traceback
 import json
 import grokpy
 
+
 from connection import Connection
 from user import User
 from project import Project
@@ -24,6 +25,12 @@ class Client(object):
   '''
 
   def __init__(self, key = None, baseURL = None, connection = None):
+    '''
+    Key - Grok API Key
+    baseURL - baseURL - Grok server request target
+    connection - An instance of the grokpy.Connection class. Used mainly for
+                 testing.
+    '''
 
     # Create a connection to the API
     if not connection:
@@ -349,7 +356,6 @@ class Client(object):
 
     * [verbose] - If set, the model Id of each model being deleted will be
       printed.
-
     .. warning:: There is currently no way to recover from this opperation.
     '''
 
