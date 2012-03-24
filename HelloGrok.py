@@ -133,6 +133,19 @@ def HelloGrok():
       print 'You win! Your Grok Swarm is complete.'
       print '\tBest Configuration: ' + str(bestConfig)
       print '\tWith an Error of: ' + str(results['bestValue'])
+      print ('\tThis model uses the following field(s): '
+             + str(results['fieldsUsed']))
+      if results['fieldContributions']:
+        print
+        print ('We evaluated all the fields to see if they would help in '
+               'predicting "%s".' % recCenterEnergyModel.predictedField)
+        print ('Compared to a model that only used the single '
+               'field "%s",' % recCenterEnergyModel.predictedField)
+        print ('this is how pairwise combinations with other fields scored '
+               '(positive is good):')
+        for fc in results['fieldContributions']:
+          print '\t', fc['field'], fc['value']
+      print
       # Exit the loop
       break
     elif jobStatus == grokpy.SwarmStatus.RUNNING and swarmStarted == False:
