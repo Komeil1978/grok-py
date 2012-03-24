@@ -39,6 +39,11 @@ class DataFlag(object):
   TIMESTAMP = 'TIMESTAMP'
   LOCATION = 'LOCATION'
 
+class PredictionType(object):
+
+  TEMPORAL = 'temporal'
+  SPATIAL = 'spatial'
+
 class DataSourceType(object):
 
   LOCAL = 'local'

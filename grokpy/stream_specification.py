@@ -18,11 +18,26 @@ class StreamSpecification(object):
     # What data sources are in this stream
     self.dataSources = []
 
+    # What type of prediction models will make when listening to this stream
+    self.predictionType = ''
+
   def setName(self, name):
     '''
     Updates the local name.
     '''
     self.name = name
+
+  def setPredictionType(self, predictionType):
+    '''
+    ... warning:: This method is temporary and may move to the model class
+
+    Sets the prediction type that models will produce when consuming data
+    from this stream
+
+    * predictionType - A grokpy.PredictionType enum value
+    '''
+
+    self.predictionType = predictionType
 
   def addDataSource(self, dataSource):
     '''
@@ -45,6 +60,9 @@ class StreamSpecification(object):
 
     returnSpec = {"name": self.name,
                  "dataSources": []}
+
+    if self.predictionType:
+      returnSpec['flags'] = self.predictionType
 
     for dataSource in self.dataSources:
       returnSpec['dataSources'].append(dataSource.getSpec())
