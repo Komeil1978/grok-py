@@ -176,7 +176,7 @@ def HelloGrokPart3():
   modelSpec = {"name": "Advanced Model" + str(now),
                "predictedField": "consumption",
                "streamId": newStream.id,
-               "aggregation": {"interval": grokpy.Aggregation.HOURS}}
+               "aggregation": {"interval": {"hours": 1}}}
 
   advancedModel = myProject.createModel(modelSpec)
 

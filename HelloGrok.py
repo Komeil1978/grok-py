@@ -34,7 +34,7 @@ import grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'YOUR_KEY_HERE'
+API_KEY = 'YOUR_API_KEY'
 STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
@@ -96,7 +96,7 @@ def HelloGrok():
   modelSpec = {"name": "Model of Fun " + str(time.time()),
                "predictedField": "consumption",
                "streamId": myStream.id,
-               "aggregation": {"interval": grokpy.Aggregation.HOURS}}
+               "aggregation": {"interval": {"hours": 1}}}
 
   # Create that model for the given stream
   print 'Creating an empty model ...'
