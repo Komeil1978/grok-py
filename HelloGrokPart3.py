@@ -5,9 +5,8 @@
 #
 # In this tutorial we will explore advanced streams. We will:
 #  Create a Project to organise our models.
-#  Join data with Grok's public data sources:
+#  Join data with Grok's a public data source:
 #    Weather
-#    Twitter
 
 ##############################################################################
 
@@ -41,6 +40,7 @@ PRODUCTION_OUTPUT_CSV = 'output/advancedStreamOutput.csv'
 def HelloGrokPart3():
 
   # Setup
+  print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY)
   now = time.time()
 
@@ -49,7 +49,7 @@ def HelloGrokPart3():
   #
   # Projects are an organizational structure like folders for models. They
   # provide all the same methods as the top level client.
-
+  print 'Creating a Project ...'
   myProject = grok.createProject('Hello Grok Part 3' + str(now))
 
   ##############################################################################
@@ -60,7 +60,7 @@ def HelloGrokPart3():
   # method and so we can explain each step as we add in public data sources
   #
   # Note: Until we call createStream(streamSpec) all these operations are local.
-
+  print 'Defining our stream ...'
   streamSpec = grokpy.StreamSpecification()
   streamSpec.setName('Advanced Stream ' + str(now))
 
@@ -107,11 +107,10 @@ def HelloGrokPart3():
   #
   # Today we have public data sources for:
   #     Weather
-  #     Twitter
   #     Stocks
   #     Holidays
   #
-  # We'll use weather and twitter data in this example.
+  # We'll use weather data in this example.
 
   ##############################################################################
   # Add weather data to the stream
@@ -132,38 +131,19 @@ def HelloGrokPart3():
   streamSpec.addDataSource(weather)
 
   ##############################################################################
-  # Add twitter data to the stream
-  #
-  # It may be that the trends on Twitter are related to what you want to
-  # predict. Grok gives you the ability to explore Twitter keyword trends with
-  # the data you provide. Here we will ask Grok to count how many mentions
-  # the words 'gym' and 'excercise' appeared on Twitter for the time period of
-  # each record.
-  #
-  # The field name specifies what word to search for and the return value
-  # is the count of how many times that word was used in the given period.
-
-  twitter = grokpy.TwitterDataSource()
-  twitter.addKeyword('gym')
-  twitter.addKeyword('excercise')
-
-  # Update the stream spec
-  print 'Adding Public Data Source: Twitter'
-  streamSpec.addDataSource(twitter)
-
-  ##############################################################################
   # Create and configure our Stream within this project.
   #
   # Note this makes an actual call to the API
 
+  print 'Creating the stream ...'
   newStream = myProject.createStream(streamSpec)
 
   ##############################################################################
   # Add local data to the stream
   #
   # As soon as Grok receives records it will begin joining in data from the
-  # file we uploaded, Grok weather data, and Grok Twitter data, creating an UBER
-  # stream. (Note: Not actually called an uber-stream)
+  # file we uploaded, and Grok weather data, creating an UBER stream.
+  # (Note: Not actually called an uber-stream)
 
   print 'Adding local records to stream ...'
   fileHandle = open(SWARM_INPUT_CSV, 'rU')
@@ -171,14 +151,24 @@ def HelloGrokPart3():
   fileHandle.close()
   newStream.addRecords(recCenterData)
 
+  #############################################################################
   # Create and configure our Model within this project.
-  print 'Creating a model ...'
-  modelSpec = {"name": "Advanced Model" + str(now),
-               "predictedField": "consumption",
-               "streamId": newStream.id,
-               "aggregation": {"interval": grokpy.Aggregation.HOURS}}
+  #
+  # This time we will build up our model spec in a higher level OO way.
+  # Grokpy provides a ModelSpecification class for this purpose.
 
+  print 'Defining a model ...'
+  modelSpec = grokpy.ModelSpecification()
+  # Give the model a name
+  modelSpec.setName("Advanced Model " + str(time.time()))
+  # Set which field this model will predict and optimize for
+  modelSpec.setPredictedField("consumption")
+  # Set which stream this model will listen to
+  modelSpec.setStream(newStream.id)
+
+  print 'Creating that model ...'
   advancedModel = myProject.createModel(modelSpec)
+  print "Done. Your model's Id is: %s" % advancedModel.id
 
   # Start the Swarm
   print 'Starting Grok Swarm'
@@ -215,7 +205,7 @@ def HelloGrokPart3():
       time.sleep(2)
 
   print "Getting full results from Swarm ..."
-  headers, resultRows = advancedModel.getModelOutput()
+  headers, resultRows = advancedModel.getModelOutput(limit = 2500)
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)
@@ -253,7 +243,7 @@ def HelloGrokPart3():
   lastRecordSeen = None
   counter = 0
   while True:
-    headers, resultRows = advancedModel.getModelOutput()
+    headers, resultRows = advancedModel.getModelOutput(limit = 20)
     latestRowId = resultRows[-1][0]
 
     if latestRowId == lastRecordSeen:
@@ -267,11 +257,13 @@ def HelloGrokPart3():
         continue
     else:
       lastRecordSeen = latestRowId
+      print 'Records seen ' + str(lastRecordSeen)
       counter = 0
       # Don't spam the server
       time.sleep(0.5)
 
   # Align predictions with actuals
+  headers, resultRows = advancedModel.getModelOutput(limit = 2500)
   resultRows = grok.alignPredictions(headers, resultRows)
 
   # Write out predictions to a CSV

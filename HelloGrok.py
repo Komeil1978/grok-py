@@ -96,11 +96,12 @@ def HelloGrok():
   modelSpec = {"name": "Model of Fun " + str(time.time()),
                "predictedField": "consumption",
                "streamId": myStream.id,
-               "aggregation": {"interval": grokpy.Aggregation.HOURS}}
+               "aggregation": {"interval": {"hours": 1}}}
 
   # Create that model for the given stream
   print 'Creating an empty model ...'
   recCenterEnergyModel = grok.createModel(modelSpec)
+  print "Done. Your model's Id is: %s" % recCenterEnergyModel.id
 
   ##############################################################################
   # Start the Swarm
@@ -163,7 +164,7 @@ def HelloGrok():
   # Retrieve Swarm results
 
   print "Getting full results from Swarm ..."
-  headers, resultRows = recCenterEnergyModel.getModelOutput()
+  headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)

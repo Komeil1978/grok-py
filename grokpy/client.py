@@ -8,6 +8,7 @@ from connection import Connection
 from user import User
 from project import Project
 from model import Model
+from model_specification import ModelSpecification
 from stream import Stream
 from stream_specification import StreamSpecification
 from exceptions import (GrokError,
@@ -266,8 +267,11 @@ class Client(object):
 
   def _handelAmbiguousSpec(self, spec):
     '''
-    Takes in either Python dicts or File paths to JSON docs and does the right
-    thing with them.
+    Returns a sanitized python dictionary for use in creating a stream
+
+    * spec - A Python dict OR
+             A file path to a JSON docucment OR
+             A StreamSpecification object
     '''
 
     processedSpec = {}
@@ -275,7 +279,7 @@ class Client(object):
     if type(spec) == type({}):
       processedSpec = spec
     # If we are given a StreamSpecification object, pull its spec and use that.
-    elif isinstance(spec, StreamSpecification):
+    elif isinstance(spec, (StreamSpecification, ModelSpecification)):
       processedSpec = spec.getSpec()
     # Otherwise pull the info out of a file.
     else:
@@ -356,6 +360,7 @@ class Client(object):
 
     * [verbose] - If set, the model Id of each model being deleted will be
       printed.
+
     .. warning:: There is currently no way to recover from this opperation.
     '''
 

@@ -132,6 +132,6 @@ class Project(object):
     '''
     Permanently deletes all streams associated with the current project
 
-    WARNING: There is currently no way to recover from this opperation.
+    .. warning:: There is currently no way to recover from this opperation.
     '''
     self.parentClient.deleteAllStreams(self.streamsUrl, verbose)

@@ -35,9 +35,15 @@ class DataType(object):
 
 class DataFlag(object):
 
-  NONE = 'NONE'
   TIMESTAMP = 'TIMESTAMP'
   LOCATION = 'LOCATION'
+
+class AggregationFunction(object):
+
+  FIRST = 'first'
+  LAST = 'last'
+  AVERAGE = 'average'
+  SUM = 'sum'
 
 class PredictionType(object):
 

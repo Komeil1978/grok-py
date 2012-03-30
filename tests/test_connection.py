@@ -6,7 +6,7 @@ import grokpy.requests as requests
 
 from mock import Mock
 
-from groktestcase import GrokTestCase
+from grok_test_case import GrokTestCase
 from grokpy.connection import Connection
 from grokpy.exceptions import AuthenticationError, GrokError
 

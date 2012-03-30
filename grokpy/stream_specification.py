@@ -29,7 +29,7 @@ class StreamSpecification(object):
 
   def setPredictionType(self, predictionType):
     '''
-    ... warning:: This method is temporary and may move to the model class
+    .. warning:: This method is temporary and may move to the model class
 
     Sets the prediction type that models will produce when consuming data
     from this stream
@@ -44,6 +44,12 @@ class StreamSpecification(object):
     Adds the data source to the local list of data sources for later assembly
     into a descriptive dict.
     '''
+
+    # Data sources must implement a getSpec() method
+    if 'getSpec' not in dir(dataSource):
+      raise GrokError('Data source objects must implement at least a getSpec '
+                      'method that returns a python dict.')
+
     self.dataSources.append(dataSource)
 
   def getSpec(self):

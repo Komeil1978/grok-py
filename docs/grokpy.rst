@@ -47,6 +47,13 @@
     :members:
     :undoc-members:
 
+:mod:`model_specification` Module
+----------------------------------
+
+.. automodule:: grokpy.model_specification
+    :members:
+    :undoc-members:
+
 :mod:`project` Module
 ---------------------
 

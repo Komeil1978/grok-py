@@ -13,7 +13,7 @@ class Connection(object):
 
   def __init__(self,
                key = None,
-               baseURL = 'http://api.numenta.com/',
+               baseURL = 'https://api.numenta.com/',
                session = None):
     '''
     key - Grok API Key
@@ -51,6 +51,9 @@ class Connection(object):
 
     # The API key we'll use to authenticate all HTTP calls.
     self.key = key
+    if grokpy.DEBUG:
+      print 'Using API Key'
+      print key
 
     # The base path for all our HTTP calls
     if baseURL[-1] != '/':
@@ -60,8 +63,10 @@ class Connection(object):
     # The HTTP Client we'll use to make requests
     if not session:
       base64string = base64.encodestring(self.key + ':').replace('\n', '')
+      agent = "Grok API Client - Python - Version %s" % grokpy.__version__
       headers = {"Authorization": "Basic %s" % base64string,
-                 "Content-Type": 'application/json; charset=UTF-8'}
+                 "Content-Type": 'application/json; charset=UTF-8',
+                 "User-Agent": agent}
       session = requests.session(headers=headers)
 
     self.s = session
@@ -70,7 +75,6 @@ class Connection(object):
     '''
     Interface for all HTTP requests made to the Grok API
     '''
-
 
     if url[:4] != 'http':
       url = self.baseURL + url
@@ -152,3 +156,17 @@ class Connection(object):
     uri = self.baseURL + uriSuffix
 
     return uri
+
+  ###########################################################################
+  # Debugging hooks
+  #
+  # See http://docs.python-requests.org/en/latest/user/advanced/#event-hooks
+
+  def _printHeaders(self, args):
+    '''
+    Event hook to print the headers of a request. Pass this to the request
+    method like this::
+
+      requests.get('http://httpbin.org', hooks=dict(args=self._printHeaders))
+    '''
+    print args['headers']
