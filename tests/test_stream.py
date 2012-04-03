@@ -1,7 +1,7 @@
 import unittest
 from mock import Mock
 
-from groktestcase import GrokTestCase
+from grok_test_case import GrokTestCase
 from grokpy.connection import Connection
 from grokpy.project import Project
 from grokpy.exceptions import GrokError

@@ -5,7 +5,7 @@ import grokpy.requests
 
 from mock import Mock
 
-from groktestcase import GrokTestCase
+from grok_test_case import GrokTestCase
 from grokpy.connection import Connection
 from grokpy.client import Client
 from grokpy.project import Project
