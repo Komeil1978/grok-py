@@ -1,3 +1,10 @@
+###############################################################################
+# 0.2.0 - MAJOR
+
+- Updates client to work with the version 2 HTTP API
+-- See grok.numenta.com -> Resources -> API for full overview of new API
+-- There are substantial breaking changes in this update.
+-- The v1 API has been removed so you MUST update your scripts to use this verion of the client.
 
 ###############################################################################
 # 0.0.8
