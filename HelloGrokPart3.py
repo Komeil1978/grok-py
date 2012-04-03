@@ -179,6 +179,7 @@ def HelloGrokPart3():
                "aggregation": {"interval": {"hours": 1}}}
 
   advancedModel = myProject.createModel(modelSpec)
+  print "Done. Your model's Id is: %s" % advancedModel.id
 
   # Start the Swarm
   print 'Starting Grok Swarm'

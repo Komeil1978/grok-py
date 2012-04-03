@@ -51,6 +51,9 @@ class Connection(object):
 
     # The API key we'll use to authenticate all HTTP calls.
     self.key = key
+    if grokpy.DEBUG:
+      print 'Using API Key'
+      print key
 
     # The base path for all our HTTP calls
     if baseURL[-1] != '/':

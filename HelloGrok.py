@@ -34,7 +34,7 @@ import grokpy
 ##############################################################################
 # Configuration Settings
 
-API_KEY = 'YOUR_API_KEY'
+API_KEY = 'YOUR_KEY_HERE'
 STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
@@ -101,6 +101,7 @@ def HelloGrok():
   # Create that model for the given stream
   print 'Creating an empty model ...'
   recCenterEnergyModel = grok.createModel(modelSpec)
+  print "Done. Your model's Id is: %s" % recCenterEnergyModel.id
 
   ##############################################################################
   # Start the Swarm
