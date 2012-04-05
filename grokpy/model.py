@@ -231,11 +231,17 @@ class Model(object):
 
     return self.swarm.getState()
 
-  def getModelOutput(self):
+  def getModelOutput(self, limit = False):
     '''
     Returns the data in the output cache of the best model found during Swarm.
     '''
-    result = self.c.request('GET', self.dataUrl)['output']
+
+    if limit:
+      params = {'limit': limit}
+    else:
+      params = None
+
+    result = self.c.request('GET', self.dataUrl, params = params)['output']
 
     headers = result['names']
     data = result['data']
