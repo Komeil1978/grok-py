@@ -41,6 +41,7 @@ PRODUCTION_OUTPUT_CSV = 'output/advancedStreamOutput.csv'
 def HelloGrokPart3():
 
   # Setup
+  print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY)
   now = time.time()
 
@@ -49,7 +50,7 @@ def HelloGrokPart3():
   #
   # Projects are an organizational structure like folders for models. They
   # provide all the same methods as the top level client.
-
+  print 'Creating a Project ...'
   myProject = grok.createProject('Hello Grok Part 3' + str(now))
 
   ##############################################################################
@@ -60,7 +61,7 @@ def HelloGrokPart3():
   # method and so we can explain each step as we add in public data sources
   #
   # Note: Until we call createStream(streamSpec) all these operations are local.
-
+  print 'Defining our stream ...'
   streamSpec = grokpy.StreamSpecification()
   streamSpec.setName('Advanced Stream ' + str(now))
 
@@ -156,6 +157,7 @@ def HelloGrokPart3():
   #
   # Note this makes an actual call to the API
 
+  print 'Creating the stream ...'
   newStream = myProject.createStream(streamSpec)
 
   ##############################################################################
@@ -171,13 +173,22 @@ def HelloGrokPart3():
   fileHandle.close()
   newStream.addRecords(recCenterData)
 
+  #############################################################################
   # Create and configure our Model within this project.
-  print 'Creating a model ...'
-  modelSpec = {"name": "Advanced Model" + str(now),
-               "predictedField": "consumption",
-               "streamId": newStream.id,
-               "aggregation": {"interval": {"hours": 1}}}
+  #
+  # This time we will build up our model spec in a higher level OO way.
+  # Grokpy provides a ModelSpecification class for this purpose.
 
+  print 'Defining a model ...'
+  modelSpec = grokpy.ModelSpecification()
+  # Give the model a name
+  modelSpec.setName("Advanced Model " + str(time.time()))
+  # Set which field this model will predict and optimize for
+  modelSpec.setPredictedField("consumption")
+  # Set which stream this model will listen to
+  modelSpec.setStream(newStream.id)
+
+  print 'Creating that model ...'
   advancedModel = myProject.createModel(modelSpec)
   print "Done. Your model's Id is: %s" % advancedModel.id
 

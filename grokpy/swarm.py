@@ -3,6 +3,8 @@ from exceptions import GrokError
 class Swarm(object):
   '''
   An object representation of the JSON swarm description the API provides.
+
+  .. note: See Model.startSwarm() for info on swarm parameters.
   '''
   def __init__(self, parentModel, swarmDict):
 

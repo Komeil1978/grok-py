@@ -1,6 +1,7 @@
 from client import Client
 from connection import Connection
 from model import Model
+from model_specification import ModelSpecification
 from project import Project
 from enum import (Aggregation,
                   SwarmSize,

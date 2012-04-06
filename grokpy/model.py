@@ -194,9 +194,10 @@ class Model(object):
     '''
     Runs permutations on model parameters to find the optimal model
     characteristics for the given data.
+
     * size - A value from grokpy.SwarmSize. Initially, small, medium, or large.
-      the default is medium. Small is only good for testing, whereas large can
-      take a very long time.
+            the default is medium. Small is only good for testing, whereas
+            large can take a very long time.
     '''
     if self.swarm and self.swarm.getState() in ['Starting', 'Running']:
       raise GrokError('This model is already swarming.')
