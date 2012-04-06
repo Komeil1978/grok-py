@@ -59,10 +59,10 @@ class ModelSpecification(object):
 
     * aggInt - Dict. Example::
 
-      interval = {'hours': 1,
-                  'minutes': 15}
+        interval = {'hours': 1,
+                    'minutes': 15}
 
-      modelSpec.setAggregationInterval(interval)
+        modelSpec.setAggregationInterval(interval)
     '''
     self.dataSources.append(dataSource)
 

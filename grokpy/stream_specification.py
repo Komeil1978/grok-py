@@ -29,7 +29,7 @@ class StreamSpecification(object):
 
   def setPredictionType(self, predictionType):
     '''
-    ... warning:: This method is temporary and may move to the model class
+    .. warning:: This method is temporary and may move to the model class
 
     Sets the prediction type that models will produce when consuming data
     from this stream

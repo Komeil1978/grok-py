@@ -55,7 +55,7 @@ class Stream(object):
     '''
     Permanently deletes this stream.
 
-    WARNING: There is currently no way to recover from this opperation.
+    .. warning:: There is currently no way to recover from this opperation.
     '''
     self.c.request('DELETE', self.url)
 
