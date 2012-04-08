@@ -57,7 +57,9 @@ class ModelSpecification(object):
     '''
     Defines the interval Grok will use to aggregate incoming records over.
 
-    * aggInt - Dict. Example::
+    * aggInt - Dict.
+
+    Example::
 
         interval = {'hours': 1,
                     'minutes': 15}
