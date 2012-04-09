@@ -164,7 +164,7 @@ def HelloGrok():
   # Retrieve Swarm results
 
   print "Getting full results from Swarm ..."
-  headers, resultRows = recCenterEnergyModel.getModelOutput()
+  headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
 
   # Align predictions with actuals
   resultRows = grok.alignPredictions(headers, resultRows)

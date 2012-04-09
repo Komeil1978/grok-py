@@ -14,6 +14,8 @@ class DataSourceField(object):
 
     self.type = None
 
+    self.aggregationFunction = None
+
     self.flag = None
 
     self.minValue = None
@@ -67,6 +69,27 @@ class DataSourceField(object):
                       'grokpy.DataFlag value')
 
     self.flag = flag
+
+  def setAggregationFunction(self, aggregationFunction):
+    '''
+    Sets the function by which we will aggregate values in this field if a
+    time aggregation is specified for the whole model.
+
+    * aggregationFunction - A grokpy.AggregationFunction enum value.
+    '''
+
+    # Type checking
+    if not self.type:
+      raise GrokError('Please set a type for this field before specifying its '
+                      'aggregation function.')
+    if (self.type == grokpy.DataType.CATEGORY or
+        self.type == grokpy.DataType.DATETIME):
+      if aggregationFunction in [grokpy.AggregationFunction.AVERAGE,
+                                 grokpy.AggregationFunction.SUM]:
+        raise GrokError('The valid aggregation functions for CATEGORY and '
+                        'DATETIME fields are FIRST or LAST')
+
+    self.aggregationFunction = aggregationFunction
 
   def setMin(self, minValue):
     '''

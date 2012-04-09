@@ -39,6 +39,13 @@ class DataFlag(object):
   TIMESTAMP = 'TIMESTAMP'
   LOCATION = 'LOCATION'
 
+class AggregationFunction(object):
+
+  FIRST = 'first'
+  LAST = 'last'
+  AVERAGE = 'average'
+  SUM = 'sum'
+
 class PredictionType(object):
 
   TEMPORAL = 'temporal'
