@@ -140,6 +140,9 @@ class DataSourceField(object):
     if self.minValue:
       returnSpec['min'] = self.minValue
 
+    if self.aggregationFunction:
+      returnSpec['aggregationFunction'] = self.aggregationFunction
+
 
     return returnSpec
 
