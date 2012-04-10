@@ -35,7 +35,6 @@ class DataType(object):
 
 class DataFlag(object):
 
-  NONE = 'NONE'
   TIMESTAMP = 'TIMESTAMP'
   LOCATION = 'LOCATION'
 
