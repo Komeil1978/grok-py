@@ -23,7 +23,7 @@ class Stream(object):
     # Take everything we're passed and make it an instance property.
     self.__dict__.update(streamDef)
 
-  def addRecords(self, records, step = 5000):
+  def addRecords(self, records, step = 500):
     '''
     Appends records to the input cache of the given stream.
     '''
