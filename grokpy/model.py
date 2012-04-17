@@ -136,7 +136,7 @@ class Model(object):
       try:
         headers, data = self.getModelOutput()
         pmocLen = len(data)
-      except grokpy.response.exceptions.HTTPError:
+      except grokpy.requests.exceptions.HTTPError:
         print 'Whoops 500'
         time.sleep(.5)
         timoutCounter += 1
