@@ -26,7 +26,7 @@ from grokpy import Client, GrokError
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-MODEL_ID = '2799de3da4c94df494e3406df1bd'
+MODEL_ID = 'YOUR_MODEL_ID_HERE'
 NEW_RECORDS = 'data/rec-center-stream.csv'
 OUTPUT_CSV = 'output/streamPredictions.csv'
 
@@ -92,7 +92,7 @@ def HelloGrokPart2():
   lastRecordSeen = None
   counter = 0
   while True:
-    headers, resultRows = recCenterEnergyModel.getModelOutput()
+    headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 20)
     latestRowId = resultRows[-1][0]
     if latestRowId == lastRecordSeen:
       if counter > 15:
@@ -112,6 +112,7 @@ def HelloGrokPart2():
 
   # Align predictions with actuals
   print 'Aligning predictions ...'
+  headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
   resultRows = grok.alignPredictions(headers, resultRows)
 
   #############################################################################

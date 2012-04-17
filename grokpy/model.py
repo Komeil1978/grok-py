@@ -162,21 +162,32 @@ class Model(object):
     '''
     raise NotYetImplementedError()
 
-  def disableLearning(self, retries = 3):
+  def disableLearning(self):
     '''
     Puts the model into a predictions only state where it will not learn from
     new data.
 
-    * retries - If this method is called immediately after model promotion it may
-              fail. By default we will retry a few times.
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
     '''
-    raise NotYetImplementedError()
+    url = self.commandsUrl
+    command = {'command': 'disableLearning'}
+    result = self.c.request('POST', url, command)
+
+    return result
 
   def enableLearning(self):
     '''
     New records will be integrated into the models future predictions.
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
     '''
-    raise NotYetImplementedError()
+    url = self.commandsUrl
+    command = {'command': 'enableLearning'}
+    result = self.c.request('POST', url, command)
+
+    return result
 
   #############################################################################
   # Stream
@@ -189,6 +200,22 @@ class Model(object):
 
   #############################################################################
   # Swarms
+
+  def listSwarms(self):
+    '''
+    Returns a list of Swarm objects for this model
+    '''
+
+    # Where to make our request
+    url = self.swarmsUrl
+
+    swarmDefs = self.c.request('GET', url)['swarms']
+
+    swarms = []
+    for swarmDef in swarmDefs:
+      swarms.append(Swarm(self, swarmDef))
+
+    return swarms
 
   def startSwarm(self, size = None):
     '''
@@ -223,12 +250,19 @@ class Model(object):
   def getSwarmState(self):
     '''
     Returns the current state of a swarm.
-
-    TODO: Check this works when you get a model that's already created and swarming
     '''
 
     if not self.swarm:
-      raise GrokError('There is no swarm associated with this model.')
+      # See if the API knows about a swarm for this model
+      swarms = self.listSwarms()
+      if not swarms:
+        raise GrokError('There is no swarm associated with this model.')
+      else:
+        # Find the latest swarm
+        swarms = sorted(swarms, key = lambda swarm: swarm.details['startTime'])
+
+        # Set that as *the* swarm for this model
+        self.swarm = swarms[0]
 
     return self.swarm.getState()
 
@@ -258,9 +292,9 @@ class Model(object):
 
     Gets predictions for the next N timesteps
 
-    * buffer - A set of actual values to send in to prime predictions. This buffer
-             should be sent in with each call and updated as new actual values
-             are measured.
+    * buffer - A set of actual values to send in to prime predictions. This
+              buffer should be sent in with each call and updated as new actual
+              values are measured.
     * timesteps - The number of steps into the future to predict.
 
 

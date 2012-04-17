@@ -11,7 +11,10 @@ from exceptions import GrokError, AuthenticationError
 class Stream(object):
   '''
   A Stream is the combination of data and the specification of those data
-  that will be used by a model
+  that will be used by a model.
+
+  * parent - Either a Client object or a Project object
+  * streamDef - A python dict representing the specification of this stream
   '''
 
   def __init__(self, parent, streamDef):
@@ -20,17 +23,24 @@ class Stream(object):
     self.parent = parent
     self.c = self.parent.c
 
+    # Store the raw stream def in case a user wants to get it later
+    self._rawStreamDef = streamDef
+
     # Take everything we're passed and make it an instance property.
     self.__dict__.update(streamDef)
 
   def addRecords(self, records, step = 500):
     '''
     Appends records to the input cache of the given stream.
+
+    * records - A list of lists representing your data rows
+    * step - How many records we will send in each request.
     '''
 
     # Where to POST the data
     url = self.dataUrl
 
+    # Limit how many records we will send in a given request
     try:
       if len(records) > step:
         i = 0
@@ -59,6 +69,12 @@ class Stream(object):
     '''
     self.c.request('DELETE', self.url)
 
+  def getSpecDict(self):
+    '''
+    Returns a Python dict representing the specification of this stream
+    '''
+    return self._rawStreamDef
+
   #############################################################################
   # Private methods
 
@@ -67,6 +83,8 @@ class Stream(object):
     Recursively clone json structure with UTF-8 dictionary keys
 
     From: http://www.gossamer-threads.com/lists/python/python/684379
+
+    * d - A python dict.
     '''
     if isinstance(d, dict):
       return dict([(k.encode('utf-8'), self._safe_dict(v)) for k,v in d.iteritems()])

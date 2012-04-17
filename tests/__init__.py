@@ -1,9 +1,9 @@
 import unittest
 
-from test_client import ClientTestCase
-from test_connection import ConnectionTestCase
-from test_project import ProjectTestCase
-from test_stream import StreamTestCase
+#from test_client import ClientTestCase
+#from test_connection import ConnectionTestCase
+#from test_project import ProjectTestCase
+#from test_stream import StreamTestCase
 from test_data_source_field import DataSourceFieldTestCase
 
 def all_tests():

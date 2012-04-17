@@ -76,6 +76,33 @@ class DataSourceFieldTestCase(GrokTestCase):
     self.f.setFlag(flag)
     self.assertEqual(self.f.flag, flag)
 
+  def testSetAggregationFunction(self):
+    '''
+    Setting a function should work and catch various type mismatches
+    '''
+
+    # Test independance yay!
+    f = grokpy.DataSourceField()
+
+    # Starts empty
+    self.assertFalse(f.aggregationFunction)
+
+    # Early set fails
+    self.assertRaises(GrokError,
+                      f.setAggregationFunction, grokpy.AggregationFunction.SUM)
+
+    # Set a valid type
+    f.setType(grokpy.DataType.CATEGORY)
+
+    # Mismatch with field type set fails
+    self.assertRaises(GrokError,
+                      f.setAggregationFunction, grokpy.AggregationFunction.SUM)
+
+    # Good set succeeds
+    aggFunc = grokpy.AggregationFunction.FIRST
+    f.setAggregationFunction(aggFunc)
+    self.assertEqual(f.aggregationFunction, aggFunc)
+
   def testSetMin(self):
     '''
     Setting min should work
@@ -125,6 +152,8 @@ class DataSourceFieldTestCase(GrokTestCase):
     f.setName(name)
     dataType = grokpy.DataType.SCALAR
     f.setType(dataType)
+    aggFunc = grokpy.AggregationFunction.SUM
+    f.setAggregationFunction(aggFunc)
     minValue = -444
     maxValue = 444.2
     f.setMin(minValue)
@@ -133,7 +162,8 @@ class DataSourceFieldTestCase(GrokTestCase):
     expectedDict = {'max': maxValue,
                     'dataFormat': {'dataType': dataType},
                     'name': name,
-                    'min': minValue}
+                    'min': minValue,
+                    'aggregationFunction': aggFunc}
 
     self.assertEqual(f.getSpec(), expectedDict)
 

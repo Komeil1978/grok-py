@@ -43,7 +43,7 @@ class StockDataSource(object):
     Usually consumed by an instance of the StreamSpecification class.
     '''
 
-    returnSpec = {"name": "Twitter",
+    returnSpec = {"name": "Stock",
                  "dataSourceType": "public",
                  "fields": self.fields}
 
