@@ -37,5 +37,9 @@ class Swarm(object):
 
     TODO: Make sure we're not leaking tracebacks.
     '''
+    try:
+      msg = getStateResult['swarm']['debug']
+    except KeyError:
+      msg = getStateResult['swarm']
 
-    raise GrokError(getStateResult['swarm']['debug'])
+    raise GrokError(msg)
