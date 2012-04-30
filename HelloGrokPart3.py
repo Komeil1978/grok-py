@@ -5,9 +5,8 @@
 #
 # In this tutorial we will explore advanced streams. We will:
 #  Create a Project to organise our models.
-#  Join data with Grok's public data sources:
+#  Join data with Grok's a public data source:
 #    Weather
-#    Twitter
 
 ##############################################################################
 
@@ -108,11 +107,10 @@ def HelloGrokPart3():
   #
   # Today we have public data sources for:
   #     Weather
-  #     Twitter
   #     Stocks
   #     Holidays
   #
-  # We'll use weather and twitter data in this example.
+  # We'll use weather data in this example.
 
   ##############################################################################
   # Add weather data to the stream
@@ -133,26 +131,6 @@ def HelloGrokPart3():
   streamSpec.addDataSource(weather)
 
   ##############################################################################
-  # Add twitter data to the stream
-  #
-  # It may be that the trends on Twitter are related to what you want to
-  # predict. Grok gives you the ability to explore Twitter keyword trends with
-  # the data you provide. Here we will ask Grok to count how many mentions
-  # the words 'gym' and 'excercise' appeared on Twitter for the time period of
-  # each record.
-  #
-  # The field name specifies what word to search for and the return value
-  # is the count of how many times that word was used in the given period.
-
-  twitter = grokpy.TwitterDataSource()
-  twitter.addKeyword('gym')
-  twitter.addKeyword('excercise')
-
-  # Update the stream spec
-  print 'Adding Public Data Source: Twitter'
-  streamSpec.addDataSource(twitter)
-
-  ##############################################################################
   # Create and configure our Stream within this project.
   #
   # Note this makes an actual call to the API
@@ -164,8 +142,8 @@ def HelloGrokPart3():
   # Add local data to the stream
   #
   # As soon as Grok receives records it will begin joining in data from the
-  # file we uploaded, Grok weather data, and Grok Twitter data, creating an UBER
-  # stream. (Note: Not actually called an uber-stream)
+  # file we uploaded, and Grok weather data, creating an UBER stream.
+  # (Note: Not actually called an uber-stream)
 
   print 'Adding local records to stream ...'
   fileHandle = open(SWARM_INPUT_CSV, 'rU')

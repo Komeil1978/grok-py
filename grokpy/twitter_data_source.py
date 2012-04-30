@@ -5,10 +5,15 @@ from grokpy.exceptions import GrokError
 
 class TwitterDataSource(object):
   '''
+  .. warning:: The twitter data source has been temporarily disabled.
+
   A specification object for adding Twitter data to your stream
   '''
 
   def __init__(self):
+
+    raise GrokError('The twitter data source has been temporarily disabled.'
+                    ' We appologise for any inconvenience.')
 
     # Our list of fields in this source
     self.fields = []
