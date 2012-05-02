@@ -34,12 +34,11 @@ class Swarm(object):
   def _handleErrors(self, getStateResult):
     '''
     Raises a useful error from an engine level error passed through the API
-
-    TODO: Make sure we're not leaking tracebacks.
     '''
-    try:
-      msg = getStateResult['swarm']['debug']
-    except KeyError:
-      msg = getStateResult['swarm']
-
+    # Return the first of these that is available:
+    # 1) getStateResult.swarm.debug (admin accounts only, full stack trace)
+    # 2) getStateResult.swarm.error (error message only)
+    # 3) 'Unexpected error'
+    swarm = getStateResult.get('swarm', {})
+    msg = swarm.get('debug', swarm.get('error', 'Unexpected error'))
     raise GrokError(msg)
