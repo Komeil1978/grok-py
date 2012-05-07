@@ -19,8 +19,8 @@ from stream import Stream
 from stream_specification import StreamSpecification
 from local_data_source import LocalDataSource
 from weather_data_source import WeatherDataSource
-#from events_data_source import EventsDataSource
-#from stocks_data_source import StocksDataSource
+from events_data_source import EventsDataSource
+from stocks_data_source import StocksDataSource
 from data_source_field import DataSourceField
 
 from exceptions import (AuthenticationError,
