@@ -267,8 +267,11 @@ class Client(object):
 
   def _handelAmbiguousSpec(self, spec):
     '''
-    Takes in either Python dicts or File paths to JSON docs and does the right
-    thing with them.
+    Returns a sanitized python dictionary for use in creating a stream
+
+    * spec - A Python dict OR
+             A file path to a JSON docucment OR
+             A StreamSpecification object
     '''
 
     processedSpec = {}
@@ -357,7 +360,7 @@ class Client(object):
 
     * [verbose] - If set, the model Id of each model being deleted will be
       printed.
-      
+
     .. warning:: There is currently no way to recover from this opperation.
     '''
 

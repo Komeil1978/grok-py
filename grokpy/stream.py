@@ -56,7 +56,7 @@ class Stream(object):
         self.c.request('POST', url, requestDef)
     except GrokError:
       # Break recursion if this just isn't going to work
-      if step < 100: raise
+      if step < 50: raise
       # Try sending half as many records.
       step = int(math.floor(step / 2))
       self.addRecords(records, step)
@@ -87,7 +87,8 @@ class Stream(object):
     * d - A python dict.
     '''
     if isinstance(d, dict):
-      return dict([(k.encode('utf-8'), self._safe_dict(v)) for k,v in d.iteritems()])
+      return dict([(k.encode('utf-8'), self._safe_dict(v))
+                    for k,v in d.iteritems()])
     elif isinstance(d, list):
       return [self._safe_dict(x) for x in d]
     else:
