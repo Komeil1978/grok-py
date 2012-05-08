@@ -13,7 +13,7 @@ class Connection(object):
 
   def __init__(self,
                key = None,
-               baseURL = 'http://api.numenta.com/',
+               baseURL = 'https://api.numenta.com/',
                session = None):
     '''
     key - Grok API Key
