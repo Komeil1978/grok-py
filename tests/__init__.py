@@ -7,6 +7,7 @@ import unittest
 from test_data_source_field import DataSourceFieldTestCase
 from test_stocks_data_source import StocksDataSourceTestCase
 from test_events_data_source import EventsDataSourceTestCase
+from test_stream_specification import StreamSpecTestCase
 
 def all_tests():
     suite = unittest.TestSuite()
@@ -19,5 +20,6 @@ def all_tests():
     suite.addTest(unittest.makeSuite(DataSourceFieldTestCase))
     suite.addTest(unittest.makeSuite(StocksDataSourceTestCase))
     suite.addTest(unittest.makeSuite(EventsDataSourceTestCase))
+    suite.addTest(unittest.makeSuite(StreamSpecTestCase))
 
     return suite
