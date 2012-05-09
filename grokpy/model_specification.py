@@ -20,6 +20,9 @@ class ModelSpecification(object):
     # What aggregation will this model use
     self.aggInt = None
 
+    # List of steps into the future to predict
+    self.steps = [1]
+
   def setName(self, name):
     '''
     Updates the local name.
@@ -68,6 +71,38 @@ class ModelSpecification(object):
     '''
     self.dataSources.append(dataSource)
 
+  def setPredictionSteps(self, steps = [1]):
+    '''
+    Adds a list of steps in the future to predict.
+
+    * steps - A list of integers. The default is to predict one timestep into
+              the future.
+
+    Example Usage::
+
+      To get predictions for the next three timesteps
+
+      model.setPredictionSteps([1,2,3])
+
+      To get predictions for the next three timesteps where you care most
+      about accuracy three steps out
+
+      model.setPredictionSteps([3,1,2])
+
+      The first item in the list is the optimized timestep. The swarm will find
+      a model that does best at predicting that number of steps into the future.
+    '''
+
+    if not steps:
+      raise GrokError('Steps be a list and have at least one value.')
+
+    if len(steps) > 10:
+      raise GrokError('Max number of values for "steps" is 10. Note you can '
+                      'request 20 steps into the future (steps = [20]), just '
+                      'not all 20 at once (steps = [1, ... 20]')
+
+    self.steps = steps
+
   def getSpec(self):
     '''
     Returns an assembled dict from the current state of the specification
@@ -81,7 +116,8 @@ class ModelSpecification(object):
 
     returnSpec = {"name": self.name,
                   "predictedField": self.predictedField,
-                  "streamId": self.streamId}
+                  "streamId": self.streamId,
+                  "predictionSteps": self.steps}
 
     if self.aggInt:
       returnSpec['aggregation'] = {}
