@@ -96,8 +96,7 @@ def HelloGrok():
   modelSpec = {"name": "Model of Fun " + str(time.time()),
                "predictedField": "consumption",
                "streamId": myStream.id,
-               "aggregation": {"interval": {"hours": 1}},
-               "predictionSteps" : [5]}
+               "aggregation": {"interval": {"hours": 1}}}
 
   # Create that model for the given stream
   print 'Creating an empty model ...'
