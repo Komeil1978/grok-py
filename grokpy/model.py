@@ -54,17 +54,14 @@ class Model(object):
     * newName - String
     '''
 
-    raise NotYetImplementedError()
-
     # Get the current model state
-    url = self.url
-    modelDef = self.c.request('GET', url)['model']
+    modelDef = self.getState()
 
     # Update the definition
     modelDef['name'] = newName
 
     # Update remote state
-    self.c.request('POST', url, {'model': modelDef})
+    self.c.request('POST', self.url, {'model': modelDef})
 
     # Update local state
     self.name = newName
@@ -76,23 +73,38 @@ class Model(object):
     * newNote - A String describing this model.
     '''
 
-    raise NotYetImplementedError
+    raise NotYetImplementedError()
 
     # Get the current model state
-    url = self.url
-    modelDef = self.c.request('GET', url)['model']
+    modelDef = self.getState()
 
     # Update the definition
     modelDef['note'] = newNote
 
     # Update remote state
-    self.c.request('POST', url, {'model': modelDef})
+    self.c.request('POST', self.url, {'model': modelDef})
 
     # Update local state
     self.note = newNote
 
   #############################################################################
   # Model states
+
+  def getState(self):
+    '''
+    Returns the full state of the model from the API server
+
+    TODO: Remove popping of Nones once API is updated
+    '''
+
+    modelDef = self.c.request('GET', self.url)['model']
+
+    # API server doesn't except None values. Remove them.
+    for key, value in modelDef.items():
+      if value == None:
+        del modelDef[key]
+
+    return modelDef
 
   def promote(self):
     '''
@@ -154,7 +166,6 @@ class Model(object):
         timeoutCounter += 1
 
     ##### END UGLY HACK
-
 
   def start(self):
     '''
@@ -266,130 +277,40 @@ class Model(object):
 
     return self.swarm.getState()
 
-  def getModelOutput(self, limit = False):
+  def getModelOutput(self, limit=None, offset = None, shift = True):
     '''
     Returns the data in the output cache of the best model found during Swarm.
+
+    * limit - The maximum number of rows to get from the model
+    * offset - The start row ID to begin returning data from. For example::
+
+      If you have 1000 records in the model output cache and set offset to
+      100, you will get records with row ID 100 to 1000. If you set an offset
+      above the maximum row ID that exists in the model's output cache you will
+      get no records. If buffer of records in the output cache has moved past
+      the offest you request you will get the first record after this row ID.
+
+    * shift - This shifts the records returned so that all predictions are
+              aligned with actual values. Note: Set this value to False if you
+              are working with realtime data.
     '''
 
-    if limit:
-      params = {'limit': limit}
-    else:
-      params = None
+    params = {}
+    if limit is not None:
+      params['limit'] = limit
+    if offset is not None:
+      params['offset'] = offset
+    if shift is not None:
+      params['shift'] = shift
 
     result = self.c.request('GET', self.dataUrl, params = params)['output']
 
     headers = result['names']
     data = result['data']
+    
+    try:
+      meta = result['meta']
+    except KeyError:
+      meta = None
 
-    return headers, data
-
-  #############################################################################
-  # Basic Interaction - Live/On/Production Models
-
-  def getMultiStepPredictions(self, buffer, timesteps):
-    '''
-    .. warning:: Not implemented for API V2 yet.
-
-    Gets predictions for the next N timesteps
-
-    * buffer - A set of actual values to send in to prime predictions. This
-              buffer should be sent in with each call and updated as new actual
-              values are measured.
-    * timesteps - The number of steps into the future to predict.
-
-
-    Example::
-
-      --TIMESTEP 1 --
-      buffer = [[0],
-                [1],
-                [2],
-                [0],
-                [1],
-                [2]]
-
-      Call:
-        model.getMultiStepPredictions(buffer, 3)
-      Return:
-        3 rows of predictions, which are then converted back to input format
-
-        results = [[.01],
-                   [1.01],
-                   [2.01]]
-
-      --TIMESTEP 2 --
-      buffer = [[0],
-                [1],
-                [2],
-                [0],
-                [1],
-                [2],
-                [0]] # Note the extra actual value we have now
-
-      Call:
-        model.getMultiStepPredictions(buffer, 3)
-      Return:
-        3 rows of predictions, which are then converted back to input format
-
-        results = [[1.01],
-                   [2.01],
-                   [.01]] # Predictions are now one more timestep in the future
-    '''
-    raise NotYetImplementedError()
-
-    # Send in our buffer
-    self.sendRecords(buffer)
-
-    # Get the last prediction
-    bufferLen = len(buffer)
-
-    if self.outputCachePointer == 0:
-      headers, resultRows = self.monitorPredictions(bufferLen - 1)
-    else:
-      start = self.outputCachePointer + bufferLen
-      headers, resultRows = self.monitorPredictions(start)
-
-    # Collect predictions
-    results = []
-    for i in range(timesteps):
-      latestPrediction = resultRows[-1]
-      # store the row id
-      latestId = int(latestPrediction[0])
-      self.outputCachePointer = latestId
-      # add that prediction to the list
-      results.append(latestPrediction)
-      # convert that prediction back into a row
-      tempRecord = self._predictionToInput(headers, latestPrediction)
-      # send that new row in
-      self.sendRecords([tempRecord])
-      # get the latest prediction
-      response = self.getPredictions((latestId + 1), -1)
-      resultRows = response['rows']
-
-    return headers, results
-
-  #############################################################################
-  # Private methods
-
-  def _predictionToInput(self, headers, prediction):
-    '''
-    Converts predictions back into inputs for multi-step prediction
-
-    * headers - The column names for each prediction
-    * prediction - A list of inputs, predictions, and metrics
-    '''
-
-    if not len(headers) == len(prediction):
-      raise GrokError('Headers and predictions do not match up. ' +
-                      str(headers) + ' ' + str(prediction))
-
-    # Match up headers and values
-    zipped = dict(zip(headers, prediction))
-    input = {}
-    for name, value in zipped.iteritems():
-      # Extract only relevant values. Preds will overwrite if they exist.
-      if 'input' in name or 'temporal_prediction' in name:
-        prefix, field = name.split(':')
-        input[field] = value
-
-    return input.values()
+    return headers, data, meta

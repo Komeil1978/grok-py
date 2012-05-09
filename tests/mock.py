@@ -12,7 +12,6 @@
 # Scripts maintained at http://www.voidspace.org.uk/python/index.shtml
 # Comments, suggestions and bug reports welcome.
 
-
 __all__ = (
     'Mock',
     'MagicMock',

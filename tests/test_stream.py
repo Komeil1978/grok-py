@@ -3,33 +3,91 @@ from mock import Mock
 
 from grok_test_case import GrokTestCase
 from grokpy.connection import Connection
-from grokpy.project import Project
 from grokpy.exceptions import GrokError
 from grokpy.model import Model
 from grokpy.stream import Stream
+from grokpy.client import Client
 
 class StreamTestCase(GrokTestCase):
 
   def setUp(self):
-    self.mockKey = 'SeQ9AhK57vOeoySQn1EvwElhZV1X87AB'
+    # Create a mock client
+    self.client = Mock(spec=Client)
+    self.client.c = Mock(spec=Connection)
 
-  def testInstantiation(self):
-    '''
-    Basic object instantiation with mocks
-    '''
-
-    # Create our mock Project class
-    proj = Mock(spec=Project)
-    conn = Mock(spec=Connection)
-
-    projId = '5344'
-    proj.id = projId
-    proj.c = conn
+    # Create our minimal streamDef
+    self.streamDef = {'dataUrl':'http://example.com',
+                      'url': 'http://example.com'}
 
     # Instantiate the stream
-    s = Stream(proj)
+    self.s = Stream(self.client, self.streamDef)
 
-    self.assertEqual(s.parentProject.id, projId)
+  def testAddRecordsLowSplit(self):
+    '''
+    A low split number should throw an error.
+    '''
+
+    self.client.c.request.side_effect = GrokError("Boom!")
+
+    # Make some dummy records
+    records = []
+    for i in range(50):
+      records.append([0])
+
+    self.assertRaises(GrokError, self.s.addRecords, records, 40)
+
+  def testAddRecordsSmallRecordCount(self):
+    '''
+    Should pass without comment
+    '''
+
+    # Make some dummy records
+    records = []
+    for i in range(50):
+      records.append([0])
+
+    self.s.addRecords(records)
+
+  def testAddRecordsLargeRecordCountBad(self):
+    '''
+    Should raise an error eventually
+    '''
+
+    self.client.c.request.side_effect = GrokError("Boom!")
+
+    # Make some dummy records
+    records = []
+    for i in range(5000):
+      records.append([0])
+
+    self.assertRaises(GrokError, self.s.addRecords, records)
+
+  def testAddRecordsLargeRecordCountGood(self):
+    '''
+    Should pass without comment
+    '''
+
+    # Make some dummy records
+    records = []
+    for i in range(5000):
+      records.append([0])
+
+
+    self.s.addRecords(records)
+
+  def testDelete(self):
+    '''
+    No-op in unit test context
+    '''
+
+    self.s.delete()
+
+  def testGetSpecDict(self):
+    '''
+    We should get back the same data we put in
+    '''
+
+    self.assertEqual(self.s.getSpecDict(), self.streamDef)
 
 if __name__ == '__main__':
   debug = 0

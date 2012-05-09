@@ -2,7 +2,7 @@ import StringIO
 import traceback
 import json
 import grokpy
-
+import warnings
 
 from connection import Connection
 from user import User
@@ -148,7 +148,7 @@ class Client(object):
 
     return models
 
-  def deleteAllModels(self, verbose = False):
+  def deleteAllModels(self, modelList = None, verbose = False):
     '''
     Permanently deletes all models associated with the current API key.
 
@@ -157,7 +157,11 @@ class Client(object):
 
     .. warning:: There is currently no way to recover from this opperation.
     '''
-    for model in self.listModels():
+
+    if modelList == None:
+      modelList = self.listModels()
+
+    for model in modelList:
       if verbose or grokpy.DEBUG:
         print 'Deleting model: ' + str(model.id)
       model.delete()
@@ -390,6 +394,10 @@ class Client(object):
   @staticmethod
   def alignPredictions(headers, resultRows):
     '''
+    .. deprecated:: 0.2.3
+      This is now done by default when calling .getModelOutput(). To get
+      unshifted results, call .getModelOutput(shift = False).
+
     Returns a list of list suitable for writing to a CSV file. Puts predictions
     on the same row the actual value for easy comparison in external tools
     like Excel.
@@ -410,6 +418,7 @@ class Client(object):
       2       7               7
                               9
     '''
+    warnings.warn("deprecated", DeprecationWarning)
 
     # Find columns that contain predictions / metrics
     predictionIndexes = [headers.index(header)

@@ -93,9 +93,9 @@ def HelloGrokPart2():
   counter = 0
   while True:
     headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 20)
-    latestRowId = resultRows[-1][0]
+    latestRowId = resultRows[-2][0]
     if latestRowId == lastRecordSeen:
-      if counter > 15:
+      if counter > 10:
         print 'Looks like we will not get any more predictions'
         break
       else:
@@ -111,9 +111,8 @@ def HelloGrokPart2():
       time.sleep(1)
 
   # Align predictions with actuals
-  print 'Aligning predictions ...'
+  print 'Getting results ...'
   headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
-  resultRows = grok.alignPredictions(headers, resultRows)
 
   #############################################################################
   # Write out predictions to a CSV
@@ -133,4 +132,7 @@ def HelloGrokPart2():
          'trained model? Then you can move on to Part Three!')
 
 if __name__ == '__main__':
+  if MODEL_ID == 'YOUR_MODEL_ID_HERE':
+    raise Exception('Please replace the MODEL_ID value in this file with a '
+                    'valid model id.')
   HelloGrokPart2()

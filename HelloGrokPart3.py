@@ -188,9 +188,12 @@ def HelloGrokPart3():
     if jobStatus == grokpy.SwarmStatus.COMPLETED:
       # Swarm is done
       bestConfig = results['bestModel']
-      print 'You win! Your Grok Swarm is complete.'
+      print '\nYou win! Your Grok Swarm is complete.'
       print '\tBest Configuration: ' + str(bestConfig)
       print '\tWith an Error of: ' + str(results['bestValue'])
+      print ('\tThis model uses the following field(s): '
+             + str(results['fieldsUsed']))
+      print
       # Exit the loop
       break
     elif jobStatus == grokpy.SwarmStatus.RUNNING and swarmStarted == False:
@@ -201,14 +204,12 @@ def HelloGrokPart3():
       print 'Swarm is starting up ...'
       time.sleep(2)
     else:
-      print "Latest record seen: " + str(recordsSeen)
+      print ".",
+      sys.stdout.flush()
       time.sleep(2)
 
   print "Getting full results from Swarm ..."
   headers, resultRows = advancedModel.getModelOutput(limit = 2500)
-
-  # Align predictions with actuals
-  resultRows = grok.alignPredictions(headers, resultRows)
 
   # Write results out to a CSV
   if not os.path.exists('output'):
@@ -244,10 +245,10 @@ def HelloGrokPart3():
   counter = 0
   while True:
     headers, resultRows = advancedModel.getModelOutput(limit = 20)
-    latestRowId = resultRows[-1][0]
+    latestRowId = resultRows[-2][0]
 
     if latestRowId == lastRecordSeen:
-      if counter > 15:
+      if counter > 10:
         print 'Looks like we will not get any more predictions'
         break
       else:

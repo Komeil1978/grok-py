@@ -26,6 +26,7 @@ sdict = {
     'maintainer_email' : 'idanforth@numenta.com',
     'keywords' : ['numenta', 'prediction'],
     'license' : 'MIT',
+    'requires': ['certifi'],
     'packages' : ['grokpy',
                   'grokpy.requests',
                   'grokpy.requests.packages',

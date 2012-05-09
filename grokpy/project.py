@@ -88,15 +88,19 @@ class Project(object):
 
     return self.parentClient.listModels(self.modelsUrl)
 
-  def stopAllModels(self, verbose = False):
+  def deleteAllModels(self, verbose = False):
     '''
-    Stops all running models in this project.
+    Permanently deletes all models associated with this project.
 
-    This method can take many seconds to return depending on how many
-    models are being stopped.
+    * [verbose] - If set, the model Id of each model being deleted will be
+      printed.
+
+    .. warning:: There is currently no way to recover from this opperation.
     '''
 
-    return self.parentClient.stopAllModels(name, url = self.modelsUrl)
+    modelList = self.listModels()
+
+    return self.parentClient.deleteAllModels(modelList, verbose)
 
   #############################################################################
   # Stream Methods

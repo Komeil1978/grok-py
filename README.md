@@ -1,5 +1,5 @@
 # grok-py
- 
+
 The Python client library for the Grok Prediction Service
 
 A note about releases:
@@ -22,6 +22,10 @@ Unpack into a directory of your choice
 From pip:
 
     $ sudo pip install grokpy
+
+Dependency (For HTTPS):
+
+    $ sudo pip install certifi
 
 ## Run the Sample App
 

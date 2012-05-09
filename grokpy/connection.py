@@ -60,6 +60,10 @@ class Connection(object):
       baseURL += '/'
     self.baseURL = baseURL + 'v2'
 
+    # Require https
+    if baseURL[:5] != 'https' and baseURL[:16] != 'http://localhost':
+      raise GrokError('Please supply an HTTPS URL to override the default.')
+
     # The HTTP Client we'll use to make requests
     if not session:
       base64string = base64.encodestring(self.key + ':').replace('\n', '')
@@ -87,21 +91,24 @@ class Connection(object):
       print url
       print requestDef
 
-    # Make the request, handle initial connection errors
-    if method == 'GET':
-      response = self.s.get(url, params = params)
-    elif method == 'POST':
-      response = self.s.post(url, requestDef)
-    elif method == 'PUT':
-      response = self.s.put(url)
-    elif method == 'DELETE':
-      response = self.s.delete(url)
-    else:
-      raise GrokError('Unrecognised HTTP method: %s' % method)
+    try:
+      # Make the request, handle initial connection errors
+      if method == 'GET':
+        response = self.s.get(url, params = params)
+      elif method == 'POST':
+        response = self.s.post(url, requestDef)
+      elif method == 'DELETE':
+        response = self.s.delete(url)
+      else:
+        raise GrokError('Unsupported HTTP method: %s' % method)
+    except ImportError:
+      raise GrokError('The certifi module is required to use grokpy. Please '
+                      'install it by running "sudo pip install certifi". If '
+                      'you get an "unknown command" error. Please install pip '
+                      'by running "sudo easy_install pip", then rerun the '
+                      'first command.')
 
     if not response.ok:
-      # TODO: This should be logged or otherwise handled better
-      print response.text
       raise response.raise_for_status(response.text)
 
     # Load info from returned JSON strings
@@ -136,26 +143,6 @@ class Connection(object):
                                 'please check it again: "' + key +'"')
     else:
       return 'OK'
-
-  def _handleGrokErrors(self, errors):
-    '''
-    Deal with known error codes from the Grok services
-    '''
-    raise GrokError(errors)
-
-  def _requestDefToURL(self, requestDef):
-    '''
-    Takes in a requestDef dict and returns a uri appropriate for GET or
-    for POST with body
-    '''
-    uriList = []
-    for key, value in requestDef.iteritems():
-      uriList.append(key)
-      uriList.append(urllib2.quote(value))
-    uriSuffix = '/'.join(uriList)
-    uri = self.baseURL + uriSuffix
-
-    return uri
 
   ###########################################################################
   # Debugging hooks

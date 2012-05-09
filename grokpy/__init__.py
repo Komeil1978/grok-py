@@ -29,7 +29,7 @@ from exceptions import (AuthenticationError,
 # Debug variable
 DEBUG = False
 
-__version__ = '0.2.2'
+__version__ = '0.2.3'
 
 __all__ = ['Client', 'Connection', 'Model', 'Project', 'Stream',
            'StreamSpecification', 'LocalDataSource', 'WeatherDataSource',

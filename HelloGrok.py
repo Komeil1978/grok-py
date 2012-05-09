@@ -131,21 +131,11 @@ def HelloGrok():
     if jobStatus == grokpy.SwarmStatus.COMPLETED:
       # Swarm is done
       bestConfig = results['bestModel']
-      print 'You win! Your Grok Swarm is complete.'
+      print '\nYou win! Your Grok Swarm is complete.'
       print '\tBest Configuration: ' + str(bestConfig)
       print '\tWith an Error of: ' + str(results['bestValue'])
       print ('\tThis model uses the following field(s): '
              + str(results['fieldsUsed']))
-      if results['fieldContributions']:
-        print
-        print ('We evaluated all the fields to see if they would help in '
-               'predicting "%s".' % recCenterEnergyModel.predictedField)
-        print ('Compared to a model that only used the single '
-               'field "%s",' % recCenterEnergyModel.predictedField)
-        print ('this is how pairwise combinations with other fields scored '
-               '(positive is good):')
-        for fc in results['fieldContributions']:
-          print '\t', fc['field'], fc['value']
       print
       # Exit the loop
       break
@@ -157,7 +147,8 @@ def HelloGrok():
       print 'Swarm is starting up ...'
       time.sleep(2)
     else:
-      print "Latest record seen: " + str(recordsSeen)
+      print ".",
+      sys.stdout.flush()
       time.sleep(2)
 
   ##############################################################################
@@ -165,9 +156,6 @@ def HelloGrok():
 
   print "Getting full results from Swarm ..."
   headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
-
-  # Align predictions with actuals
-  resultRows = grok.alignPredictions(headers, resultRows)
 
   # Write results out to a CSV
   if not os.path.exists('output'):

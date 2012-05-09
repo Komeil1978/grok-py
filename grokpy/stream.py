@@ -11,7 +11,8 @@ from exceptions import GrokError, AuthenticationError
 class Stream(object):
   '''
   A Stream is the combination of data and the specification of those data
-  that will be used by a model.
+  that will be used by a model. Stream objects are returned by createStream()
+  methods and should usually not be instantiated directly by end users.
 
   * parent - Either a Client object or a Project object
   * streamDef - A python dict representing the specification of this stream
@@ -31,7 +32,9 @@ class Stream(object):
 
   def addRecords(self, records, step = 500):
     '''
-    Appends records to the input cache of the given stream.
+    Appends records to the input cache of the given stream. This method will
+    recurse if it needs to split up the records into smaller chunks for
+    sending.
 
     * records - A list of lists representing your data rows
     * step - How many records we will send in each request.
@@ -54,9 +57,11 @@ class Stream(object):
       else:
         requestDef = {"input": records}
         self.c.request('POST', url, requestDef)
+    # TODO: Make the error thrown by connection class more specific
     except GrokError:
       # Break recursion if this just isn't going to work
-      if step < 50: raise
+      if step < 50:
+        raise GrokError('Step size started or has grown too small.')
       # Try sending half as many records.
       step = int(math.floor(step / 2))
       self.addRecords(records, step)
@@ -74,22 +79,3 @@ class Stream(object):
     Returns a Python dict representing the specification of this stream
     '''
     return self._rawStreamDef
-
-  #############################################################################
-  # Private methods
-
-  def _safe_dict(self, d):
-    '''
-    Recursively clone json structure with UTF-8 dictionary keys
-
-    From: http://www.gossamer-threads.com/lists/python/python/684379
-
-    * d - A python dict.
-    '''
-    if isinstance(d, dict):
-      return dict([(k.encode('utf-8'), self._safe_dict(v))
-                    for k,v in d.iteritems()])
-    elif isinstance(d, list):
-      return [self._safe_dict(x) for x in d]
-    else:
-      return d

@@ -1,6 +1,6 @@
 import grokpy
 
-from grokpy.exceptions import GrokError
+from grokpy.exceptions import GrokError, NotYetImplementedError
 
 class ModelSpecification(object):
   '''
@@ -20,6 +20,9 @@ class ModelSpecification(object):
     # What aggregation will this model use
     self.aggInt = None
 
+    # Per field aggregation function overrides
+    self.aggOverrides = []
+
     # List of steps into the future to predict
     self.steps = [1]
 
@@ -35,7 +38,7 @@ class ModelSpecification(object):
     models based on the models ability to predict this field.
 
     * predictedField - String. A field name as it appears in the stream
-      specification.
+                       specification.
     '''
 
     self.predictedField = predictedField
@@ -44,8 +47,8 @@ class ModelSpecification(object):
     '''
     Sets which stream the model will listen to.
 
-    * streamId - String. A 36 unique id for a Stream. OR grokpy.Stream object
-      from which a stream id will be extracted.
+    * streamId - String. A 36 char unique id for a Stream OR grokpy.Stream
+                 object from which a stream id will be extracted.
     '''
 
     if isinstance(streamId, grokpy.Stream):
@@ -69,7 +72,35 @@ class ModelSpecification(object):
 
         modelSpec.setAggregationInterval(interval)
     '''
-    self.dataSources.append(dataSource)
+
+    self.aggInt = aggInt
+
+  def setAggFuncOverrides(self, aggOverrides):
+    '''
+    Overrides the aggregation functions for fields in a stream to which this
+    model is attached.
+
+    * aggOverrides - A list of tuples in the form (fieldName, aggFunc)
+
+    Example Usage::
+
+      When creating a stream you might specify that the field 'Energy' should
+      be aggregated using grokpy.AggregationFunction.AVERAGE. However
+      for this particular model you might want to re-use the same stream
+      but have aggregation sum values over the aggregation interval
+      rather than average them.
+
+      model.setAggFuncOverrides([('Energy', grokpy.AggregationFunction.SUM)])
+    '''
+
+    if not self.aggInt:
+      raise GrokError('Please set an aggregation interval if you want to '
+                      'override field aggregation functions.')
+
+    if type(aggOverrides) != type([]):
+      raise GrokError('aggOverrides must be a list of tuples.')
+
+    self.aggOverrides = aggOverrides
 
   def setPredictionSteps(self, steps = [1]):
     '''
@@ -122,5 +153,8 @@ class ModelSpecification(object):
     if self.aggInt:
       returnSpec['aggregation'] = {}
       returnSpec['aggregation']['interval'] = self.aggInt
+
+      if self.aggOverrides:
+        returnSpec['aggregation']['fields'] = self.aggOverrides
 
     return returnSpec

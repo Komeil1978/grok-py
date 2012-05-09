@@ -3,6 +3,7 @@ import unittest
 import socket
 import base64
 import grokpy.requests as requests
+import json
 
 from mock import Mock
 
@@ -13,12 +14,12 @@ from grokpy.exceptions import AuthenticationError, GrokError
 class ConnectionTestCase(GrokTestCase):
 
   def setUp(self):
-    self.mockKey = 'SeQ9AhK57vOeoySQn1EvwElhZV1X87AB'
 
-    base64string = base64.encodestring(self.mockKey + ':').replace('\n', '')
-    headers = {"Authorization": "Basic %s" % base64string,
-                 "Content-Type": 'application/json; charset=UTF-8'}
-    self.s = requests.session(headers=headers)
+    self.mockKey = 'g1gCaM3PLRze6wuCtqSqQb5l41k06h3r'
+
+    self.mockSession = Mock(spec = requests.session())
+
+    self.mockResponse = Mock(spec = requests.Response())
 
   def testGoodKey(self):
     '''
@@ -34,11 +35,21 @@ class ConnectionTestCase(GrokTestCase):
     '''
     c = Connection(self.mockKey)
 
-    self.assertEqual(c.baseURL, 'http://grok-api.numenta.com/version/1/')
+    self.assertEqual(c.baseURL, 'https://api.numenta.com/v2')
 
-    c2 = Connection(self.mockKey, 'http://www.example.com')
+    c2 = Connection(self.mockKey, 'https://www.example.com')
 
-    self.assertEqual(c2.baseURL, 'http://www.example.com/version/1/')
+    self.assertEqual(c2.baseURL, 'https://www.example.com/v2')
+
+  def testHTTPSRequirement(self):
+    '''
+    Passing in an http url should raise a GrokError
+    '''
+
+    self.assertRaises(GrokError,
+                      Connection,
+                      self.mockKey,
+                      'http://www.example.com')
 
   def testBadKey(self):
     '''
@@ -46,169 +57,123 @@ class ConnectionTestCase(GrokTestCase):
     '''
     badKey = 'foo'
     self.assertRaises(AuthenticationError,
-                      Connection, badKey)
+                      Connection,
+                      badKey)
 
-  def testBasicRequest(self):
+  def testMissingKey(self):
     '''
-    Make sure we are building the HTTP request properly
+    If you've left the default and haven't set a ENV key we should throw an
+    error
+    '''
+    mockKey = 'YOUR_KEY_HERE'
+
+    # Monkey patch the connection class. A dev running these tests will
+    # probably have a key in their environment. We want this check to fail.
+    def mp(self):
+      return None
+
+    Connection._find_key = mp
+
+    self.assertRaises(AuthenticationError, Connection, mockKey)
+
+  def testRequestGET(self):
+    '''
+    Make sure a basic GET returns code as expected
     '''
 
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-
-    # Define it's responses
-    mock.request.return_value = ({'status': '200'}, '{"result": "success"}')
+    # Define responses
+    response = {'users': 'idanforth@numenta.com'}
+    responseJSON = json.dumps(response)
+    self.mockResponse.text = responseJSON
+    self.mockSession.get.return_value = self.mockResponse
 
     # Make the request
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
-    c.request(requestDef)
+    c = Connection(self.mockKey, session = self.mockSession)
+    rv = c.request('GET', '/users')
 
-    # Assert our Mock HTTP Client was called with expected values
-    mock.request.assert_called_with(body = '{"version": "1", "service": "projectList"}',
-                                    headers = {'content-type': 'application/json', 'API-Key': self.mockKey},
-                                    uri = 'http://grok-api.numenta.com/version/1/',
-                                    method = 'POST')
+    # Make sure we get out what we put in
+    self.assertEqual(rv, response)
 
-  def testBasicGETRequest(self):
+  def testRequestPOST(self):
     '''
-    Make sure we are building GET requests properly
+    Make sure a basic POST returns as expected
     '''
 
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-
-    # Define it's responses
-    mock.request.return_value = ({'status': '200'}, '{"result": "success"}')
+    # Define responses
+    response = {'model': {}}
+    responseJSON = json.dumps(response)
+    self.mockResponse.text = responseJSON
+    self.mockSession.post.return_value = self.mockResponse
 
     # Make the request
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
-    c.request(requestDef, 'GET')
+    requestDef = {'model': 'modelSpec'}
+    c = Connection(self.mockKey, session = self.mockSession)
+    rv = c.request('POST', '/models', requestDef)
 
-    # Assert our Mock HTTP Client was called with expected values
-    mock.request.assert_called_with(headers = {'API-Key': self.mockKey},
-                                    uri = 'http://grok-api.numenta.com/version/1/service/projectList',
-                                    method = 'GET')
+    # Make sure we get out what we put in
+    self.assertEqual(rv, response)
 
-  def testUnsupportedHTTPMethod(self):
+  def testRequestDELETE(self):
     '''
-    This version only allows GET and POST
+    Make sure basic DELETE returns properly
     '''
 
-    c = Connection(self.mockKey)
-
-    requestDef = {'service': 'projectList'}
-
-    self.assertRaises(GrokError, c.request, requestDef, 'PUT')
-
-  def testHTTPRequestTimeOut(self):
-    '''
-    We should throw an error on socket timeouts
-    '''
-
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-
-    # Define a side effect
-    mock.request.side_effect = socket.error('This request has timed out')
-
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
-
-    self.assertRaises(GrokError, c.request, requestDef)
-
-  def testUnknownHTTPRequestError(self):
-    '''
-    We should catch and wrap all socket.error's and pass them back as
-    GrokErrors
-    '''
-
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-    # Define a side effect
-    mock.request.side_effect = socket.error('Foobar')
-
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
-
-    self.assertRaisesRegexp(GrokError, 'Foobar', c.request, requestDef)
-
-  def testNon200Response(self):
-    '''
-    If the HTTP response isn't 200 we should throw an error
-    '''
-
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-    # Define it's responses
-    mock.request.return_value = ({'status': '404'}, '{"result": "Error"}')
+    # Define responses
+    response = {'ok': True}
+    responseJSON = json.dumps(response)
+    self.mockResponse.text = responseJSON
+    self.mockSession.delete.return_value = self.mockResponse
 
     # Make the request
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
+    c = Connection(self.mockKey, session = self.mockSession)
+    rv = c.request('DELETE', '/model/foo')
 
-    # Assert an error is raised
-    self.assertRaises(GrokError, c.request, requestDef)
+    # Make sure we get out what we put in
+    self.assertEqual(rv, response)
 
-  def testAPIError(self):
+  def testRequestPUT(self):
     '''
-    We should handle error messages the API returns
+    PUT Should raise a Grok error as we don't use it today
     '''
-
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-    # Define it's responses
-    mock.request.return_value = ({'status': '200'}, '{"errors": "EC2 is dead"}')
-
     # Make the request
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
+    c = Connection(self.mockKey, session = self.mockSession)
+    self.assertRaises(GrokError,
+                      c.request,
+                      'PUT',
+                      '/models')
 
-    # Assert an error is raised
-    self.assertRaisesRegexp(GrokError, 'EC2 is dead', c.request, requestDef)
-
-  def testAPIInformationResponse(self):
+  def testMissingCertifi(self):
     '''
-    The API might not return a result or an error, but instead an information
-    level response. This should be returned to the user.
-    '''
-
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-    # Define it's responses
-    infoString = "EC2 is neat!"
-    JSON = '{"information": ["'+infoString+'"]}'
-    mock.request.return_value = ({'status': '200'}, JSON)
-
-    # Make the request
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
-
-    self.assertEquals(c.request(requestDef), infoString)
-
-  def testGarbageAPIResponse(self):
-    '''
-    Something has really gone wrong and we've returned crap
+    If the certifi module isn't present we should raise a GrokError
     '''
 
-    # Create our Mock HTTP Client
-    mock = Mock(spec=self.h)
-    # Define it's responses
-    mock.request.return_value = ({'status': '200'}, '{}')
+    self.mockSession.get.side_effect = ImportError('Missing module')
 
-    # Make the request
-    c = Connection(self.mockKey, httpClient = mock)
-    requestDef = {'service': 'projectList'}
+    c = Connection(self.mockKey, session = self.mockSession)
+    self.assertRaises(GrokError, c.request, 'GET', '/users')
 
-    # Assert an error is raised
-    self.assertRaisesRegexp(GrokError, 'Unexpected request response:{}', c.request, requestDef)
+  def testResponseStatusNotOK(self):
+    '''
+    If the status of the response is not 'ok' as determined by the requests lib
+    we should forward on the underlying error
+    '''
+
+    response = {'error': 'Monkeys! Everywhere!'}
+    responseJSON = json.dumps(response)
+    self.mockResponse.text = responseJSON
+    self.mockResponse.ok = False
+    self.mockResponse.raise_for_status = Exception
+    self.mockSession.get.return_value = self.mockResponse
+
+    # Check we get the correct error text out
+    c = Connection(self.mockKey, session = self.mockSession)
+    self.assertRaisesRegexp(Exception, responseJSON, c.request, 'GET', '/users')
 
 if __name__ == '__main__':
   debug = 0
   if debug:
     single = unittest.TestSuite()
-    single.addTest(ConnectionTestCase('testGoodKey'))
+    single.addTest(ConnectionTestCase('testRequestPUT'))
     unittest.TextTestRunner().run(single)
   else:
     unittest.main()

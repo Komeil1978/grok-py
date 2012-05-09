@@ -7,290 +7,121 @@ from grokpy.project import Project
 from grokpy.exceptions import GrokError
 from grokpy.model import Model
 from grokpy.stream import Stream
+from grokpy.client import Client
 
 class ProjectTestCase(GrokTestCase):
 
   def setUp(self):
-    self.mockKey = 'SeQ9AhK57vOeoySQn1EvwElhZV1X87AB'
+    # Create a mock client
+    self.client = Mock(spec=Client)
+    self.client.c = Mock(spec=Connection)
 
-  def testInstantiation(self):
-    '''
-    Basic object instantiation with mocks
-    '''
+    # Create our minimal projectDef
+    self.projectId = 3354
+    self.projectDef = {'id': self.projectId,
+                       'name': 'Joyous Days',
+                       'url': 'http://www.example.com',
+                       'modelsUrl': 'http://www.example.com',
+                       'streamsUrl': 'http://www.example.com'}
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
-
-    projectDef = {'id': 1980,
-                  'name': 'Joyous Days'}
-
-    # Instantiate the project
-    p = Project(mock, projectDef)
-
-    self.assertEqual(p.id, '1980')
-    self.assertEqual(p.name, 'Joyous Days')
-
-    # Passing anything in beside a dict should fail
-    projectDef2 = []
-    self.assertRaises(GrokError, Project, mock, projectDef2)
-
-  def testGetDescription(self):
-    '''
-    Make a well formatted call to the API
-    '''
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
-    mock.request.return_value = 'Foo'
-
-    # Instantiate the project
-    projectId = '1980'
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
-    p = Project(mock, projectDef)
-
-    # Make the call
-    returnValue = p.getDescription()
-
-    mock.request.assert_called_with({'service': 'projectRead',
-                                     'projectId': projectId})
-
-    self.assertEqual(returnValue, 'Foo')
-
-  def testDelete(self):
-    '''
-    Make a well formatted call to the API
-    '''
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
-    mock.request.return_value = 'Foo'
-
-    # Instantiate the project
-    projectId = '1980'
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
-    p = Project(mock, projectDef)
-
-    # Make the call
-    returnValue = p.delete()
-
-    mock.request.assert_called_with({'service': 'projectDelete',
-                                     'projectId': projectId})
-
-    self.assertEqual(returnValue, 'Foo')
+    # Instantiate the stream
+    self.p = Project(self.client, self.projectDef)
 
   def testSetName(self):
     '''
-    Make a well formed call to the API and update the local objects name
+    Calls the parent and updates the local objects name
     '''
-    # Setup
-    projectId = 3354
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
+    def rv(*args):
+      return {'project': self.projectDef}
 
-    # Set up our return values
-    returns = [projectDef, 'OK']
-    def side_effects(*args):
-       result = returns.pop(0)
-       return result
+    # The function passed in will be called when request() is.
+    self.client.c.request.side_effect = rv
 
-    mock.request.side_effect = side_effects
+    newName = 'globorous'
+    self.p.setName(newName)
 
-    # Instantiate the project
-    p = Project(mock, projectDef)
+    self.assertEqual(self.p.name, newName)
 
-    # Make the call
-    newName = 'Calypso'
-    returnValue = p.setName(newName)
+  def testDelete(self):
+    '''
+    Calls the request method as expected
+    '''
 
-    # Check update request was made properly
-    mock.request.assert_called_with({'project': {'id': 3354, 'name': 'Calypso'},
-                                     'service': 'projectUpdate'},
-                                     'POST')
-
-    self.assertEqual(p.name, newName)
+    self.p.delete()
+    self.p.c.request.assert_any_call()
 
   def testCreateModel(self):
     '''
-    Returns a model object
+    Should make a call to the parent objects client.
     '''
-    # Setup
-    projectId = 3354
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
-
-    # Instantiate the project
-    p = Project(mock, projectDef)
-
-    model = p.createModel()
-
-    self.assertIsInstance(model, Model)
+    modelSpec = {}
+    model = self.p.createModel(modelSpec)
+    self.p.parentClient.createModel.assert_any_call()
 
   def testGetModel(self):
     '''
-    Handles default inputs, makes valid API calls
+    Makes a call to the parent method
     '''
-    # Setup
-    projectId = 3354
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
+    self.p.getModel('id')
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
-
-    # Set up our return values
-    returns = [{'productionModels': []}, # Missing Model
-              {'searchModels': []}, # Missing Model
-              {'productionModels': [{'id': 32}]}, # Collision
-              {'searchModels': [{'id': 32}]}, # Collision
-              {'productionModels': [{'id': 32}]}, # Good Call (search)
-              {'searchModels': [{'id': 15}]}, # Good Call (search)
-              {'id': 15}, # Good Call (search)
-              {'productionModels': [{'id': 32}]}, # Good Call (prod)
-              {'searchModels': [{'id': 15}]}, # Good Call (prod)
-              {'id': 32}, # Good Call (prod)
-              ]
-    def side_effects(*args):
-       result = returns.pop(0)
-       return result
-
-    mock.request.side_effect = side_effects
-
-    # Instantiate the project
-    p = Project(mock, projectDef)
-
-    # Default values check
-    badId = 'YOUR_MODEL_ID'
-    self.assertRaises(GrokError, p.getModel, badId)
-
-    # Missing model
-    self.assertRaisesRegexp(GrokError, 'Model Id not found.',
-                            p.getModel, 'foo')
-
-    # Collision
-    self.assertRaisesRegexp(GrokError, 'Ruh-ro.*',
-                            p.getModel, 32)
-
-    # Good Call (search)
-    modelId = 15
-    model = p.getModel(modelId)
-
-    self.assertIsInstance(model, Model)
-
-    # Check request was made properly
-    mock.request.assert_called_with({'searchModelId': modelId,
-                                     'service': 'searchModelRead'}, 'POST')
-
-    # Good Call (prod)
-    modelId = 32
-    model = p.getModel(modelId)
-
-    self.assertIsInstance(model, Model)
-
-    # Check request was made properly
-    mock.request.assert_called_with({'productionModelId': modelId,
-                                     'service': 'productionModelRead'}, 'POST')
+    self.p.parentClient.getModel.assert_any_call()
 
   def testListModels(self):
     '''
-    Should return a list of model objects
+    Makes a call to the parent method
     '''
-    # Setup
-    projectId = 3354
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
+    self.p.listModels()
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
+    self.p.parentClient.listModels.assert_any_call()
 
-    # Instantiate the project
-    p = Project(mock, projectDef)
-
-    # Empty list
-
-    # Override private methods used by this call
-    def rv1(*args): return []
-    def rv2(*args): return []
-    p._listSearchModels = rv1
-    p._listProductionModels = rv2
-
-    models = p.listModels()
-
-    self.assertEqual(models, [])
-
-    # Small list
-
-    # Override private methods used by this call
-    def rv1(*args): return [{'id': 15}]
-    def rv2(*args): return [{'id': 14, 'running': True}]
-    p._listSearchModels = rv1
-    p._listProductionModels = rv2
-
-    models = p.listModels()
-
-    # Make sure we get back models
-    for model in models:
-      self.assertIsInstance(model, Model)
-
-    # Second model should be a production model
-    self.assertEqual(models[1].type, 'production')
-
-  def testStopAllModels(self):
+  def testDeleteAllModels(self):
     '''
-    Should make a well formed request to the API for each running model
+    Makes a call to the parent method
     '''
-    # Setup
-    projectId = 3354
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
+    self.p.deleteAllModels()
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
-
-    # Instantiate the project
-    p = Project(mock, projectDef)
-
-    # Override private methods used by this call
-    def rv(*args): return [{'id': 14, 'running': True},
-                          {'id': 15, 'running': False}]
-    p._listProductionModels = rv
-
-    p.stopAllModels()
-
-    mock.request.assert_called_once_with({'productionModelId': 14,
-                                     'service': 'productionModelStop'})
+    self.p.parentClient.deleteAllModels.assert_any_call()
 
   def testCreateStream(self):
     '''
-    Should return a stream object
+    Should make a call to the parent objects client.
     '''
-    # Setup
-    projectId = 3354
-    projectDef = {'id': projectId,
-                  'name': 'Joyous Days'}
 
-    # Create our mock Connection class
-    mock = Mock(spec=Connection)
+    modelSpec = {}
+    model = self.p.createStream(modelSpec)
+    self.p.parentClient.createStream.assert_any_call()
 
-    # Instantiate the project
-    p = Project(mock, projectDef)
+  def testGetStream(self):
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.getStream('id')
 
-    # Make the call, test the results
-    stream = p.createStream()
-    self.assertIsInstance(stream, Stream)
-    self.assertEqual(stream.parentProject.id, str(projectId))
+    self.p.parentClient.getStream.assert_any_call()
 
+  def testListStreams(self):
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.listStreams()
+
+    self.p.parentClient.listStreams.assert_any_call()
+
+  def testDeleteAllStreams(self):
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.deleteAllStreams()
+
+    self.p.parentClient.deleteAllStreams.assert_any_call()
 
 if __name__ == '__main__':
   debug = 0
   if debug:
     single = unittest.TestSuite()
-    single.addTest(ProjectTestCase('testInstantiation'))
+    single.addTest(ProjectTestCase('testDeleteAllModels'))
     unittest.TextTestRunner().run(single)
   else:
     unittest.main()

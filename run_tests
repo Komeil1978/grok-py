@@ -1,8 +1,16 @@
 #!/usr/bin/env python
 
+import os
 import unittest
+import xmlrunner
+
 from tests import all_tests
 
 if __name__ == "__main__":
-    suite = all_tests()
+
+  suite = all_tests()
+
+  if 'JENKINS_URL' in os.environ:
+    xmlrunner.XMLTestRunner().run(suite)
+  else:
     results = unittest.TextTestRunner().run(suite)
