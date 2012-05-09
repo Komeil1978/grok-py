@@ -1,4 +1,17 @@
 ###############################################################################
+# 0.2.2
+  - Bump version number
+  - Update CHANGES files
+  - Print out the model id earlier in the example apps. This is useful for debugging
+  - Remove stated httplib2 dependency from client; Update CHANGES to reflect move to v2 api
+  - Add support for "limit" parameter in getModelOutput()
+  - Add in ModelSpecification class to mirror StreamSpecification class; Minor tweaks to doc formatting
+  - Reduce default number of records we will will send to a stream at a time from 5000 to 500. The larger size was timing out
+  - When building the output Hello Grok examples now explicitly request a max of 2500 records. This overcomes the small (1k) default on the server
+  - Added ability to set aggregation functions for local data_source_fields
+  - Stream objects now have a .getSpecDict() method that will return a python dict representation of the stream specification. This doesnt quite work yet due to a missing property in the API stream schema, but should work soon.
+  - Make default connection https vs. http.
+###############################################################################
 # 0.2.1
 
 - Bump version number
