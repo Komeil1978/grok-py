@@ -1,4 +1,14 @@
 ###############################################################################
+# 0.2.3
+  - Added 'offset' and 'shift' params to the model getData method.
+  - Add getState() method to model object; Remove old implementation of multistep
+  - Add method to set per field aggregation function overrides when defining a model. This also fixes the method that sets the aggregation interval for the model itself
+  - Use row shifting as provided by API Server
+  - Improve HelloGrok progress message
+  - Raise an exception if a valid model id has not be provided
+  - Fix failure of model.getModelOutput() to return meta, which is necessary for plotting data easily
+  - Fix KeyError on meta when swarm is brand new. Now meta = None on KeyError
+###############################################################################
 # 0.2.2
   - Bump version number
   - Update CHANGES files
