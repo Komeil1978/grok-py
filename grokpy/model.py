@@ -114,7 +114,7 @@ class Model(object):
     '''
 
     # Check how many records are in the swarm model output cache
-    headers, data = self.getModelOutput()
+    headers, data, meta = self.getModelOutput()
     swarmOutputCacheLen = len(data)
 
     # Promotion command
@@ -146,7 +146,7 @@ class Model(object):
     while True:
       # Production Model Output Cache Length
       try:
-        headers, data = self.getModelOutput()
+        headers, data, meta = self.getModelOutput()
         pmocLen = len(data)
       except grokpy.requests.exceptions.HTTPError:
         print 'Whoops 500'

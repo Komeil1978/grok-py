@@ -155,7 +155,7 @@ def HelloGrok():
   # Retrieve Swarm results
 
   print "Getting full results from Swarm ..."
-  headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
+  headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 2500)
 
   # Write results out to a CSV
   if not os.path.exists('output'):

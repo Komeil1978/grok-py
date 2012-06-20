@@ -92,7 +92,7 @@ def HelloGrokPart2():
   lastRecordSeen = None
   counter = 0
   while True:
-    headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 20)
+    headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 20)
     latestRowId = resultRows[-2][0]
     if latestRowId == lastRecordSeen:
       if counter > 10:
@@ -112,7 +112,7 @@ def HelloGrokPart2():
 
   # Align predictions with actuals
   print 'Getting results ...'
-  headers, resultRows = recCenterEnergyModel.getModelOutput(limit = 2500)
+  headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 2500)
 
   #############################################################################
   # Write out predictions to a CSV

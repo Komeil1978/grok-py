@@ -209,7 +209,7 @@ def HelloGrokPart3():
       time.sleep(2)
 
   print "Getting full results from Swarm ..."
-  headers, resultRows = advancedModel.getModelOutput(limit = 2500)
+  headers, resultRows, resultMetadata = advancedModel.getModelOutput(limit = 2500)
 
   # Write results out to a CSV
   if not os.path.exists('output'):
@@ -244,7 +244,7 @@ def HelloGrokPart3():
   lastRecordSeen = None
   counter = 0
   while True:
-    headers, resultRows = advancedModel.getModelOutput(limit = 20)
+    headers, resultRows, resultMetadata = advancedModel.getModelOutput(limit = 20)
     latestRowId = resultRows[-2][0]
 
     if latestRowId == lastRecordSeen:
@@ -264,7 +264,7 @@ def HelloGrokPart3():
       time.sleep(0.5)
 
   # Align predictions with actuals
-  headers, resultRows = advancedModel.getModelOutput(limit = 2500)
+  headers, resultRows, resultMetadata = advancedModel.getModelOutput(limit = 2500)
   resultRows = grok.alignPredictions(headers, resultRows)
 
   # Write out predictions to a CSV
