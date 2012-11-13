@@ -44,6 +44,8 @@ class AggregationFunction(object):
   LAST = 'last'
   AVERAGE = 'average'
   SUM = 'sum'
+  MAX = 'max'
+  MIN = 'min'
 
 class PredictionType(object):
 

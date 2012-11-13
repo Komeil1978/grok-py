@@ -1,24 +1,19 @@
-import grokpy
 import unittest
-import socket
-import base64
 import grokpy.requests as requests
 import json
 
-from mock import Mock
+from mock import Mock, patch, sentinel
 
 from grok_test_case import GrokTestCase
+import grokpy
 from grokpy.connection import Connection
 from grokpy.exceptions import AuthenticationError, GrokError
 
 class ConnectionTestCase(GrokTestCase):
 
   def setUp(self):
-
     self.mockKey = 'g1gCaM3PLRze6wuCtqSqQb5l41k06h3r'
-
     self.mockSession = Mock(spec = requests.session())
-
     self.mockResponse = Mock(spec = requests.Response())
 
   def testGoodKey(self):
@@ -168,6 +163,28 @@ class ConnectionTestCase(GrokTestCase):
     # Check we get the correct error text out
     c = Connection(self.mockKey, session = self.mockSession)
     self.assertRaisesRegexp(Exception, responseJSON, c.request, 'GET', '/users')
+
+  def testNewRequestSessionCreatedWithUserSpecifiedHeaders(self):
+    '''
+    User can optionally specify headers to be sent along with all requests
+    coming from a particular Connection object.
+    '''
+
+    mockSessionFunction = Mock(return_value=sentinel.some_object)
+
+    with patch.object(grokpy.connection.requests, 'session', mockSessionFunction):
+      grokpy.connection.Connection(self.mockKey,
+        'https://www.example.com',
+        # sending no session so one is created so we can test the headers it gets
+        session = None,
+        headers = {'x-test-header': 'header val'})
+
+    sessionArgs = mockSessionFunction.call_args[1]
+    self.assertIsInstance(sessionArgs, dict, 'session must be send headers dict')
+    headers = sessionArgs['headers']
+    self.assertIsInstance(headers, dict, 'session headers object must be a dict')
+    self.assertTrue('x-test-header' in headers, 'headers object missing user-specified header')
+    self.assertEqual('header val', headers['x-test-header'], 'bad custom header value')
 
 if __name__ == '__main__':
   debug = 0

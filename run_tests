@@ -4,7 +4,7 @@ import os
 import unittest
 import xmlrunner
 
-from tests import all_tests
+from tests.unit import all_tests
 
 if __name__ == "__main__":
 

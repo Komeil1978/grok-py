@@ -96,12 +96,6 @@
     :members:
     :undoc-members:
 
-:mod:`weather_data_source` Module
----------------------------------
-
-.. automodule:: grokpy.weather_data_source
-    :members:
-    :undoc-members:
 
 Subpackages
 -----------

@@ -36,6 +36,12 @@ class Model(object):
     # Prepare to have a swarm associated with the model
     self.swarm = None
 
+  def _runCommand(self, command):
+    url = self.commandsUrl
+    commandObject = {'command': command}
+    result = self.c.request('POST', url, commandObject)
+    return result
+
   def delete(self):
     '''
     Permanently deletes the model
@@ -43,6 +49,18 @@ class Model(object):
     .. warning:: There is currently no way to recover from this opperation.
     '''
     self.c.request('DELETE', self.url)
+
+  def clone(self, params = None):
+    '''
+    Clones this model
+    '''
+
+    if params:
+      result = self.c.request('POST', self.cloneUrl, {'model': params})
+    else:
+      result = self.c.request('POST', self.cloneUrl)
+
+    return Model(self.parent, result['model'])
 
   #############################################################################
   # Model Configuration
@@ -118,9 +136,7 @@ class Model(object):
     swarmOutputCacheLen = len(data)
 
     # Promotion command
-    command = {'command': 'promote'}
-
-    self.c.request('POST', self.commandsUrl, command)
+    self._runCommand('promote')
 
     ##### WARNING: Ugly hack that will go away #####
 
@@ -151,10 +167,10 @@ class Model(object):
       except grokpy.requests.exceptions.HTTPError:
         print 'Whoops 500'
         time.sleep(.5)
-        timoutCounter += 1
+        timeoutCounter += 1
         continue
 
-      if timeoutCounter >= 40:
+      if timeoutCounter >= 80:
         raise GrokError("The production model did not catch up to the swarm "
                         "in a reasonable amount of time. Please try again or "
                         "contact support.")
@@ -171,7 +187,7 @@ class Model(object):
     '''
     Starts up a model, readying it to receive new data from a stream
     '''
-    raise NotYetImplementedError()
+    return self._runCommand('start')
 
   def disableLearning(self):
     '''
@@ -181,11 +197,7 @@ class Model(object):
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
     '''
-    url = self.commandsUrl
-    command = {'command': 'disableLearning'}
-    result = self.c.request('POST', url, command)
-
-    return result
+    return self._runCommand('disableLearning')
 
   def enableLearning(self):
     '''
@@ -194,11 +206,7 @@ class Model(object):
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
     '''
-    url = self.commandsUrl
-    command = {'command': 'enableLearning'}
-    result = self.c.request('POST', url, command)
-
-    return result
+    return self._runCommand('enableLearning')
 
   #############################################################################
   # Stream
@@ -270,12 +278,41 @@ class Model(object):
         raise GrokError('There is no swarm associated with this model.')
       else:
         # Find the latest swarm
-        swarms = sorted(swarms, key = lambda swarm: swarm.details['startTime'])
+        # Use the string time to sort with the latest time first
+        # If details hasn't been populated yet, assume this is the latest
+        swarms = sorted(swarms,
+                        key = lambda swarm: swarm.details.get('startTime', 0),
+                        reverse=True)
+
 
         # Set that as *the* swarm for this model
         self.swarm = swarms[0]
 
     return self.swarm.getState()
+
+  #############################################################################
+  # Checkpoints
+
+  def listCheckpoints(self):
+    '''
+    Returns a list of checkpoint dicts for this model
+    '''
+    # Where to make our request
+    url = self.checkpointsUrl
+    checkpoints = self.c.request('GET', url)['checkpoints']
+    return checkpoints
+
+  def createCheckpoint(self):
+    '''
+    Creates a new checkpoint object and returns it as a dict
+    '''
+    # Where to make our request
+    url = self.checkpointsUrl
+    checkpoint = self.c.request('POST', url)['checkpoint']
+    return checkpoint
+
+  #############################################################################
+  # Model data
 
   def getModelOutput(self, limit=None, offset = None, shift = True):
     '''
@@ -307,7 +344,7 @@ class Model(object):
 
     headers = result['names']
     data = result['data']
-    
+
     try:
       meta = result['meta']
     except KeyError:

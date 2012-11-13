@@ -12,13 +12,11 @@ from enum import (Aggregation,
                   PredictionType,
                   DataSourceType,
                   PublicDataSources,
-                  WeatherDataType,
                   StockDataTypes,
                   HolidayLocale)
 from stream import Stream
 from stream_specification import StreamSpecification
 from local_data_source import LocalDataSource
-from weather_data_source import WeatherDataSource
 from events_data_source import EventsDataSource
 from stocks_data_source import StocksDataSource
 from data_source_field import DataSourceField
@@ -29,8 +27,7 @@ from exceptions import (AuthenticationError,
 # Debug variable
 DEBUG = False
 
-__version__ = '0.2.3'
+__version__ = '0.2.5'
 
 __all__ = ['Client', 'Connection', 'Model', 'Project', 'Stream',
-           'StreamSpecification', 'LocalDataSource', 'WeatherDataSource',
-           'DataSourceField']
+           'StreamSpecification', 'LocalDataSource', 'DataSourceField']

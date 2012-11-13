@@ -74,6 +74,18 @@ class Stream(object):
     '''
     self.c.request('DELETE', self.url)
 
+  def clone(self, params = None):
+    '''
+    Clones this stream
+    '''
+    if params:
+      result = self.c.request('POST', self.cloneUrl, {'stream': params})
+    else:
+      result = self.c.request('POST', self.cloneUrl)
+
+
+    return Stream(self.parent, result['stream'])
+
   def getSpecDict(self):
     '''
     Returns a Python dict representing the specification of this stream

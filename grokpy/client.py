@@ -23,22 +23,25 @@ class Client(object):
   * [baseURL] - Grok server request target
   * [connection] - An instance of the grokpy.Connection class. Used mainly for
     testing.
+  * [headers] - Overrides for auth and user agent headers. Used mainly for
+    testing.
+  * [proxies] - Dict - e.g. {"http": "10.10.1.10:3128", "https": "10.10.1.10:1080"}
   '''
 
-  def __init__(self, key = None, baseURL = None, connection = None):
-    '''
-    Key - Grok API Key
-    baseURL - baseURL - Grok server request target
-    connection - An instance of the grokpy.Connection class. Used mainly for
-                 testing.
-    '''
+  def __init__(self, key = None,
+               baseURL = None,
+               connection = None,
+               headers = None,
+               proxies = None):
 
+    if headers is None:
+      headers = {}
     # Create a connection to the API
     if not connection:
       if baseURL:
-        self.c = Connection(key, baseURL)
+        self.c = Connection(key, baseURL, headers = headers, proxies = proxies)
       else:
-        self.c = Connection(key)
+        self.c = Connection(key, headers = headers, proxies = proxies)
     else:
       self.c = connection
 

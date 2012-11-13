@@ -26,7 +26,6 @@
 import time
 import csv
 import os
-import signal
 import sys
 
 import grokpy
@@ -35,7 +34,6 @@ import grokpy
 # Configuration Settings
 
 API_KEY = 'YOUR_KEY_HERE'
-STREAM_SPEC = 'data/streamSpecification.json'
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV = 'output/SwarmOutput.csv'
 
@@ -63,18 +61,48 @@ def HelloGrok():
   # Connect to Grok
   print 'Connecting to Grok ...'
   grok = grokpy.Client(API_KEY)
+  now = time.time()
 
   ##############################################################################
-  # Create and configure our Stream
+  # Your Stream
   #
   # For Grok to use your data we need a careful specification of that data to
   # work with. The combination of your data and its specification is what
   # we call a 'Stream'.
 
-  # Create an empty stream using our JSON definition
-  myStream = grok.createStream(STREAM_SPEC)
+  # Create our stream specification
+  # Note: Until we call createStream(streamSpec) all these operations are local.
+  print 'Defining our stream ...'
+  streamSpec = grokpy.StreamSpecification()
+  streamSpec.setName('Recreation Center Stream ' + str(now))
 
-  # Add data to the stream from a local source
+  # Create a Data Source and specify fields
+  local = grokpy.LocalDataSource()
+  local.setName('Local CSV Data')
+
+  # Create each of our fields
+  timestamp = grokpy.DataSourceField()
+  timestamp.setName('timestamp')
+  timestamp.setType(grokpy.DataType.DATETIME)
+  timestamp.setFlag(grokpy.DataFlag.TIMESTAMP)
+
+  consumption = grokpy.DataSourceField()
+  consumption.setName('consumption')
+  consumption.setType(grokpy.DataType.SCALAR)
+
+  # Add our fields to our source
+  local.addField(timestamp)
+  local.addField(consumption)
+
+  # Add our source to the stream specification
+  streamSpec.addDataSource(local)
+
+  # Create an empty stream using our streamSpec object
+  # Note this makes an actual call to the API
+  print 'Creating the stream ...'
+  myStream = grok.createStream(streamSpec)
+
+  # Add data to the stream from a csv
   print 'Adding records to stream ...'
   fileHandle = open(INPUT_CSV, 'rU')
   recCenterData = [row for row in csv.reader(fileHandle)]
@@ -82,23 +110,26 @@ def HelloGrok():
   myStream.addRecords(recCenterData)
 
   ##############################################################################
-  # Create and configure our Model
+  # Create and configure your Model
   #
   # Your models can listen to your streams in many different ways. Here we
-  # tell the model how to deal with each field and which field we want to
+  # tell the model how to deal with stream data and which field we want to
   # optimize our predictions for.
 
-  # This time we'll build up a dictionary to spec out the model.
-  #
-  # Both models and streams can take specs from either dictionaries or JSON
-  # files.
+  print 'Defining a model ...'
+  modelSpec = grokpy.ModelSpecification()
+  # Give the model a name
+  modelSpec.setName("Recreaction Center Model " + str(time.time()))
+  # Set which field this model will predict and optimize for
+  modelSpec.setPredictedField("consumption")
+  # Set which stream this model will listen to
+  modelSpec.setStream(myStream.id)
 
-  modelSpec = {"name": "Model of Fun " + str(time.time()),
-               "predictedField": "consumption",
-               "streamId": myStream.id,
-               "aggregation": {"interval": {"hours": 1}}}
+  # We want to get predictions every hour, so we'll set this model to
+  # aggregate data for us.
+  modelSpec.setAggregationInterval({"hours": 1})
 
-  # Create that model for the given stream
+  # Create that model using our specification
   print 'Creating an empty model ...'
   recCenterEnergyModel = grok.createModel(modelSpec)
   print "Done. Your model's Id is: %s" % recCenterEnergyModel.id
@@ -116,7 +147,7 @@ def HelloGrok():
   ##############################################################################
   # Monitor Progress
   #
-  # To know when our Swarm is complete we will poll for the state of the swarm
+  # To know when our Swarm is complete we will poll for the state of the Swarm
 
   swarmStarted = False
   while True:
@@ -171,14 +202,19 @@ def HelloGrok():
   ##############################################################################
   # Next steps ...
   #
+  # You now have a set of predictions about the energy use of this building!
   # Now would be a good time to explore the results of the Swarm and familiarize
-  # yourself with their format. After that, you can take the Project id and
-  # Model id printed out below and head over to part two!
+  # yourself with their format. You can find documentation about this here:
+  #
+  # https://www.numenta.com/devs/interpreting_results.html
+  #
+  # After that, you can take the Model id printed out below and head over
+  # to Part Two!
 
   print """
 =====================================================================
 On to Part Two!
-  Take this, the wizard will ask for it:
+  Take this, you'll need it:
   MODEL_ID: %s
 
 Please edit HelloGrokPart2.py, adding in the MODEL_ID.

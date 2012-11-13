@@ -1,3 +1,4 @@
+import sys
 import os
 import json
 import requests
@@ -5,6 +6,7 @@ import base64
 import grokpy
 
 from exceptions import GrokError, AuthenticationError
+from grokpy.requests.exceptions import HTTPError
 
 class Connection(object):
   '''
@@ -14,13 +16,16 @@ class Connection(object):
   def __init__(self,
                key = None,
                baseURL = 'https://api.numenta.com/',
-               session = None):
+               session = None,
+               headers = None,
+               proxies = None):
     '''
     key - Grok API Key
     baseURL - Grok server request target
     session - A requests lib Session instance. Useful for testing.
+    headers - Dict - Headers to add to each request.
+    proxies - Dict - e.g. {"http": "10.10.1.10:3128", "https": "10.10.1.10:1080"}
     '''
-
     # Search for API key in environment
     if not key or key == 'YOUR_KEY_HERE':
       key = self._find_key()
@@ -68,12 +73,15 @@ class Connection(object):
     if not session:
       base64string = base64.encodestring(self.key + ':').replace('\n', '')
       agent = "Grok API Client - Python - Version %s" % grokpy.__version__
-      headers = {"Authorization": "Basic %s" % base64string,
-                 "Content-Type": 'application/json; charset=UTF-8',
-                 "User-Agent": agent}
-      session = requests.session(headers=headers)
+      if headers is None:
+        headers = {}
+      headers["Authorization"] = "Basic %s" % base64string
+      headers["Content-Type"] = 'application/json; charset=UTF-8'
+      headers["User-Agent"] = agent
+      session = requests.session(headers=headers, proxies=proxies)
 
     self.s = session
+    self.requuid = None
 
   def request(self, method, url, requestDef = None, params = None):
     '''
@@ -87,9 +95,10 @@ class Connection(object):
     requestDef = json.dumps(requestDef, ensure_ascii=False)
 
     if grokpy.DEBUG:
-      print method
-      print url
-      print requestDef
+      print "Method :", method
+      print "Url :", url
+      print "requestDef : ", requestDef
+      print "params :", params
 
     try:
       # Make the request, handle initial connection errors
@@ -107,15 +116,32 @@ class Connection(object):
                       'you get an "unknown command" error. Please install pip '
                       'by running "sudo easy_install pip", then rerun the '
                       'first command.')
-
+    if response.headers.get('x-grok-requuid'):
+      self.requuid = response.headers.get('x-grok-requuid')
     if not response.ok:
-      raise response.raise_for_status(response.text)
+      try:
+        # Requests will construct an exception based on context
+        raise response.raise_for_status(response.text)
+      except HTTPError, e:
+        # Add in our useful error text to that exception
+        e = str(e) + \
+            " - Request Uid: %s - Response content: %s" % (
+                                         response.headers.get('x-grok-requuid'),
+                                         response.text
+                                        )
+        raise HTTPError(e)
+
+    if grokpy.DEBUG >= 1:
+      print 'Raw response:'
+      print response.text
 
     # Load info from returned JSON strings
     content = json.loads(response.text)
 
-    if grokpy.DEBUG >= 1:
+    if grokpy.DEBUG:
+      print 'Response converted to JSON:'
       print content
+      print 'Request Uid:%s' % response.headers.get('x-grok-requuid')
 
     return content
 
@@ -137,7 +163,6 @@ class Connection(object):
     '''
     Makes sure that a given key conforms to the expected format
     '''
-
     if len(key) < 5:
       raise AuthenticationError('This key is too short, '
                                 'please check it again: "' + key +'"')

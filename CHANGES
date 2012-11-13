@@ -1,4 +1,10 @@
 ###############################################################################
+# 0.2.5
+  - Add support for proxies.
+###############################################################################
+# 0.2.4
+  - HelloGrokPart3.py removed.  Weather public data provider is no longer supported
+###############################################################################
 # 0.2.3
   - Fix bug in handling of resultMetadata return value in grok-py and HelloGrok examples
 ###############################################################################

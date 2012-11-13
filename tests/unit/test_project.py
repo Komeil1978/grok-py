@@ -114,6 +114,43 @@ class ProjectTestCase(GrokTestCase):
     Makes a call to the parent method
     '''
     self.p.deleteAllStreams()
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.deleteAllModels()
+
+    self.p.parentClient.deleteAllModels.assert_any_call()
+
+  def testCreateStream(self):
+    '''
+    Should make a call to the parent objects client.
+    '''
+
+    modelSpec = {}
+    model = self.p.createStream(modelSpec)
+    self.p.parentClient.createStream.assert_any_call()
+
+  def testGetStream(self):
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.getStream('id')
+
+    self.p.parentClient.getStream.assert_any_call()
+
+  def testListStreams(self):
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.listStreams()
+
+    self.p.parentClient.listStreams.assert_any_call()
+
+  def testDeleteAllStreams(self):
+    '''
+    Makes a call to the parent method
+    '''
+    self.p.deleteAllStreams()
 
     self.p.parentClient.deleteAllStreams.assert_any_call()
 
