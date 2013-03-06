@@ -1,4 +1,24 @@
 ###############################################################################
+# 0.2.6
+  - Added startAt parameter to method getModelOutput in model.py
+  - Accept python datetime objects as part of records, convertingly them silently to strings before POSTing to API
+  - Add support for actions and unit tests for same
+  - Fix bug with requesting a user by id
+  - The API supports additional (optional) params for model commands.  This change allows you to optionally specify those params as kwargs.
+
+  For example, to start a model from a checkpoint:
+
+      model.start(checkpointId='some checkpoint id')
+
+  or:
+
+      model._runCommand('start', checkpointId='some checkpoint id')
+
+  - For consistency, derive baseURL from GROK_API_URL environment var in the same way that key is derived from GROK_API_KEY environment var.
+  - Fixed bug handling 0 min and max values in grok-py getSpec
+  - Added model commands for addLabel, getLabels, and removeLabels
+  - hello grok anomaly
+###############################################################################
 # 0.2.5
   - Add support for proxies.
 ###############################################################################

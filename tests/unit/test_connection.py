@@ -128,14 +128,21 @@ class ConnectionTestCase(GrokTestCase):
 
   def testRequestPUT(self):
     '''
-    PUT Should raise a Grok error as we don't use it today
+    Make sure basic PUT returns properly
     '''
+
+    # Define responses
+    response = {'ok': True}
+    responseJSON = json.dumps(response)
+    self.mockResponse.text = responseJSON
+    self.mockSession.put.return_value = self.mockResponse
+
     # Make the request
     c = Connection(self.mockKey, session = self.mockSession)
-    self.assertRaises(GrokError,
-                      c.request,
-                      'PUT',
-                      '/models')
+    rv = c.request('PUT', '/model/foo')
+
+    # Make sure we get out what we put in
+    self.assertEqual(rv, response)
 
   def testMissingCertifi(self):
     '''

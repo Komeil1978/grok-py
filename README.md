@@ -7,7 +7,7 @@ A note about releases:
 Development of Grok client libraries happens internally and
 is then released to github master at the same time as we
 release server side code. Github master branch can thus
-be considered STABLE.
+be considered STABLE. 
 
 ## Installation
 

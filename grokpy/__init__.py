@@ -13,7 +13,8 @@ from enum import (Aggregation,
                   DataSourceType,
                   PublicDataSources,
                   StockDataTypes,
-                  HolidayLocale)
+                  HolidayLocale,
+                  ModelType)
 from stream import Stream
 from stream_specification import StreamSpecification
 from local_data_source import LocalDataSource
@@ -27,7 +28,7 @@ from exceptions import (AuthenticationError,
 # Debug variable
 DEBUG = False
 
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 
 __all__ = ['Client', 'Connection', 'Model', 'Project', 'Stream',
            'StreamSpecification', 'LocalDataSource', 'DataSourceField']

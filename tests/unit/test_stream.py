@@ -1,5 +1,6 @@
 import unittest
 from mock import Mock
+from datetime import datetime
 
 from grok_test_case import GrokTestCase
 from grokpy.connection import Connection
@@ -88,6 +89,19 @@ class StreamTestCase(GrokTestCase):
     '''
 
     self.assertEqual(self.s.getSpecDict(), self.streamDef)
+
+  def testAddRecordsWithPythonDatetimes(self):
+    '''
+    Records that include datetime objects should be silently converted to
+    strings and passed on without error
+    '''
+
+    # Make some dummy records
+    records = []
+    for i in range(10):
+      records.append([datetime.now(), 'foo', 14])
+
+    self.s.addRecords(records)
 
 if __name__ == '__main__':
   debug = 0

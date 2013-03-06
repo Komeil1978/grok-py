@@ -1,13 +1,13 @@
 #!/bin/sh
 TESTROOT="tests"
 ARTIFACTS="artifacts"
-TESTS="${TESTROOT}/integration ${TESTROOT}/unit"
+TESTS="${TESTROOT}/unit"
 COVERAGE=""
 while :
 do
   case "$1" in
       -a) TESTS=$TESTROOT ;;
-      -c) COVERAGE="--with-coverage --with-xunit --xunit-file=${ARTIFACTS}/tests.xml --cover-erase --cover-package=grok-app"
+      -c) COVERAGE="--with-coverage --with-xunit --xunit-file=${ARTIFACTS}/tests.xml --cover-erase --cover-package=grok-py"
           mkdir -p $ARTIFACTS;;
       -i) echo "Integration tests are not yet supported. Sorry. :("; exit ;;
       -u) TESTS="${TESTROOT}/unit" ;;

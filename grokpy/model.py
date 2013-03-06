@@ -36,9 +36,13 @@ class Model(object):
     # Prepare to have a swarm associated with the model
     self.swarm = None
 
-  def _runCommand(self, command):
+  def _runCommand(self, command, **params):
     url = self.commandsUrl
     commandObject = {'command': command}
+
+    if params:
+      commandObject['params'] = params
+
     result = self.c.request('POST', url, commandObject)
     return result
 
@@ -124,7 +128,7 @@ class Model(object):
 
     return modelDef
 
-  def promote(self):
+  def promote(self, **params):
     '''
     Puts the model into a production ready mode.
 
@@ -136,7 +140,7 @@ class Model(object):
     swarmOutputCacheLen = len(data)
 
     # Promotion command
-    self._runCommand('promote')
+    self._runCommand('promote', **params)
 
     ##### WARNING: Ugly hack that will go away #####
 
@@ -183,13 +187,13 @@ class Model(object):
 
     ##### END UGLY HACK
 
-  def start(self):
+  def start(self, **params):
     '''
     Starts up a model, readying it to receive new data from a stream
     '''
-    return self._runCommand('start')
+    return self._runCommand('start', **params)
 
-  def disableLearning(self):
+  def disableLearning(self, **params):
     '''
     Puts the model into a predictions only state where it will not learn from
     new data.
@@ -197,16 +201,100 @@ class Model(object):
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
     '''
-    return self._runCommand('disableLearning')
+    return self._runCommand('disableLearning', **params)
 
-  def enableLearning(self):
+  def enableLearning(self, **params):
     '''
     New records will be integrated into the models future predictions.
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
     '''
-    return self._runCommand('enableLearning')
+    return self._runCommand('enableLearning', **params)
+
+
+  def getLabels(self, startRecordID=None, endRecordID=None):
+    '''
+    Returns a list of labels for a given range of records. Each record has a 
+    list of labels assocciated. A label may have no labels.
+
+    Parameters
+    ----------------------------
+    startRecordID - ROWID of the first prediction of these label results
+    endRecordID - ROWID of the last prediction record of these label results.
+                  (Not inclusive.)
+
+    Response on success
+    ----------------------------
+    {
+      'isProcessing': boolean,
+      'recordLabels': [
+        {
+          'ROWID': integer,
+          'labels': [str, ...]
+        },...
+      ]
+    }
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('getLabels', startRecordID=startRecordID,
+      endRecordID=endRecordID)
+
+
+  def addLabel(self, startRecordID, endRecordID, labelName):
+    '''
+    Adds a label to a given range of records from startRecordID to endRecordID,
+    not inclusive of endRecordID.
+
+    Parameters
+    ----------------------------
+    startRecordID - ROWID of the first prediction to add this label
+    endRecordID - ROWID of the last prediction record to add this label.
+                  (Not inclusive.)
+    labelName - string indicating name of the label to add to the given range
+
+    Response on success
+    ----------------------------
+    {
+      'status': 'success'
+    }
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('addLabel', startRecordID=startRecordID, \
+      endRecordID=endRecordID, labelName=labelName)
+
+
+  def removeLabels(self, startRecordID=None, endRecordID=None, labelFilter=None):
+    '''
+    Removes a label or all labels from a given range of records from 
+    startRecordID to endRecordID, not inclusive of endRecordID. If labelFilter
+    is set, only labels of type labelFilter will be removed, otherwise all
+    labels will be removed from the given range.
+
+    Parameters
+    ----------------------------
+    startRecordID - ROWID of the first prediction to remove labels
+    endRecordID - ROWID of the last prediction record to remove labels.
+                  (Not inclusive.)
+    labelFilter - string. If not None, only labels equal to this will be
+                  removed. Otherwise all labels will be removed from given
+                  range.
+
+    Response on success
+    ----------------------------
+    {
+      'status': 'success'
+    }
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('removeLabels', startRecordID=startRecordID, \
+      endRecordID=endRecordID, labelFilter=labelFilter)
 
   #############################################################################
   # Stream
@@ -314,18 +402,26 @@ class Model(object):
   #############################################################################
   # Model data
 
-  def getModelOutput(self, limit=None, offset = None, shift = True):
+  def getModelOutput(self, limit=None, offset = None,
+                           startAt = None, shift = True):
     '''
     Returns the data in the output cache of the best model found during Swarm.
 
     * limit - The maximum number of rows to get from the model
-    * offset - The start row ID to begin returning data from. For example::
+    * offset - The number of rows from the last row from which to begin
+               returning data from. For example::
 
       If you have 1000 records in the model output cache and set offset to
-      100, you will get records with row ID 100 to 1000. If you set an offset
+      100, you will get records with row ID 900 to 999. If you set offset
       above the maximum row ID that exists in the model's output cache you will
-      get no records. If buffer of records in the output cache has moved past
-      the offest you request you will get the first record after this row ID.
+      get no records.
+
+    * startAt - The start row ID to begin returning data from. For example::
+
+      If you have 1000 records in the model output cache and set startAt to
+      100, you will get records with row ID 100 to 1000. If you set startAt
+      above the maximum row ID that exists in the model's output cache you will
+      get no records.
 
     * shift - This shifts the records returned so that all predictions are
               aligned with actual values. Note: Set this value to False if you
@@ -337,6 +433,8 @@ class Model(object):
       params['limit'] = limit
     if offset is not None:
       params['offset'] = offset
+    if startAt is not None:
+      params['startAt'] = startAt
     if shift is not None:
       params['shift'] = shift
 

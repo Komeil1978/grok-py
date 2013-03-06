@@ -1,5 +1,8 @@
+import grokpy
+
 from model import Model
 from stream import Stream
+from action import Action
 from exceptions import GrokError, AuthenticationError
 
 class Project(object):
@@ -14,6 +17,7 @@ class Project(object):
     * name
     * url
     * modelsUrl
+    * actionsUrl
     * id
   '''
 
@@ -139,3 +143,89 @@ class Project(object):
     .. warning:: There is currently no way to recover from this opperation.
     '''
     self.parentClient.deleteAllStreams(self.streamsUrl, verbose)
+
+  #############################################################################
+  # Action Methods
+  #
+
+  def createAction(self, description):
+    '''
+    Returns a new Action object. The Action will be created under this project.
+
+    * description - String - A short description of the action the client
+    has taken and would like to log with the project.
+    '''
+
+    if self.actionsUrl:
+      url = self.actionsUrl
+    else:
+      raise GrokError('There is no Actions URL associated with this Project' \
+                      ' object.')
+
+    requestDef = {'action': {'description': description}}
+
+    result = self.c.request('POST', url, requestDef)
+
+    if grokpy.DEBUG:
+      print result
+
+    parentProject = self
+
+    return Action(parentProject, result['action'])
+
+  def getAction(self, actionId):
+    '''
+    Returns a Action object from the given actionId.
+    '''
+    raise NotImplementedError()
+
+    #if self.actionsUrl:
+    #  url = self.actionsUrl
+    #else:
+    #  raise GrokError('There is no Actions URL associated with this Project' \
+    #                  ' object.')
+    #
+    #url += ('/' + str(actionId))
+    #result = self.c.request('GET', url)
+    #
+    #parentProject = self
+    #
+    #return Action(parentProject, result['action'])
+
+  def listActions(self):
+    '''
+    Returns a list of Actions associated with the current project
+    '''
+
+    if self.actionsUrl:
+      url = self.actionsUrl
+    else:
+      raise GrokError('There is no Actions URL associated with this Project' \
+                      ' object.')
+
+    actionDefs = self.c.request('GET', url)['actions']
+
+    actions = []
+    for actionDef in actionDefs:
+      actions.append(Action(self, actionDef))
+
+    return actions
+
+  def deleteAllActions(self, verbose = False):
+    '''
+    Permanently deletes all Actions associated with the current project
+
+      * [verbose] - If set, the action Id of each action being deleted will be
+      printed.
+
+    .. warning:: There is currently no way to recover from this opperation.
+    '''
+
+    raise NotImplementedError()
+
+    #actionList = self.listActions()
+    #
+    #for action in actionList:
+    #  if verbose or grokpy.DEBUG:
+    #    print 'Deleting action: ' + str(action.id)
+    #  action.delete()

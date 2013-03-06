@@ -7,6 +7,7 @@ from grokpy.project import Project
 from grokpy.exceptions import GrokError
 from grokpy.model import Model
 from grokpy.stream import Stream
+from grokpy.action import Action
 from grokpy.client import Client
 
 class ProjectTestCase(GrokTestCase):
@@ -22,10 +23,14 @@ class ProjectTestCase(GrokTestCase):
                        'name': 'Joyous Days',
                        'url': 'http://www.example.com',
                        'modelsUrl': 'http://www.example.com',
-                       'streamsUrl': 'http://www.example.com'}
+                       'streamsUrl': 'http://www.example.com',
+                       'actionsUrl': 'http://www.example.com'}
 
-    # Instantiate the stream
+    # Instantiate the project
     self.p = Project(self.client, self.projectDef)
+
+  ####################
+  # Project Top Level
 
   def testSetName(self):
     '''
@@ -50,6 +55,9 @@ class ProjectTestCase(GrokTestCase):
 
     self.p.delete()
     self.p.c.request.assert_any_call()
+
+  ###################
+  # Models
 
   def testCreateModel(self):
     '''
@@ -83,6 +91,9 @@ class ProjectTestCase(GrokTestCase):
     self.p.deleteAllModels()
 
     self.p.parentClient.deleteAllModels.assert_any_call()
+
+  #################
+  # Streams
 
   def testCreateStream(self):
     '''
@@ -154,11 +165,74 @@ class ProjectTestCase(GrokTestCase):
 
     self.p.parentClient.deleteAllStreams.assert_any_call()
 
+  ################
+  # Actions
+
+  def testCreateAction(self):
+    '''
+    Creating a action should make a well formatted call to the API
+    '''
+
+    # Update the response for the next request
+    description = "I did things!"
+    response = {"action": {
+                  "description": "I did things!",
+                  "id": "dbbfc567-c409-4e7a-b06f-941f752e2f55",
+                  "url": "http://www.example.com"
+                }}
+
+    self.p.c.request.return_value = response
+
+    # Make the call
+    returnValue = self.p.createAction(description)
+
+    self.p.c.request.assert_called_with('POST',
+                                        self.p.actionsUrl,
+                                        {'action': {'description': description}})
+
+    self.assertIsInstance(returnValue, Action)
+
+  def testGetAction(self):
+    '''
+    Not Implemented - Error should be raised
+    '''
+
+    actionId = 'foo'
+
+    self.assertRaises(NotImplementedError, self.p.getAction, actionId)
+
+  def testListActions(self):
+    '''
+    Should make a well formatted call and return a list of Action instances
+    '''
+
+    # Update the response for the next request
+    response = {'actions': [{'description': 'Stuff Done', 'id': 1},
+                            {'description': 'More things!', 'id': 2}]}
+    self.p.c.request.return_value = response
+
+    # Make the call
+    actions = self.p.listActions()
+
+    self.p.c.request.assert_called_with('GET', self.p.actionsUrl)
+
+    self.assertIsInstance(actions, type([]))
+
+    for action in actions:
+      self.assertIsInstance(action, Action)
+
+  def testDeleteAllActions(self):
+    '''
+    Not Implemented - Error should be raised
+    '''
+
+    self.assertRaises(NotImplementedError, self.p.deleteAllActions)
+
 if __name__ == '__main__':
   debug = 0
   if debug:
     single = unittest.TestSuite()
-    single.addTest(ProjectTestCase('testDeleteAllModels'))
+    single.addTest(ProjectTestCase('testDeleteAllActions'))
     unittest.TextTestRunner().run(single)
   else:
     unittest.main()

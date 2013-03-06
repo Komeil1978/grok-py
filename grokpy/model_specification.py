@@ -33,6 +33,11 @@ class ModelSpecification(object):
     self.customErrorExpression = None
     self.customErrorAveragingWindow = None
 
+    # Type of model: 
+    #    grokpy.ModelType.PREDICTOR - standard predictor model
+    #    grokpy.ModelType.ANOMALY   - model optimized for anomaly detection
+    self.modelType = grokpy.ModelType.PREDICTOR
+
   def setName(self, name):
     '''
     Updates the local name.
@@ -213,6 +218,28 @@ class ModelSpecification(object):
     self.customErrorExpression = encodedCustomExpr
     self.customErrorAveragingWindow = errorWindow
 
+  def setType(self, modelType):
+    '''
+    Defines the type of model to be run.
+
+    * modelType - string (must be one of the grokpy.ModelType options:
+                            grokpy.ModelType.ANOMALY
+                            grokpy.ModelType.PREDICTOR
+                          )
+
+    If ModelType.ANOMALY, the model will return AnomalyScore and will be 
+    optimized for anomaly detection.
+
+    Example::
+
+        modelSpec.setType(grokpy.ModelType.PREDICTOR)
+    '''
+    if type(modelType) != str or \
+       modelType not in [grokpy.ModelType.ANOMALY, grokpy.ModelType.PREDICTOR]:
+      raise GrokError("Model type must be one of the grokpy.ModelType options.")
+
+    self.modelType = modelType
+
 
   def getSpec(self):
     '''
@@ -229,6 +256,8 @@ class ModelSpecification(object):
                   "predictedField": self.predictedField,
                   "streamId": self.streamId,
                   "predictionSteps": self.steps}
+
+    returnSpec['modelType'] = self.modelType
 
     if self.aggInt:
       returnSpec['aggregation'] = {}

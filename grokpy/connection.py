@@ -1,12 +1,35 @@
-import sys
-import os
-import json
-import requests
 import base64
 import grokpy
-
-from exceptions import GrokError, AuthenticationError
+import json
+import os
+import requests
+import sys
+import time
+from datetime import (
+  datetime,
+  timedelta
+)
+from exceptions import (
+  GrokError,
+  AuthenticationError
+)
+from functools import wraps
 from grokpy.requests.exceptions import HTTPError
+
+
+def total_seconds(dt):
+  '''
+  Calculates the total seconds represented in a datetime.timedelta instance.
+
+  Provided for backward compatibility in versions of python < 2.7.  For later
+  versions, the native datetime.timedelta.total_seconds() implementation is
+  used.
+  '''
+  if hasattr(dt, 'total_seconds'):
+    return dt.total_seconds()
+
+  return (dt.microseconds + (dt.seconds + dt.days * 24 * 3600) * 10**6) / 10**6
+
 
 class Connection(object):
   '''
@@ -15,7 +38,7 @@ class Connection(object):
 
   def __init__(self,
                key = None,
-               baseURL = 'https://api.numenta.com/',
+               baseURL = None,
                session = None,
                headers = None,
                proxies = None):
@@ -60,6 +83,9 @@ class Connection(object):
       print 'Using API Key'
       print key
 
+    if not baseURL:
+      baseURL = self._find_baseURL(default='https://api.numenta.com/')
+
     # The base path for all our HTTP calls
     if baseURL[-1] != '/':
       baseURL += '/'
@@ -83,7 +109,8 @@ class Connection(object):
     self.s = session
     self.requuid = None
 
-  def request(self, method, url, requestDef = None, params = None):
+  def request(self, method, url, requestDef = None, params = None,
+    retries = 3, retryInterval = 30):
     '''
     Interface for all HTTP requests made to the Grok API
     '''
@@ -92,12 +119,12 @@ class Connection(object):
       url = self.baseURL + url
 
     # JSON serialize the requestDef object
-    requestDef = json.dumps(requestDef, ensure_ascii=False)
+    requestDefJSON = json.dumps(requestDef, ensure_ascii=False)
 
     if grokpy.DEBUG:
       print "Method :", method
       print "Url :", url
-      print "requestDef : ", requestDef
+      print "requestDef : ", requestDefJSON
       print "params :", params
 
     try:
@@ -105,9 +132,11 @@ class Connection(object):
       if method == 'GET':
         response = self.s.get(url, params = params)
       elif method == 'POST':
-        response = self.s.post(url, requestDef)
+        response = self.s.post(url, requestDefJSON)
       elif method == 'DELETE':
         response = self.s.delete(url)
+      elif method == 'PUT':
+        response = self.s.put(url, requestDefJSON)
       else:
         raise GrokError('Unsupported HTTP method: %s' % method)
     except ImportError:
@@ -116,6 +145,7 @@ class Connection(object):
                       'you get an "unknown command" error. Please install pip '
                       'by running "sudo easy_install pip", then rerun the '
                       'first command.')
+
     if response.headers.get('x-grok-requuid'):
       self.requuid = response.headers.get('x-grok-requuid')
     if not response.ok:
@@ -129,7 +159,36 @@ class Connection(object):
                                          response.headers.get('x-grok-requuid'),
                                          response.text
                                         )
-        raise HTTPError(e)
+
+        if ('retry-after' in response.headers) \
+          and response.status_code == 503 \
+          and retries:
+          retryAfter = response.headers['retry-after']
+
+          try:
+            ttl = int(retryAfter)
+
+          except ValueError:
+            retryAfterTS = \
+              datetime.strptime(retryAfter, '%a, %d %b %Y %H:%M:%S UTC')
+
+            dttl = retryAfterTS - datetime.utcnow()
+
+            ttl = total_seconds(dttl)
+
+          if ttl > 0:
+            time.sleep(ttl)
+
+            return self.request(method, url, requestDef, params, retries)
+
+          raise HTTPError(e)
+
+        elif response.status_code >= 500 and retries > 1:
+          time.sleep(retryInterval)
+          return self.request(method, url, requestDef, params, retries - 1, retryInterval)
+
+        else:
+          raise HTTPError(e)
 
     if grokpy.DEBUG >= 1:
       print 'Raw response:'
@@ -158,6 +217,12 @@ class Connection(object):
       return None
 
     return key
+
+  def _find_baseURL(self, default):
+    '''
+    Retrieve an API base URL from the user's shell environment
+    '''
+    return os.environ.get("GROK_API_URL", default)
 
   def _validateKey(self, key):
     '''

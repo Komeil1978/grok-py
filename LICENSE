@@ -1,4 +1,4 @@
-Copyright (c) 2011 Numenta, Inc.
+Copyright (c) 2012 Numenta, Inc.
 
  Permission is hereby granted, free of charge, to any person
  obtaining a copy of this software and associated documentation
@@ -24,31 +24,36 @@ Copyright (c) 2011 Numenta, Inc.
 #############################################################################
 # Included Libraries
 
-### Httplib2 ###
-Copyright (c) 2006 by Joe Gregorio
+### Requests ###
+Copyright (c) 2012 Kenneth Reitz.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted, provided that the above
+copyright notice and this permission notice appear in all copies.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+https://github.com/kennethreitz/requests
+
+### urllib3 ###
+
+Copyright 2008-2012 Andrey Petrov and contributors.
 
 MIT Licensed as above.
 
-http://code.google.com/p/httplib2/
+https://github.com/shazow/urllib3
 
 #############################################################################
-# Significant contributions
+# Portions of thise code were inspired by the excellent Redis python client
+library, Copyright (c) 2010 Andy McCurdy.
 
-###
-Portions of this code are Copyright (c) 2010 Andy McCurdy.
-
-MIT Licensed as above.
-
-The excellent Redis python client library:
 https://github.com/andymccurdy/redis-py/
-
-###
-Portions of this code are Copyright (c) 2009-2010 Joshua Roesslein
-
-MIT Licensed as above.
-
-The thoroughly appreciated Tweepy library:
-https://github.com/tweepy/tweepy
 
 ###
 Portions of this code are Copyright (c) 1999-2003 Steve Purcell and

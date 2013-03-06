@@ -134,10 +134,10 @@ class DataSourceField(object):
     if self.flag:
       returnSpec['flag'] = self.flag
 
-    if self.maxValue:
+    if self.maxValue is not None:
       returnSpec['max'] = self.maxValue
 
-    if self.minValue:
+    if self.minValue is not None:
       returnSpec['min'] = self.minValue
 
     if self.aggregationFunction:

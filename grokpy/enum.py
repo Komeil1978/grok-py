@@ -52,6 +52,11 @@ class PredictionType(object):
   TEMPORAL = 'temporal'
   SPATIAL = 'spatial'
 
+class ModelType(object):
+
+  ANOMALY = 'anomalyDetector'
+  PREDICTOR = 'predictor'
+
 class DataSourceType(object):
 
   LOCAL = 'local'

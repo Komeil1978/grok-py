@@ -6,6 +6,8 @@ import StringIO
 import traceback
 import grokpy
 
+from datetime import datetime
+
 from exceptions import GrokError, AuthenticationError
 
 class Stream(object):
@@ -42,6 +44,9 @@ class Stream(object):
 
     # Where to POST the data
     url = self.dataUrl
+
+    # Parse records for various things
+    records = self._parseRecords(records)
 
     # Limit how many records we will send in a given request
     try:
@@ -91,3 +96,23 @@ class Stream(object):
     Returns a Python dict representing the specification of this stream
     '''
     return self._rawStreamDef
+
+
+  #############################################################################
+  # PRIVATE METHODS
+
+  def _parseRecords(self, records):
+    '''
+    Return records in a format more compatible with POSTing to the API
+
+    NOTE: This could be expensive. First optimization would be to use list
+    comprehensions at the expense of readability.
+    '''
+
+    # Convert Python datetime objects into API compatible strings
+    for i, record in enumerate(records):
+      for j, item in enumerate(record):
+        if isinstance(item, datetime):
+          records[i][j] = item.strftime('%Y-%m-%d %H:%M:%S.%f')
+
+    return records

@@ -68,7 +68,7 @@ class Client(object):
     # Otherwise return the first user with a matching Id
     else:
       for userDict in rv['users']:
-        if int(userDict['userId']) == userId:
+        if userDict['id'] == userId:
           return User(userDict)
 
     # We didn't find the user
