@@ -1,4 +1,8 @@
 ###############################################################################
+# 0.2.7
+  - getAnomalyAutoDetectThreshold and setAnomalyAutoDetectThreshold added to models
+  - Changed aggregation 'average' to 'mean'
+###############################################################################
 # 0.2.6
   - Added startAt parameter to method getModelOutput in model.py
   - Accept python datetime objects as part of records, convertingly them silently to strings before POSTing to API

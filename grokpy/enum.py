@@ -42,7 +42,7 @@ class AggregationFunction(object):
 
   FIRST = 'first'
   LAST = 'last'
-  AVERAGE = 'average'
+  AVERAGE = 'mean'
   SUM = 'sum'
   MAX = 'max'
   MIN = 'min'

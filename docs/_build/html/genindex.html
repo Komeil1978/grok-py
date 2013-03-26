@@ -10,7 +10,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &mdash; Grokpy 0.1.0 documentation</title>
+    <title>Index &mdash; Grokpy 0.2.7 documentation</title>
     
     <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -18,7 +18,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '',
-        VERSION:     '0.1.0',
+        VERSION:     '0.2.7',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <link rel="top" title="Grokpy 0.1.0 documentation" href="index.html" /> 
+    <link rel="top" title="Grokpy 0.2.7 documentation" href="index.html" /> 
   </head>
   <body>
     <div class="related">
@@ -39,7 +39,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Grokpy 0.1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Grokpy 0.2.7 documentation</a> &raquo;</li> 
       </ul>
     </div>  
 
@@ -100,25 +100,21 @@
   </dt>
 
       
-  <dt><a href="grokpy.html#grokpy.twitter_data_source.TwitterDataSource.addKeyword">addKeyword() (grokpy.twitter_data_source.TwitterDataSource method)</a>
-  </dt>
-
-      
-  <dt><a href="grokpy.html#grokpy.weather_data_source.WeatherDataSource.addMeasurement">addMeasurement() (grokpy.weather_data_source.WeatherDataSource method)</a>
-  </dt>
-
-      
   <dt><a href="grokpy.html#grokpy.stream.Stream.addRecords">addRecords() (grokpy.stream.Stream method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.packages.urllib3.packages.html#grokpy.requests.packages.urllib3.packages.six.advance_iterator">advance_iterator() (in module grokpy.requests.packages.urllib3.packages.six)</a>
   </dt>
 
       
   <dt><a href="grokpy.html#grokpy.enum.Aggregation">Aggregation (class in grokpy.enum)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction">AggregationFunction (class in grokpy.enum)</a>
   </dt>
 
       
@@ -139,6 +135,10 @@
 
       
   <dt><a href="grokpy.html#grokpy.exceptions.AuthenticationError">AuthenticationError</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction.AVERAGE">AVERAGE (grokpy.enum.AggregationFunction attribute)</a>
   </dt>
 
   </dl></td>
@@ -203,6 +203,16 @@
   <dt><a href="grokpy.html#grokpy.client.Client">Client (class in grokpy.client)</a>
   </dt>
 
+      
+  <dt><a href="grokpy.html#grokpy.model.Model.clone">clone() (grokpy.model.Model method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="grokpy.html#grokpy.stream.Stream.clone">(grokpy.stream.Stream method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="grokpy.html#grokpy.enum.SwarmStatus.COMPLETED">COMPLETED (grokpy.enum.SwarmStatus attribute)</a>
   </dt>
@@ -281,6 +291,10 @@
       </dl></dd>
       
   <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.structures.MultiDict.copy">copy() (grokpy.requests.packages.oreos.structures.MultiDict method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model.Model.createCheckpoint">createCheckpoint() (grokpy.model.Model method)</a>
   </dt>
 
       
@@ -387,6 +401,12 @@
   <dt><a href="grokpy.html#grokpy.client.Client.deleteAllModels">deleteAllModels() (grokpy.client.Client method)</a>
   </dt>
 
+      <dd><dl>
+        
+  <dt><a href="grokpy.html#grokpy.project.Project.deleteAllModels">(grokpy.project.Project method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="grokpy.html#grokpy.client.Client.deleteAllProjects">deleteAllProjects() (grokpy.client.Client method)</a>
   </dt>
@@ -470,11 +490,15 @@
   </dt>
 
       
-  <dt><a href="grokpy.requests.packages.urllib3.html#grokpy.requests.packages.urllib3.response.HTTPResponse.from_httplib">from_httplib() (grokpy.requests.packages.urllib3.response.HTTPResponse class method)</a>
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction.FIRST">FIRST (grokpy.enum.AggregationFunction attribute)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="grokpy.requests.packages.urllib3.html#grokpy.requests.packages.urllib3.response.HTTPResponse.from_httplib">from_httplib() (grokpy.requests.packages.urllib3.response.HTTPResponse class method)</a>
+  </dt>
+
       
   <dt><a href="grokpy.requests.html#grokpy.requests.models.Request.full_url">full_url (grokpy.requests.models.Request attribute)</a>
   </dt>
@@ -574,10 +598,6 @@
   </dt>
 
       
-  <dt><a href="grokpy.html#grokpy.model.Model.getMultiStepPredictions">getMultiStepPredictions() (grokpy.model.Model method)</a>
-  </dt>
-
-      
   <dt><a href="grokpy.html#grokpy.client.Client.getProject">getProject() (grokpy.client.Client method)</a>
   </dt>
 
@@ -595,22 +615,28 @@
   </dt>
 
         
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.getSpec">(grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+        
   <dt><a href="grokpy.html#grokpy.stream_specification.StreamSpecification.getSpec">(grokpy.stream_specification.StreamSpecification method)</a>
-  </dt>
-
-        
-  <dt><a href="grokpy.html#grokpy.twitter_data_source.TwitterDataSource.getSpec">(grokpy.twitter_data_source.TwitterDataSource method)</a>
-  </dt>
-
-        
-  <dt><a href="grokpy.html#grokpy.weather_data_source.WeatherDataSource.getSpec">(grokpy.weather_data_source.WeatherDataSource method)</a>
   </dt>
 
       </dl></dd>
       
-  <dt><a href="grokpy.html#grokpy.swarm.Swarm.getState">getState() (grokpy.swarm.Swarm method)</a>
+  <dt><a href="grokpy.html#grokpy.stream.Stream.getSpecDict">getSpecDict() (grokpy.stream.Stream method)</a>
   </dt>
 
+      
+  <dt><a href="grokpy.html#grokpy.model.Model.getState">getState() (grokpy.model.Model method)</a>
+  </dt>
+
+      <dd><dl>
+        
+  <dt><a href="grokpy.html#grokpy.swarm.Swarm.getState">(grokpy.swarm.Swarm method)</a>
+  </dt>
+
+      </dl></dd>
       
   <dt><a href="grokpy.html#grokpy.client.Client.getStream">getStream() (grokpy.client.Client method)</a>
   </dt>
@@ -666,6 +692,10 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#module-grokpy.model_specification">grokpy.model_specification (module)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.html#module-grokpy.project">grokpy.project (module)</a>
   </dt>
 
@@ -673,6 +703,8 @@
   <dt><a href="grokpy.requests.html#module-grokpy.requests">grokpy.requests (module)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.html#module-grokpy.requests.api">grokpy.requests.api (module)</a>
   </dt>
@@ -681,8 +713,6 @@
   <dt><a href="grokpy.requests.html#module-grokpy.requests.async">grokpy.requests.async (module)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.html#module-grokpy.requests.auth">grokpy.requests.auth (module)</a>
   </dt>
@@ -804,15 +834,7 @@
   </dt>
 
       
-  <dt><a href="grokpy.html#module-grokpy.twitter_data_source">grokpy.twitter_data_source (module)</a>
-  </dt>
-
-      
   <dt><a href="grokpy.html#module-grokpy.user">grokpy.user (module)</a>
-  </dt>
-
-      
-  <dt><a href="grokpy.html#module-grokpy.weather_data_source">grokpy.weather_data_source (module)</a>
   </dt>
 
       
@@ -1044,7 +1066,15 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction.LAST">LAST (grokpy.enum.AggregationFunction attribute)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.html#grokpy.enum.StockDataTypes.LAST_PRICE">LAST_PRICE (grokpy.enum.StockDataTypes attribute)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model.Model.listCheckpoints">listCheckpoints() (grokpy.model.Model method)</a>
   </dt>
 
       
@@ -1080,11 +1110,15 @@
 
       </dl></dd>
       
-  <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.structures.MultiDict.listvalues">listvalues() (grokpy.requests.packages.oreos.structures.MultiDict method)</a>
+  <dt><a href="grokpy.html#grokpy.model.Model.listSwarms">listSwarms() (grokpy.model.Model method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.structures.MultiDict.listvalues">listvalues() (grokpy.requests.packages.oreos.structures.MultiDict method)</a>
+  </dt>
+
       
   <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.monkeys.BaseCookie.load">load() (grokpy.requests.packages.oreos.monkeys.BaseCookie method)</a>
   </dt>
@@ -1136,6 +1170,10 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction.MAX">MAX (grokpy.enum.AggregationFunction attribute)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.requests.packages.urllib3.html#grokpy.requests.packages.urllib3.exceptions.MaxRetryError">MaxRetryError</a>
   </dt>
 
@@ -1151,6 +1189,10 @@
   <dt><a href="grokpy.requests.html#grokpy.requests.models.Request.method">method (grokpy.requests.models.Request attribute)</a>
   </dt>
 
+      
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction.MIN">MIN (grokpy.enum.AggregationFunction attribute)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
@@ -1163,6 +1205,10 @@
 
       
   <dt><a href="grokpy.html#grokpy.model.Model">Model (class in grokpy.model)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification">ModelSpecification (class in grokpy.model_specification)</a>
   </dt>
 
       
@@ -1186,12 +1232,6 @@
 
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%" valign="top"><dl>
-      
-  <dt><a href="grokpy.html#grokpy.enum.DataFlag.NONE">NONE (grokpy.enum.DataFlag attribute)</a>
-  </dt>
-
-  </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.html#grokpy.exceptions.NotYetImplementedError">NotYetImplementedError</a>
@@ -1291,8 +1331,6 @@
   <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.structures.MultiDict.poplist">poplist() (grokpy.requests.packages.oreos.structures.MultiDict method)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.html#grokpy.requests.sessions.Session.post">post() (grokpy.requests.sessions.Session method)</a>
   </dt>
@@ -1307,12 +1345,18 @@
   </dt>
 
       </dl></dd>
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.packages.urllib3.html#grokpy.requests.packages.urllib3.request.RequestMethods.post_url">post_url() (grokpy.requests.packages.urllib3.request.RequestMethods method)</a>
   </dt>
 
       
   <dt><a href="grokpy.html#grokpy.enum.WeatherDataType.PRECIPITATION">PRECIPITATION (grokpy.enum.WeatherDataType attribute)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.enum.PredictionType">PredictionType (class in grokpy.enum)</a>
   </dt>
 
       
@@ -1538,6 +1582,26 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setAggFuncOverrides">setAggFuncOverrides() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.data_source_field.DataSourceField.setAggregationFunction">setAggregationFunction() (grokpy.data_source_field.DataSourceField method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setAggregationInterval">setAggregationInterval() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setComputeInterval">setComputeInterval() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setCustomErrorMetric">setCustomErrorMetric() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.structures.MultiDict.setdefault">setdefault() (grokpy.requests.packages.oreos.structures.MultiDict method)</a>
   </dt>
 
@@ -1554,6 +1618,14 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#grokpy.data_source_field.DataSourceField.setMax">setMax() (grokpy.data_source_field.DataSourceField method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.data_source_field.DataSourceField.setMin">setMin() (grokpy.data_source_field.DataSourceField method)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.html#grokpy.data_source_field.DataSourceField.setName">setName() (grokpy.data_source_field.DataSourceField method)</a>
   </dt>
 
@@ -1564,6 +1636,10 @@
 
         
   <dt><a href="grokpy.html#grokpy.model.Model.setName">(grokpy.model.Model method)</a>
+  </dt>
+
+        
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setName">(grokpy.model_specification.ModelSpecification method)</a>
   </dt>
 
         
@@ -1580,6 +1656,24 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setPredictedField">setPredictedField() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setPredictionSteps">setPredictionSteps() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="grokpy.html#grokpy.stream_specification.StreamSpecification.setPredictionType">setPredictionType() (grokpy.stream_specification.StreamSpecification method)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.model_specification.ModelSpecification.setStream">setStream() (grokpy.model_specification.ModelSpecification method)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.html#grokpy.data_source_field.DataSourceField.setType">setType() (grokpy.data_source_field.DataSourceField method)</a>
   </dt>
 
@@ -1591,10 +1685,12 @@
   <dt><a href="grokpy.html#grokpy.enum.SwarmSize.SMALL">SMALL (grokpy.enum.SwarmSize attribute)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.packages.oreos.html#grokpy.requests.packages.oreos.monkeys.SmartCookie">SmartCookie (class in grokpy.requests.packages.oreos.monkeys)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.enum.PredictionType.SPATIAL">SPATIAL (grokpy.enum.PredictionType attribute)</a>
   </dt>
 
       
@@ -1626,10 +1722,6 @@
   </dt>
 
       
-  <dt><a href="grokpy.html#grokpy.project.Project.stopAllModels">stopAllModels() (grokpy.project.Project method)</a>
-  </dt>
-
-      
   <dt><a href="grokpy.html#grokpy.model.Model.stopSwarm">stopSwarm() (grokpy.model.Model method)</a>
   </dt>
 
@@ -1651,6 +1743,10 @@
 
       
   <dt><a href="grokpy.html#grokpy.stream_specification.StreamSpecification">StreamSpecification (class in grokpy.stream_specification)</a>
+  </dt>
+
+      
+  <dt><a href="grokpy.html#grokpy.enum.AggregationFunction.SUM">SUM (grokpy.enum.AggregationFunction attribute)</a>
   </dt>
 
       
@@ -1676,6 +1772,10 @@
   </dt>
 
       
+  <dt><a href="grokpy.html#grokpy.enum.PredictionType.TEMPORAL">TEMPORAL (grokpy.enum.PredictionType attribute)</a>
+  </dt>
+
+      
   <dt><a href="grokpy.requests.html#grokpy.requests.models.Response.text">text (grokpy.requests.models.Response attribute)</a>
   </dt>
 
@@ -1687,12 +1787,12 @@
   <dt><a href="grokpy.requests.html#grokpy.requests.models.Request.timeout">timeout (grokpy.requests.models.Request attribute)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.requests.packages.urllib3.html#grokpy.requests.packages.urllib3.exceptions.TimeoutError">TimeoutError</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.html#grokpy.enum.DataFlag.TIMESTAMP">TIMESTAMP (grokpy.enum.DataFlag attribute)</a>
   </dt>
@@ -1707,10 +1807,6 @@
 
       
   <dt><a href="grokpy.html#grokpy.enum.PublicDataSources.TWITTER">TWITTER (grokpy.enum.PublicDataSources attribute)</a>
-  </dt>
-
-      
-  <dt><a href="grokpy.html#grokpy.twitter_data_source.TwitterDataSource">TwitterDataSource (class in grokpy.twitter_data_source)</a>
   </dt>
 
   </dl></td>
@@ -1852,19 +1948,15 @@
   </dt>
 
       
-  <dt><a href="grokpy.html#grokpy.weather_data_source.WeatherDataSource">WeatherDataSource (class in grokpy.weather_data_source)</a>
-  </dt>
-
-      
   <dt><a href="grokpy.html#grokpy.enum.WeatherDataType">WeatherDataType (class in grokpy.enum)</a>
   </dt>
 
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.html#grokpy.enum.Aggregation.WEEKS">WEEKS (grokpy.enum.Aggregation attribute)</a>
   </dt>
 
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="grokpy.html#grokpy.enum.WeatherDataType.WIND_SPEED">WIND_SPEED (grokpy.enum.WeatherDataType attribute)</a>
   </dt>
@@ -1912,11 +2004,11 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li><a href="index.html">Grokpy 0.1.0 documentation</a> &raquo;</li> 
+        <li><a href="index.html">Grokpy 0.2.7 documentation</a> &raquo;</li> 
       </ul>
     </div>
     <div class="footer">
-        &copy; Copyright 2012, Ian Danforth.
+        &copy; Copyright 2013, Numenta.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

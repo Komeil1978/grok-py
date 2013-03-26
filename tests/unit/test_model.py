@@ -28,7 +28,32 @@ class ModelTestCase(GrokTestCase):
     self.m = Model(self.client, self.modelDef)
 
 
-  @patch.object(Model, '_runCommand')
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
+  def testModelSetAnomalyAutoDetectThreshold(self, runCommandMock):
+
+    self.m.setAnomalyAutoDetectThreshold('mockThreshold')
+    runCommandMock.assert_called_once_with('setAutoDetectThreshold', 
+      autoDetectThreshold='mockThreshold')
+    runCommandMock.reset_mock()
+
+    self.assertRaises(Exception, self.m.setAnomalyAutoDetectThreshold, 
+      badParam='test')
+
+    self.assertRaises(Exception, self.m.setAnomalyAutoDetectThreshold)
+
+
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
+  def testModelGetAnomalyAutoDetectThreshold(self, runCommandMock):
+
+    self.m.getAnomalyAutoDetectThreshold()
+    runCommandMock.assert_called_once_with('getAutoDetectThreshold')
+    runCommandMock.reset_mock()
+
+    self.assertRaises(Exception, self.m.getAnomalyAutoDetectThreshold, 
+      badParam='test')
+
+
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
   def testModelGetLabels(self, runCommandMock):
 
     self.m.getLabels()
@@ -50,7 +75,7 @@ class ModelTestCase(GrokTestCase):
 
     self.assertRaises(Exception, self.m.addLabel, badParam='test')
 
-  @patch.object(Model, '_runCommand')
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
   def testModelAddLabels(self, runCommandMock):
 
     self.m.addLabel(startRecordID=10, endRecordID=15, labelName='test')
@@ -67,7 +92,7 @@ class ModelTestCase(GrokTestCase):
     self.assertRaises(Exception, self.m.addLabel, badParam='test')
 
 
-  @patch.object(Model, '_runCommand')
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
   def testModelRemoveLabels(self, runCommandMock):
 
     self.m.removeLabels(startRecordID=10)

@@ -213,6 +213,39 @@ class Model(object):
     return self._runCommand('enableLearning', **params)
 
 
+  def setAnomalyAutoDetectThreshold(self, autoDetectThreshold):
+    '''
+    Sets the autoDetectThreshold of the model.  Model must be TemporalAnomaly
+    for this to succeed.
+
+    Parameters
+    ----------------------------
+    autoDetectThreshold - value to set the auto detect threshold
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('setAutoDetectThreshold', \
+      autoDetectThreshold=autoDetectThreshold)
+
+
+  def getAnomalyAutoDetectThreshold(self):
+    '''
+    Gets the autoDetectThreshold of the model.  Model must be TemporalAnomaly
+    for this to succeed.
+
+    Response on success
+    ----------------------------
+    {
+      'autoDetectThreshold': float
+    }
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('getAutoDetectThreshold')
+
+
   def getLabels(self, startRecordID=None, endRecordID=None):
     '''
     Returns a list of labels for a given range of records. Each record has a 
