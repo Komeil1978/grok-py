@@ -27,6 +27,7 @@ from grokpy import Client, GrokError
 # Configuration Settings
 
 API_KEY = None
+ANOMALY_THRESHOLD = 0.8 # Anomaly scores above this are considered anomalies
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV_SWARM = 'output/SwarmOutput.csv'
 NEW_RECORDS = 'data/rec-center-stream.csv'
@@ -202,6 +203,9 @@ def HelloGrokAnomalyProduction(modelId = None):
   print 'Promoting our model. This may take a few seconds ...'
   recCenterEnergyModel.promote()
 
+  print 'Setting our anomaly score threshold to: %s' % (ANOMALY_THRESHOLD)
+  recCenterEnergyModel.setAnomalyAutoDetectThreshold(ANOMALY_THRESHOLD)
+
   ##############################################################################
   # Sending new records
 
@@ -254,6 +258,15 @@ def HelloGrokAnomalyProduction(modelId = None):
   # Align predictions with actuals
   print 'Retrieving results ...'
   headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 2500)
+
+  # Get and align anomalies
+  print 'Retrieving anomalies ...'
+  anomalyRows = recCenterEnergyModel.getLabels()
+  firstROWID = resultRows[0][0]
+  anomalyLabelID = headers.index('Anomaly Label')
+  for anomaly in anomalyRows['recordLabels']:
+    resultID = anomaly['ROWID'] - firstROWID
+    resultRows[resultID][anomalyLabelID] = anomaly['labels']
 
   #############################################################################
   # Write out predictions to a CSV

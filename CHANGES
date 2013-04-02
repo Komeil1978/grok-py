@@ -1,4 +1,7 @@
 ###############################################################################
+# 0.2.8
+  - HelloGrokAnomaly.py uses getLabels() and set the threshold after swarm.
+###############################################################################
 # 0.2.7
   - getAnomalyAutoDetectThreshold and setAnomalyAutoDetectThreshold added to models
   - Changed aggregation 'average' to 'mean'
