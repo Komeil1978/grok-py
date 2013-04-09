@@ -179,7 +179,7 @@ class Connection(object):
           if ttl > 0:
             time.sleep(ttl)
 
-            return self.request(method, url, requestDef, params, retries)
+            return self.request(method, url, requestDef, params, retries - 1)
 
           raise HTTPError(e)
 

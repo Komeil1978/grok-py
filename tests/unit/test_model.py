@@ -54,6 +54,31 @@ class ModelTestCase(GrokTestCase):
 
 
   @patch.object(Model, '_runCommand', spec=Model._runCommand)
+  def testModelSetAnomalyAutoDetectWaitRecords(self, runCommandMock):
+
+    self.m.setAnomalyAutoDetectWaitRecords('mockWaitRecords')
+    runCommandMock.assert_called_once_with('setAutoDetectWaitRecords', 
+      autoDetectWaitRecords='mockWaitRecords')
+    runCommandMock.reset_mock()
+
+    self.assertRaises(Exception, self.m.setAnomalyAutoDetectWaitRecords, 
+      badParam='test')
+
+    self.assertRaises(Exception, self.m.setAnomalyAutoDetectWaitRecords)
+
+
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
+  def testModelGetAnomalyAutoDetectWaitRecords(self, runCommandMock):
+
+    self.m.getAnomalyAutoDetectWaitRecords()
+    runCommandMock.assert_called_once_with('getAutoDetectWaitRecords')
+    runCommandMock.reset_mock()
+
+    self.assertRaises(Exception, self.m.getAnomalyAutoDetectWaitRecords, 
+      badParam='test')
+
+
+  @patch.object(Model, '_runCommand', spec=Model._runCommand)
   def testModelGetLabels(self, runCommandMock):
 
     self.m.getLabels()

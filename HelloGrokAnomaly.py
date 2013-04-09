@@ -26,8 +26,13 @@ from grokpy import Client, GrokError
 ##############################################################################
 # Configuration Settings
 
+# Anomaly scores above this are considered anomalies
+ANOMALY_THRESHOLD = 0.8
+
+# Number of records to wait before labeling anomalies
+ANOMALY_WAIT_RECORDS = 1000 
+
 API_KEY = None
-ANOMALY_THRESHOLD = 0.8 # Anomaly scores above this are considered anomalies
 INPUT_CSV = 'data/rec-center-swarm.csv'
 OUTPUT_CSV_SWARM = 'output/SwarmOutput.csv'
 NEW_RECORDS = 'data/rec-center-stream.csv'
@@ -203,8 +208,12 @@ def HelloGrokAnomalyProduction(modelId = None):
   print 'Promoting our model. This may take a few seconds ...'
   recCenterEnergyModel.promote()
 
-  print 'Setting our anomaly score threshold to: %s' % (ANOMALY_THRESHOLD)
+  print 'Setting our anomaly score threshold to %s.' % (ANOMALY_THRESHOLD)
   recCenterEnergyModel.setAnomalyAutoDetectThreshold(ANOMALY_THRESHOLD)
+
+  print 'Setting our model to wait %s records before labeling anomalies.' % \
+    (ANOMALY_WAIT_RECORDS)
+  recCenterEnergyModel.setAnomalyAutoDetectWaitRecords(ANOMALY_WAIT_RECORDS)
 
   ##############################################################################
   # Sending new records

@@ -1,4 +1,9 @@
 ###############################################################################
+# 0.2.9
+  - Adds tests for model commands get/setAnomalyAutoDetectWaitRecords
+  - Adds get/setAutoDetectWaitRecord to model command API and updates HelloGrokAnomaly to use setAutoDetectWaitRecords
+  - BUGFIX in connection.py to avoid infinite loop with 503 HTTP error
+###############################################################################
 # 0.2.8
   - HelloGrokAnomaly.py uses getLabels() and set the threshold after swarm.
 ###############################################################################

@@ -229,6 +229,39 @@ class Model(object):
       autoDetectThreshold=autoDetectThreshold)
 
 
+  def getAnomalyAutoDetectWaitRecords(self):
+    '''
+    Gets the autoDetectWaitRecords of the model.  Model must be TemporalAnomaly
+    for this to succeed.
+
+    Response on success
+    ----------------------------
+    {
+      'autoDetectWaitRecords': integer
+    }
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('getAutoDetectWaitRecords')
+
+
+  def setAnomalyAutoDetectWaitRecords(self, autoDetectWaitRecords):
+    '''
+    Sets the autoDetectWaitRecords of the model.  Model must be TemporalAnomaly
+    for this to succeed.
+
+    Parameters
+    ----------------------------
+    autoDetectWaitRecords - value to set the auto detect wait records
+
+    .. note:: This method is intended for use with RUNNING models that have
+              been promoted. The API server will return an error in other cases.
+    '''
+    return self._runCommand('setAutoDetectWaitRecords', \
+      autoDetectWaitRecords=autoDetectWaitRecords)
+
+
   def getAnomalyAutoDetectThreshold(self):
     '''
     Gets the autoDetectThreshold of the model.  Model must be TemporalAnomaly
