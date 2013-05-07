@@ -1,4 +1,9 @@
 ###############################################################################
+# 0.2.10
+  - Cleanup grokpy.stream.Stream.addRecords to minimize redundant iterations and support generators.
+  - Updated in-line documentation to support reStructuredText-based docs build
+  - Updated download url to point to PyPi, since github doesn't do generic file hosting any more.
+###############################################################################
 # 0.2.9
   - Adds tests for model commands get/setAnomalyAutoDetectWaitRecords
   - Adds get/setAutoDetectWaitRecord to model command API and updates HelloGrokAnomaly to use setAutoDetectWaitRecords

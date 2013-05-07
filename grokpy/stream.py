@@ -10,6 +10,8 @@ from datetime import datetime
 
 from exceptions import GrokError, AuthenticationError
 
+from itertools import izip_longest
+
 class Stream(object):
   '''
   A Stream is the combination of data and the specification of those data
@@ -42,34 +44,16 @@ class Stream(object):
     * step - How many records we will send in each request.
     '''
 
-    # Where to POST the data
-    url = self.dataUrl
+    for subset in izip_longest(*[iter(records)]*step):
+      requestDef = {
+          "input": [
+              self._parseRecord(record)
+                for record in subset
+                  if record is not None
+            ]
+        }
 
-    # Parse records for various things
-    records = self._parseRecords(records)
-
-    # Limit how many records we will send in a given request
-    try:
-      if len(records) > step:
-        i = 0
-        while i < len(records):
-          requestDef = {"input": records[i:(i+step)]}
-          if grokpy.DEBUG:
-            print len(requestDef['input'])
-          self.c.request('POST', url, requestDef)
-          i += step
-      # If it's small enough send everything
-      else:
-        requestDef = {"input": records}
-        self.c.request('POST', url, requestDef)
-    # TODO: Make the error thrown by connection class more specific
-    except GrokError:
-      # Break recursion if this just isn't going to work
-      if step < 50:
-        raise GrokError('Step size started or has grown too small.')
-      # Try sending half as many records.
-      step = int(math.floor(step / 2))
-      self.addRecords(records, step)
+      self.c.request('POST', self.dataUrl, requestDef)
 
   def delete(self):
     '''
@@ -100,6 +84,16 @@ class Stream(object):
 
   #############################################################################
   # PRIVATE METHODS
+
+  def _parseRecord(self, record):
+    '''
+    Return record in a format more compatible with POSTing to the API
+    '''
+    for (column, item) in enumerate(record):
+      if isinstance(item, datetime):
+        record[column] = item.strftime('%Y-%m-%d %H:%M:%S.%f')
+
+    return record
 
   def _parseRecords(self, records):
     '''

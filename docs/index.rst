@@ -3,7 +3,7 @@ Grok Python Client Library
 ==========================
 
 Grokpy is the Python client for Grok, Numenta's Prediction Service. It wraps
-the `Grok HTTP API <http://grok.numenta.com/resources>`_ in a convenient Python
+the `Grok HTTP API <https://www.numenta.com/docs/devs/api/>`_ in a convenient Python
 library.
 
 .. _installation:
@@ -14,15 +14,7 @@ Installation
 With Example Apps (Recommended)
 -------------------------------
 
-Grab `the latest stable build`_ by clicking either 'Download as zip' or
-'Download as tar.gz' on the linked page. After uncompressing that file you
-can then install the grokpy library.::
-
-    $ python setup.py install
-
-.. _the latest stable build: http://github.com/numenta/grok-py/downloads
-
-Or, you can clone the repo. (Master is always stable.) ::
+::
 
     $ git clone git@github.com:numenta/grok-py.git
     $ cd grok-py

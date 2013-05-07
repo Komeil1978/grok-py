@@ -19,7 +19,7 @@ sdict = {
     'description' : 'Python client for Grok Prediction Service',
     'long_description' : long_description,
     'url': 'http://github.com/numenta/grok-py',
-    'download_url' : 'http://cloud.github.com/downloads/numenta/grok-py/grokpy-%s.tar.gz' % __version__,
+    'download_url' : 'https://pypi.python.org/packages/source/g/grokpy/grokpy-%s.tar.gz' % __version__,
     'author' : 'Ian Danforth',
     'author_email' : 'idanforth@numenta.com',
     'maintainer' : 'Austin Marshall',

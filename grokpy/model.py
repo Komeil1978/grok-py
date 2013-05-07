@@ -218,9 +218,7 @@ class Model(object):
     Sets the autoDetectThreshold of the model.  Model must be TemporalAnomaly
     for this to succeed.
 
-    Parameters
-    ----------------------------
-    autoDetectThreshold - value to set the auto detect threshold
+    * autoDetectThreshold - value to set the auto detect threshold
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -234,11 +232,11 @@ class Model(object):
     Gets the autoDetectWaitRecords of the model.  Model must be TemporalAnomaly
     for this to succeed.
 
-    Response on success
-    ----------------------------
-    {
-      'autoDetectWaitRecords': integer
-    }
+    Response on success::
+
+      {
+        'autoDetectWaitRecords': integer
+      }
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -251,9 +249,7 @@ class Model(object):
     Sets the autoDetectWaitRecords of the model.  Model must be TemporalAnomaly
     for this to succeed.
 
-    Parameters
-    ----------------------------
-    autoDetectWaitRecords - value to set the auto detect wait records
+    * autoDetectWaitRecords - value to set the auto detect wait records
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -267,11 +263,11 @@ class Model(object):
     Gets the autoDetectThreshold of the model.  Model must be TemporalAnomaly
     for this to succeed.
 
-    Response on success
-    ----------------------------
-    {
-      'autoDetectThreshold': float
-    }
+    Response on success::
+
+      {
+        'autoDetectThreshold': float
+      }
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -281,26 +277,24 @@ class Model(object):
 
   def getLabels(self, startRecordID=None, endRecordID=None):
     '''
-    Returns a list of labels for a given range of records. Each record has a 
+    Returns a list of labels for a given range of records. Each record has a
     list of labels assocciated. A label may have no labels.
 
-    Parameters
-    ----------------------------
-    startRecordID - ROWID of the first prediction of these label results
-    endRecordID - ROWID of the last prediction record of these label results.
-                  (Not inclusive.)
+    * startRecordID - ROWID of the first prediction of these label results
+    * endRecordID - ROWID of the last prediction record of these label results.
+                    (Not inclusive.)
 
-    Response on success
-    ----------------------------
-    {
-      'isProcessing': boolean,
-      'recordLabels': [
-        {
-          'ROWID': integer,
-          'labels': [str, ...]
-        },...
-      ]
-    }
+    Response on success::
+
+      {
+        'isProcessing': boolean,
+        'recordLabels': [
+          {
+            'ROWID': integer,
+            'labels': [str, ...]
+          },...
+        ]
+      }
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -314,18 +308,16 @@ class Model(object):
     Adds a label to a given range of records from startRecordID to endRecordID,
     not inclusive of endRecordID.
 
-    Parameters
-    ----------------------------
-    startRecordID - ROWID of the first prediction to add this label
-    endRecordID - ROWID of the last prediction record to add this label.
-                  (Not inclusive.)
-    labelName - string indicating name of the label to add to the given range
+    * startRecordID - ROWID of the first prediction to add this label
+    * endRecordID - ROWID of the last prediction record to add this label.
+                    (Not inclusive.)
+    * labelName - string indicating name of the label to add to the given range
 
-    Response on success
-    ----------------------------
-    {
-      'status': 'success'
-    }
+    Response on success::
+
+      {
+        'status': 'success'
+      }
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -336,25 +328,23 @@ class Model(object):
 
   def removeLabels(self, startRecordID=None, endRecordID=None, labelFilter=None):
     '''
-    Removes a label or all labels from a given range of records from 
+    Removes a label or all labels from a given range of records from
     startRecordID to endRecordID, not inclusive of endRecordID. If labelFilter
     is set, only labels of type labelFilter will be removed, otherwise all
     labels will be removed from the given range.
 
-    Parameters
-    ----------------------------
-    startRecordID - ROWID of the first prediction to remove labels
-    endRecordID - ROWID of the last prediction record to remove labels.
-                  (Not inclusive.)
-    labelFilter - string. If not None, only labels equal to this will be
-                  removed. Otherwise all labels will be removed from given
-                  range.
+    * startRecordID - ROWID of the first prediction to remove labels
+    * endRecordID - ROWID of the last prediction record to remove labels.
+                    (Not inclusive.)
+    * labelFilter - string. If not None, only labels equal to this will be
+                    removed. Otherwise all labels will be removed from given
+                    range.
 
-    Response on success
-    ----------------------------
-    {
-      'status': 'success'
-    }
+    Response on success::
+
+      {
+        'status': 'success'
+      }
 
     .. note:: This method is intended for use with RUNNING models that have
               been promoted. The API server will return an error in other cases.
@@ -475,19 +465,23 @@ class Model(object):
 
     * limit - The maximum number of rows to get from the model
     * offset - The number of rows from the last row from which to begin
-               returning data from. For example::
+               returning data from.
 
-      If you have 1000 records in the model output cache and set offset to
-      100, you will get records with row ID 900 to 999. If you set offset
-      above the maximum row ID that exists in the model's output cache you will
-      get no records.
+      For example::
 
-    * startAt - The start row ID to begin returning data from. For example::
+        If you have 1000 records in the model output cache and set offset to
+        100, you will get records with row ID 900 to 999. If you set offset
+        above the maximum row ID that exists in the model's output cache you will
+        get no records.
 
-      If you have 1000 records in the model output cache and set startAt to
-      100, you will get records with row ID 100 to 1000. If you set startAt
-      above the maximum row ID that exists in the model's output cache you will
-      get no records.
+    * startAt - The start row ID to begin returning data from.
+
+      For example::
+
+        If you have 1000 records in the model output cache and set startAt to
+        100, you will get records with row ID 100 to 1000. If you set startAt
+        above the maximum row ID that exists in the model's output cache you will
+        get no records.
 
     * shift - This shifts the records returned so that all predictions are
               aligned with actual values. Note: Set this value to False if you

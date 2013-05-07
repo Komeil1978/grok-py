@@ -82,13 +82,6 @@
     :members:
     :undoc-members:
 
-:mod:`twitter_data_source` Module
----------------------------------
-
-.. automodule:: grokpy.twitter_data_source
-    :members:
-    :undoc-members:
-
 :mod:`user` Module
 ------------------
 

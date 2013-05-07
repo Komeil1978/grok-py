@@ -153,7 +153,8 @@ class Project(object):
     Returns a new Action object. The Action will be created under this project.
 
     * description - String - A short description of the action the client
-    has taken and would like to log with the project.
+      has taken and would like to log with the project.
+
     '''
 
     if self.actionsUrl:
@@ -216,7 +217,7 @@ class Project(object):
     Permanently deletes all Actions associated with the current project
 
       * [verbose] - If set, the action Id of each action being deleted will be
-      printed.
+                    printed.
 
     .. warning:: There is currently no way to recover from this opperation.
     '''
