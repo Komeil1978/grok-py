@@ -1,4 +1,9 @@
 ###############################################################################
+# 0.2.11
+  - Added stop command to grokpy.model.Model
+  - Added early exit to speed up swarm
+  - Simplified HelloGrokAnomaly example and output format
+###############################################################################
 # 0.2.10
   - Cleanup grokpy.stream.Stream.addRecords to minimize redundant iterations and support generators.
   - Updated in-line documentation to support reStructuredText-based docs build

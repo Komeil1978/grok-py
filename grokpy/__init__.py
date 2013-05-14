@@ -28,7 +28,7 @@ from exceptions import (AuthenticationError,
 # Debug variable
 DEBUG = False
 
-__version__ = '0.2.10'
+__version__ = '0.2.11'
 
 __all__ = ['Client', 'Connection', 'Model', 'Project', 'Stream',
            'StreamSpecification', 'LocalDataSource', 'DataSourceField']

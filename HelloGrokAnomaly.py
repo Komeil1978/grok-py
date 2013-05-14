@@ -32,21 +32,35 @@ ANOMALY_THRESHOLD = 0.8
 # Number of records to wait before labeling anomalies
 ANOMALY_WAIT_RECORDS = 1000 
 
-API_KEY = None
 INPUT_CSV = 'data/rec-center-swarm.csv'
-OUTPUT_CSV_SWARM = 'output/SwarmOutput.csv'
 NEW_RECORDS = 'data/rec-center-stream.csv'
-OUTPUT_CSV = 'output/streamPredictions.csv'
+OUTPUT_CSV = 'output/anomaly_scores.csv'
 
-##############################################################################
-# API KEY NOTE: A slightly more secure method is to store your API key in your
-# shell environment GROK_API_KEY
+# API KEY NOTE: Add your API key here. If set to None, grokpy will
+# use the value of environment variable GROK_API_KEY
+API_KEY = None
+
+def waitForPredictions(model):
+  """
+  This function waits until there are no new predictions from this model.
+  """
+  lastRowID = -1
+  while True:
+    time.sleep(5)
+    headers, rows, _ = model.getModelOutput(1, shift = False)
+    if rows[0][0] == lastRowID:
+      print "Done: predictions have not advanced in 5 secs"
+      break
+    else:
+      lastRowID = rows[0][0]
+      print "Records seen:",lastRowID
+
 
 def HelloGrokAnomalySwarm(swarmSize = "medium"):
   """
   This function creates an anomaly detector model using the rec-center dataset.
   It is almost identical to HelloGrok.py with the exception of the call to
-  modelSpec.setType() when setting up the model object.  
+  modelSpec.setType() when setting up the model object. 
   """
 
   ##############################################################################
@@ -125,6 +139,7 @@ def HelloGrokAnomalySwarm(swarmSize = "medium"):
   #
 
   print 'Starting Grok Swarm'
+  swarmStartTime = time.time()
   recCenterEnergyModel.startSwarm(size = swarmSize)
 
   ##############################################################################
@@ -132,7 +147,6 @@ def HelloGrokAnomalySwarm(swarmSize = "medium"):
   #
   # Here we print out the error over time
 
-  swarmStarted = False
   while True:
     state = recCenterEnergyModel.getSwarmState()
     jobStatus = state['status']
@@ -145,44 +159,28 @@ def HelloGrokAnomalySwarm(swarmSize = "medium"):
     if jobStatus == grokpy.SwarmStatus.COMPLETED:
       # Swarm is done
       bestConfig = results['bestModel']
-      print '\nYou win! Your Grok Swarm is complete.'
-      print '\tWith an Error of: ' + str(results['bestValue'])
+      print '\tSwarm completed with an Error of: ' + str(results['bestValue'])
       print ('\tThis model uses the following field(s): '
              + str(results['fieldsUsed']))
+      print '\tSwarm duration: %g seconds' %(time.time() - swarmStartTime)
       print
-      # Exit the loop
       break
-    elif jobStatus == grokpy.SwarmStatus.RUNNING and swarmStarted == False:
-      # The first time we see that the swarm is running
-      swarmStarted = True
-      print 'Swarm started.'
-    elif jobStatus == grokpy.SwarmStatus.STARTING:
+    elif jobStatus == grokpy.SwarmStatus.STARTING or \
+         not results.has_key('bestValue'):
       print 'Swarm is starting up ...'
-      time.sleep(2)
-    else:
-      if results.has_key('bestValue'):
-        print 'Current swarm error: ' + str(results['bestValue'])
-        sys.stdout.flush()
-      else:
-        print 'Swarm is starting up ...'        
       time.sleep(5)
+    else:
+      print 'Current swarm error: ' + str(results['bestValue'])
+      sys.stdout.flush()
+      
+      # If we've already reached our error threshold, we can stop the swarm
+      # This only works if you already have a sense of the error ahead of time
+      # but does speed up the swarm process significantly
+      # Note: with a large swarm you can get down to an even lower error.
+      if results['bestValue'] < 14:
+        recCenterEnergyModel.stop()
 
-  ##############################################################################
-  # Retrieve Swarm results
-
-  print "Getting full results from Swarm ..."
-  headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 2500)
-
-  # Write results out to a CSV
-  if not os.path.exists('output'):
-    print 'Output directory not found, creating ...'
-    os.mkdir('output')
-  print "Saving results to " + OUTPUT_CSV_SWARM
-  fileHandle = open(OUTPUT_CSV_SWARM, 'w')
-  writer = csv.writer(fileHandle)
-  writer.writerow(headers)
-  writer.writerows(resultRows)
-  fileHandle.close()
+      time.sleep(5)
 
   # Return the model ID
   return recCenterEnergyModel.id
@@ -192,18 +190,14 @@ def HelloGrokAnomalyProduction(modelId = None):
 
   ##############################################################################
   # Setup
-
-  print 'Connecting to Grok ...'
+  print 'Retrieving Model and Stream'
   grok = grokpy.Client(API_KEY)
-
-  print 'Retrieving Model ...'
   recCenterEnergyModel = grok.getModel(modelId)
-
-  print 'Retrieving Stream ...'
   myStream = recCenterEnergyModel.getStream()
 
   ##############################################################################
-  # Promote the model
+  # Setup the production model, set anomaly score threshold and set the
+  # initial wait period for anomaly detection
 
   print 'Promoting our model. This may take a few seconds ...'
   recCenterEnergyModel.promote()
@@ -232,53 +226,30 @@ def HelloGrokAnomalyProduction(modelId = None):
   for i in range(5890,5931):
     newRecords[i] = [newRecords[i][0], str(0.75*float(newRecords[i][1]) + offset[i%8])]
   
-  # Send data. (Recall that our model will aggregate into hourly buckets)
   print 'Sending new data ...'
-  # This method will send a maximum of 5k records per request.
   myStream.addRecords(newRecords)
 
   ##############################################################################
   # Retrieving predictions
-  #
-  # We will poll until no new predictions are generated
   
-  print 'Monitoring predictions ...'
-  lastRecordSeen = None
-  counter = 0
-  while True:
-    headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 20)
-    latestRowId = resultRows[-2][0]
-    if latestRowId == lastRecordSeen:
-      if counter > 3:
-        print 'Looks like we will not get any more predictions'
-        break
-      else:
-        print 'No new records in this step ...'
-        counter += 1
-        time.sleep(4)
-        continue
-    else:
-      lastRecordSeen = latestRowId
-      print 'Records seen ' + str(lastRecordSeen)
-      counter = 0
-      # Don't spam the server
-      time.sleep(2)
+  print 'Waiting for Grok to process all data...'
+  waitForPredictions(recCenterEnergyModel)
 
-  # Align predictions with actuals
-  print 'Retrieving results ...'
-  headers, resultRows, resultMetadata = recCenterEnergyModel.getModelOutput(limit = 2500)
+  # Get the full set of anomaly scores
+  print 'Retrieving anomaly scores...'
+  headers, resultRows, _ = recCenterEnergyModel.getModelOutput(limit = 5000)
 
   # Get and align anomalies
   print 'Retrieving anomalies ...'
-  anomalyRows = recCenterEnergyModel.getLabels()
-  firstROWID = resultRows[0][0]
-  anomalyLabelID = headers.index('Anomaly Label')
+  anomalyRows     = recCenterEnergyModel.getLabels()
+  firstROWID      = resultRows[0][0]
+  anomalyLabelID  = headers.index('Anomaly Label')
   for anomaly in anomalyRows['recordLabels']:
-    resultID = anomaly['ROWID'] - firstROWID
+    resultID      = anomaly['ROWID'] - firstROWID
     resultRows[resultID][anomalyLabelID] = anomaly['labels']
 
   #############################################################################
-  # Write out predictions to a CSV
+  # Write out anomaly scores to a CSV
 
   if not os.path.exists('output'):
     print 'Output directory not found, creating ...'
@@ -286,13 +257,30 @@ def HelloGrokAnomalyProduction(modelId = None):
   print "Saving results to " + OUTPUT_CSV
   fileHandle = open(OUTPUT_CSV, 'w')
   writer = csv.writer(fileHandle)
-  writer.writerow(headers)
-  writer.writerows(resultRows)
+  
+  # Write out the specific fields we want from the model output results
+  rowID       = headers.index('ROWID')
+  timestamp   = headers.index('timestamp')
+  consumption = headers.index('consumption')
+  labelID     = headers.index('Anomaly Label')
+  score       = headers.index('Anomaly Score')
+
+  writer.writerow([headers[rowID],headers[timestamp],headers[consumption],
+                   headers[labelID],headers[score]])
+  for r in resultRows:
+    writer.writerow([r[rowID],r[timestamp],r[consumption],r[labelID],r[score]])
   fileHandle.close()
+  
+  #############################################################################
+  # Clean up
+  recCenterEnergyModel.delete()
+  myStream.delete()
 
   print "\n\nWonderful! You've completed HelloGrokAnomaly!!"
   print ('Why not take a moment to examine the anomaly scores generated by your '
          'trained model?')
+  print "Open the file %s and look at the 'Anomaly Score' column" % (OUTPUT_CSV)
+
 
 if __name__ == '__main__':
 
