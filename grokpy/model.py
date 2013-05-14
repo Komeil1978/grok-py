@@ -404,11 +404,13 @@ class Model(object):
 
     return result
 
-  def stopSwarm(self):
+  def stop(self):
     '''
-    Terminates a Swarm in progress
+    Stops (and checkpoints) a running model. If a swarm is in progress it will
+    gracefully stop the swarm progress and make the model available for
+    promotion (this can take a few seconds).
     '''
-    raise NotYetImplementedError()
+    self._runCommand('stop')
 
   def getSwarmState(self):
     '''
